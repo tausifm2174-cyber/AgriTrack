@@ -1,0 +1,423 @@
+/* ==========================================================================
+   AgriTrack Soil Records Module Styles (Phase 4)
+   ========================================================================== */
+
+.agri-soil-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Soil Summary Cards Grid */
+.agri-soil-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .agri-soil-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-soil-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.agri-soil-summary-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.agri-soil-summary-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.agri-soil-summary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agri-soil-summary-icon--green {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+  border: 1px solid var(--primary-200);
+}
+
+.agri-soil-summary-icon--blue {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+  border: 1px solid var(--info-border);
+}
+
+.agri-soil-summary-icon--amber {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.agri-soil-summary-icon--red {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-border);
+}
+
+.agri-soil-summary-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-soil-summary-label {
+  font-size: 0.8125rem;
+  color: var(--slate-500);
+  font-weight: 500;
+}
+
+.agri-soil-summary-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  line-height: 1.2;
+  margin-top: 0.15rem;
+}
+
+.agri-soil-summary-sub {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+  margin-top: 0.15rem;
+}
+
+/* Toolbar & Filters */
+.agri-soil-toolbar {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: var(--shadow-xs);
+}
+
+@media (min-width: 860px) {
+  .agri-soil-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.agri-soil-search-box {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+
+.agri-soil-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--slate-400);
+  pointer-events: none;
+}
+
+.agri-soil-search-input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.4rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--slate-800);
+  background-color: var(--slate-50);
+  transition: all var(--transition-fast);
+}
+
+.agri-soil-search-input:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.agri-soil-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.agri-soil-filter-select {
+  padding: 0.525rem 0.75rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  color: var(--slate-700);
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.agri-soil-filter-select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+}
+
+.agri-soil-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--slate-100);
+  padding: 0.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-200);
+}
+
+.agri-soil-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  transition: all var(--transition-fast);
+}
+
+.agri-soil-toggle-btn--active {
+  background-color: #ffffff;
+  color: var(--primary-700);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Soil Records Table */
+.agri-soil-table-container {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  overflow-x: auto;
+}
+
+.agri-soil-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.agri-soil-table th {
+  background-color: var(--slate-50);
+  padding: 0.85rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--slate-500);
+  border-bottom: 1px solid var(--slate-200);
+  white-space: nowrap;
+}
+
+.agri-soil-table td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--slate-100);
+  color: var(--slate-700);
+  vertical-align: middle;
+}
+
+.agri-soil-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.agri-soil-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.agri-soil-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.agri-soil-field-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.agri-soil-field-name {
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-soil-farm-name {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+}
+
+.agri-soil-ph-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.agri-soil-ph-badge--neutral {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.agri-soil-ph-badge--acidic {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.agri-soil-ph-badge--alkaline {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.agri-soil-npk-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.775rem;
+}
+
+.agri-soil-npk-pill {
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-xs);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.agri-soil-npk-pill--n {
+  background-color: #eff6ff;
+  color: #1e40af;
+}
+
+.agri-soil-npk-pill--p {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.agri-soil-npk-pill--k {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+}
+
+/* Soil Records Card Grid (Card View) */
+.agri-soil-card-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .agri-soil-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .agri-soil-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1400px) {
+  .agri-soil-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.agri-soil-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.agri-soil-card:hover {
+  border-color: var(--slate-300);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.agri-soil-card__header {
+  padding: 1.15rem 1.15rem 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--slate-100);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.agri-soil-card__body {
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  flex: 1;
+}
+
+.agri-soil-card__ph-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+}
+
+.agri-soil-card__nutrients-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.agri-soil-card__nutrient-bar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.agri-soil-card__nutrient-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.725rem;
+  color: var(--slate-600);
+}
+
+.agri-soil-card__footer {
+  padding: 0.75rem 1rem;
+  background-color: var(--slate-50);
+  border-top: 1px solid var(--slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

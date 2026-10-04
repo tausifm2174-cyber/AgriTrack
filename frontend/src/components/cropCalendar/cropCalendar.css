@@ -1,0 +1,667 @@
+/* ==========================================================================
+   AgriTrack Crop Calendar Module Styles (Phase 5)
+   ========================================================================== */
+
+.agri-crop-calendar-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header */
+.agri-cal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .agri-cal-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.agri-cal-header__left {
+  max-width: 700px;
+}
+
+.agri-cal-header__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-700);
+  background-color: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.4rem;
+}
+
+.agri-cal-header__title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.agri-cal-header__desc {
+  font-size: 0.925rem;
+  color: var(--slate-600);
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+
+.agri-cal-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.agri-cal-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--slate-100);
+  padding: 0.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-200);
+}
+
+.agri-cal-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  transition: all var(--transition-fast);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.agri-cal-toggle-btn--active {
+  background-color: #ffffff;
+  color: var(--primary-700);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Summary Grid */
+.agri-cal-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .agri-cal-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-cal-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.agri-cal-summary-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.agri-cal-summary-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.agri-cal-summary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agri-cal-summary-icon--green {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+  border: 1px solid var(--primary-200);
+}
+
+.agri-cal-summary-icon--blue {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+  border: 1px solid var(--info-border);
+}
+
+.agri-cal-summary-icon--amber {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.agri-cal-summary-icon--purple {
+  background-color: #faf5ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+
+.agri-cal-summary-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-cal-summary-label {
+  font-size: 0.8125rem;
+  color: var(--slate-500);
+  font-weight: 500;
+}
+
+.agri-cal-summary-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  line-height: 1.2;
+  margin-top: 0.15rem;
+}
+
+.agri-cal-summary-sub {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+  margin-top: 0.15rem;
+}
+
+/* Toolbar & Filters */
+.agri-cal-toolbar {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: var(--shadow-xs);
+}
+
+@media (min-width: 992px) {
+  .agri-cal-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.agri-cal-search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+
+.agri-cal-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--slate-400);
+  pointer-events: none;
+}
+
+.agri-cal-search-input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.4rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--slate-800);
+  background-color: var(--slate-50);
+  transition: all var(--transition-fast);
+}
+
+.agri-cal-search-input:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.agri-cal-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.agri-cal-filter-item {
+  display: flex;
+  align-items: center;
+}
+
+.agri-cal-filter-select {
+  padding: 0.525rem 0.75rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  color: var(--slate-700);
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.agri-cal-filter-select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+}
+
+/* ==========================================================================
+   Calendar Month Grid Card
+   ========================================================================== */
+
+.agri-cal-grid-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.agri-cal-month-nav {
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--slate-200);
+  background-color: #ffffff;
+}
+
+.agri-cal-month-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-cal-month-heading {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-cal-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.agri-cal-nav-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  background-color: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.agri-cal-nav-btn:hover {
+  background-color: var(--slate-200);
+}
+
+.agri-cal-nav-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.agri-cal-nav-arrow:hover {
+  background-color: var(--slate-50);
+  border-color: var(--slate-300);
+  color: var(--slate-900);
+}
+
+.agri-cal-weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: var(--slate-50);
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.agri-cal-weekday {
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.agri-cal-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: var(--slate-200);
+  gap: 1px;
+}
+
+.agri-cal-cell {
+  background-color: #ffffff;
+  min-height: 105px;
+  padding: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+@media (max-width: 640px) {
+  .agri-cal-cell {
+    min-height: 70px;
+    padding: 0.25rem;
+  }
+}
+
+.agri-cal-cell:hover {
+  background-color: #f8fafc;
+}
+
+.agri-cal-cell--empty {
+  background-color: var(--slate-50);
+  cursor: default;
+}
+
+.agri-cal-cell--today {
+  background-color: #f0fdf4;
+}
+
+.agri-cal-cell--today:hover {
+  background-color: #e2fbe8;
+}
+
+.agri-cal-cell--selected {
+  outline: 2px solid var(--primary-600);
+  outline-offset: -2px;
+  background-color: #ecfdf5;
+}
+
+.agri-cal-cell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.agri-cal-day-num {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--slate-700);
+}
+
+.agri-cal-cell--today .agri-cal-day-num {
+  color: var(--primary-700);
+  font-weight: 800;
+}
+
+.agri-cal-today-pill {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background-color: var(--primary-600);
+  color: #ffffff;
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-xs);
+}
+
+.agri-cal-chips-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.agri-cal-chip {
+  padding: 0.2rem 0.35rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.675rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 2px solid transparent;
+}
+
+@media (max-width: 640px) {
+  .agri-cal-chip {
+    padding: 0.1rem 0.2rem;
+    font-size: 0.6rem;
+  }
+}
+
+.agri-cal-chip--green {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-left-color: var(--primary-500);
+}
+
+.agri-cal-chip--blue {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-left-color: #3b82f6;
+}
+
+.agri-cal-chip--purple {
+  background-color: #faf5ff;
+  color: #6b21a8;
+  border-left-color: #a855f7;
+}
+
+.agri-cal-chip--amber {
+  background-color: #fffbeb;
+  color: #92400e;
+  border-left-color: #f59e0b;
+}
+
+.agri-cal-more-chip {
+  font-size: 0.625rem;
+  color: var(--slate-500);
+  font-weight: 600;
+  padding-left: 0.2rem;
+}
+
+/* ==========================================================================
+   Milestones List & Timeline View
+   ========================================================================== */
+
+.agri-cal-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.agri-cal-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.agri-cal-list-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-cal-list-subtitle {
+  font-size: 0.85rem;
+  color: var(--slate-500);
+  margin-top: 0.15rem;
+}
+
+.agri-cal-events-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.agri-cal-event-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+@media (min-width: 860px) {
+  .agri-cal-event-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.25rem;
+  }
+}
+
+.agri-cal-event-card:hover {
+  border-color: var(--slate-300);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(2px);
+}
+
+.agri-cal-event-card__date-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 140px;
+}
+
+.agri-cal-event-card__badge-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-cal-event-pill {
+  display: inline-block;
+  font-size: 0.675rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  width: fit-content;
+}
+
+.agri-cal-event-pill--green {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.agri-cal-event-pill--blue {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.agri-cal-event-pill--purple {
+  background-color: #faf5ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+}
+
+.agri-cal-event-pill--amber {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.agri-cal-event-card__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.agri-cal-event-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.agri-cal-event-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin: 0;
+}
+
+.agri-cal-event-card__context {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.775rem;
+  color: var(--slate-500);
+  flex-wrap: wrap;
+}
+
+.agri-cal-event-card__field,
+.agri-cal-event-card__crop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.agri-cal-event-card__dot {
+  color: var(--slate-300);
+}
+
+.agri-cal-event-card__desc {
+  font-size: 0.8125rem;
+  color: var(--slate-600);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.agri-cal-event-card__action {
+  flex-shrink: 0;
+}
+
+.agri-cal-list-empty {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 3rem 1.5rem;
+}

@@ -1,0 +1,750 @@
+/* ==========================================================================
+   AgriTrack Weather & Farm Insights Module Styles (Phase 6)
+   ========================================================================== */
+
+.agri-weather-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header */
+.agri-weather-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 860px) {
+  .agri-weather-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.agri-weather-header__left {
+  max-width: 720px;
+}
+
+.agri-weather-header__badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.agri-weather-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.725rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+}
+
+.agri-weather-badge--demo {
+  color: var(--warning-text);
+  background-color: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+}
+
+.agri-weather-badge--time {
+  color: var(--slate-600);
+  background-color: var(--slate-100);
+  border: 1px solid var(--slate-200);
+}
+
+.agri-weather-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.agri-weather-header__desc {
+  font-size: 0.925rem;
+  color: var(--slate-600);
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+
+.agri-weather-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Farm Selector Control */
+.agri-weather-farm-selector {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  padding: 0.2rem 0.6rem;
+  box-shadow: var(--shadow-xs);
+  gap: 0.4rem;
+}
+
+.agri-weather-farm-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate-600);
+}
+
+.agri-weather-farm-dropdown {
+  border: none;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  background: transparent;
+  cursor: pointer;
+  padding: 0.35rem 0.2rem;
+  outline: none;
+}
+
+/* ==========================================================================
+   Current Weather Card
+   ========================================================================== */
+
+.agri-cur-weather-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.agri-cur-weather-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.agri-cur-weather-card__loc-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.agri-cur-weather-card__loc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-cur-weather-card__loc-sub {
+  font-size: 0.775rem;
+  color: var(--slate-500);
+}
+
+.agri-cur-weather-card__condition-tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-800);
+  background-color: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+}
+
+.agri-cur-weather-card__hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.agri-cur-weather-card__temp-group {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.agri-cur-weather-card__temp-num {
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  letter-spacing: -0.04em;
+}
+
+.agri-cur-weather-card__temp-unit {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  margin-top: 0.35rem;
+  margin-left: 0.2rem;
+}
+
+.agri-cur-weather-card__glyph-wrap {
+  padding: 0.5rem;
+}
+
+.agri-cur-weather__glyph--sunny {
+  color: #f59e0b;
+  filter: drop-shadow(0 4px 12px rgba(245, 158, 11, 0.3));
+}
+
+.agri-cur-weather__glyph--rainy {
+  color: #0284c7;
+  filter: drop-shadow(0 4px 12px rgba(2, 132, 199, 0.3));
+}
+
+.agri-cur-weather__glyph--cloudy {
+  color: #94a3b8;
+}
+
+.agri-cur-weather__glyph--partly {
+  color: #10b981;
+}
+
+.agri-cur-weather-card__feels-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.825rem;
+  color: var(--slate-600);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--slate-100);
+  flex-wrap: wrap;
+}
+
+.agri-cur-weather-card__dot {
+  color: var(--slate-300);
+}
+
+.agri-cur-weather-card__metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .agri-cur-weather-card__metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-cur-weather-card__metrics-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.agri-cur-weather-card__metric-item {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.agri-cur-weather-card__metric-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-transform: uppercase;
+}
+
+.agri-cur-weather-card__metric-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--slate-800);
+}
+
+/* ==========================================================================
+   Weather Summary Cards Grid
+   ========================================================================== */
+
+.agri-weather-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .agri-weather-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-weather-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.agri-weather-summary-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.agri-weather-summary-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.agri-weather-summary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agri-weather-summary-icon--green {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+  border: 1px solid var(--primary-200);
+}
+
+.agri-weather-summary-icon--blue {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+  border: 1px solid var(--info-border);
+}
+
+.agri-weather-summary-icon--amber {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.agri-weather-summary-icon--purple {
+  background-color: #faf5ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+
+.agri-weather-summary-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-weather-summary-label {
+  font-size: 0.8125rem;
+  color: var(--slate-500);
+  font-weight: 500;
+}
+
+.agri-weather-summary-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  line-height: 1.2;
+  margin-top: 0.15rem;
+}
+
+.agri-weather-summary-sub {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+  margin-top: 0.15rem;
+}
+
+/* ==========================================================================
+   7-Day Forecast Grid Card
+   ========================================================================== */
+
+.agri-weather-forecast-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.agri-weather-forecast-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.agri-weather-forecast-card__title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-weather-forecast-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-weather-forecast-card__sub {
+  font-size: 0.8rem;
+  color: var(--slate-500);
+}
+
+.agri-weather-forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .agri-weather-forecast-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-weather-forecast-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+.agri-forecast-item {
+  background-color: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.45rem;
+  transition: all var(--transition-fast);
+}
+
+.agri-forecast-item:hover {
+  background-color: #ffffff;
+  border-color: var(--primary-400);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.agri-forecast-item--today {
+  background-color: #f0fdf4;
+  border-color: var(--primary-300);
+}
+
+.agri-forecast-item__day-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.agri-forecast-item__day {
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-forecast-item__date {
+  font-size: 0.7rem;
+  color: var(--slate-400);
+}
+
+.agri-forecast-item__icon-box {
+  padding: 0.25rem 0;
+}
+
+.agri-forecast-item__condition {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  line-height: 1.2;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agri-forecast-item__temp-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.agri-forecast-item__temp-high {
+  color: var(--slate-900);
+}
+
+.agri-forecast-item__temp-sep {
+  color: var(--slate-300);
+}
+
+.agri-forecast-item__temp-low {
+  color: var(--slate-400);
+  font-weight: 500;
+}
+
+.agri-forecast-item__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.675rem;
+  color: var(--slate-500);
+  margin-top: 0.2rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--slate-200);
+  width: 100%;
+  justify-content: center;
+}
+
+.agri-forecast-item__rain,
+.agri-forecast-item__humid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+/* ==========================================================================
+   Weather Trend Chart Card
+   ========================================================================== */
+
+.agri-weather-trend-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.agri-weather-trend-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.agri-weather-trend-card__title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-weather-trend-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-weather-trend-card__sub {
+  font-size: 0.8rem;
+  color: var(--slate-500);
+}
+
+.agri-weather-trend-card__chart-wrap {
+  width: 100%;
+  min-height: 260px;
+}
+
+/* ==========================================================================
+   Weather Alerts & Advisories Card
+   ========================================================================== */
+
+.agri-weather-alerts-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.agri-weather-alerts-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.agri-weather-alerts-card__title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-weather-alerts-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-weather-alerts-card__sub {
+  font-size: 0.8rem;
+  color: var(--slate-500);
+}
+
+.agri-weather-alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.agri-weather-alert-item {
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.agri-weather-alert-item--warning {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+}
+
+.agri-weather-alert-item--danger {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.agri-weather-alert-item--success {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.agri-weather-alert-item--neutral {
+  background-color: var(--slate-50);
+  border-color: var(--slate-200);
+}
+
+.agri-weather-alert-item__icon-col {
+  padding-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.agri-weather-alert-item__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.agri-weather-alert-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.agri-weather-alert-item__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin: 0;
+}
+
+.agri-weather-alert-item__badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.agri-weather-alert-item__time {
+  font-size: 0.725rem;
+  color: var(--slate-500);
+  font-weight: 500;
+}
+
+.agri-weather-alert-item__condition {
+  font-size: 0.825rem;
+  color: var(--slate-700);
+  margin: 0;
+}
+
+.agri-weather-alert-item__recommendation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 0.2rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+}
+
+.agri-weather-alert-item__recom-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--slate-700);
+}
+
+.agri-weather-alert-item__recom-text {
+  font-size: 0.825rem;
+  color: var(--slate-800);
+  line-height: 1.4;
+}
+
+.agri-weather-alert-item__fields {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.agri-weather-alert-item__field-pill {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-xs);
+  padding: 0.1rem 0.4rem;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+/* Two-column layout on wide screens for forecast & trend */
+.agri-weather-two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1100px) {
+  .agri-weather-two-col {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}

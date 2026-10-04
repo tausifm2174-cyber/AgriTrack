@@ -1,0 +1,316 @@
+/**
+ * AgriTrack Irrigation Management Demo Data (Phase 11)
+ * Grounded in the AgriTrack operational specification and hierarchy:
+ * Farmer -> Farm Holdings -> Fields -> Soil -> Crop Cycle -> Precision Irrigation
+ * 
+ * Supports Drip, Sprinkler, and Flood methods with duration, water volume,
+ * weather-aware advisory conditions, and execution statuses.
+ */
+
+export const IRRIGATION_METHODS = ['Drip', 'Sprinkler', 'Flood'];
+
+export const IRRIGATION_STATUSES = [
+  'Scheduled',
+  'In Progress',
+  'Completed',
+  'Skipped',
+  'Cancelled',
+];
+
+export const IRRIGATION_PRIORITIES = ['Low', 'Medium', 'High'];
+
+export const initialIrrigationRecords = [
+  {
+    id: 'IRR-001',
+    title: 'Field 2B Maize Drip Cycle - Flowering Phase',
+    farmId: 'farm-2',
+    fieldId: 'field-2b',
+    cropId: 'crop-maize',
+    cropName: 'Maize',
+    scheduledDate: '2026-10-03',
+    scheduledTime: '04:00 PM',
+    irrigationMethod: 'Drip',
+    durationMinutes: 45,
+    waterVolumeLitres: 13500,
+    status: 'Scheduled',
+    priority: 'High',
+    soilMoisture: 38,
+    weatherCondition: 'Partly Cloudy',
+    rainfallExpected: 0,
+    notes: 'Triggered by low root zone moisture (38% vs 40% threshold). Targets 45-min drip cycle at 300 L/min emitter flow.',
+    createdAt: '2026-10-03T07:30:00Z',
+    completedAt: null,
+  },
+  {
+    id: 'IRR-002',
+    title: 'Field 1A Wheat Crown Root Sprinkler Top-Up',
+    farmId: 'farm-1',
+    fieldId: 'field-1a',
+    cropId: 'crop-cycle-1',
+    cropName: 'Wheat',
+    scheduledDate: '2026-10-03',
+    scheduledTime: '07:00 AM',
+    irrigationMethod: 'Sprinkler',
+    durationMinutes: 60,
+    waterVolumeLitres: 24000,
+    status: 'Completed',
+    priority: 'Medium',
+    soilMoisture: 45,
+    weatherCondition: 'Partly Cloudy',
+    rainfallExpected: 0,
+    notes: 'Morning micro-sprinkler session completed successfully. Uniform coverage verified across all 8 nozzles.',
+    createdAt: '2026-10-02T16:00:00Z',
+    completedAt: '2026-10-03T08:05:00Z',
+  },
+  {
+    id: 'IRR-003',
+    title: 'Field 3A Potato Tuber Initiation Drip Run',
+    farmId: 'farm-3',
+    fieldId: 'field-3a',
+    cropId: 'crop-cycle-5',
+    cropName: 'Potato',
+    scheduledDate: '2026-10-04',
+    scheduledTime: '06:30 AM',
+    irrigationMethod: 'Drip',
+    durationMinutes: 90,
+    waterVolumeLitres: 18000,
+    status: 'Scheduled',
+    priority: 'High',
+    soilMoisture: 36,
+    weatherCondition: 'Sunny',
+    rainfallExpected: 0,
+    notes: 'Critical tuber bulking window. Drip lateral operating pressure set to 1.5 bar.',
+    createdAt: '2026-10-02T18:20:00Z',
+    completedAt: null,
+  },
+  {
+    id: 'IRR-004',
+    title: 'Field 2A Soybean Pod Setting Furrow Flood',
+    farmId: 'farm-2',
+    fieldId: 'field-2a',
+    cropId: 'crop-cycle-4',
+    cropName: 'Soybean',
+    scheduledDate: '2026-10-04',
+    scheduledTime: '05:00 PM',
+    irrigationMethod: 'Flood',
+    durationMinutes: 120,
+    waterVolumeLitres: 48000,
+    status: 'Scheduled',
+    priority: 'Medium',
+    soilMoisture: 41,
+    weatherCondition: 'Sunny',
+    rainfallExpected: 0,
+    notes: 'Canal gate valve release scheduled with sub-catchment water master. Furrows pre-cleared.',
+    createdAt: '2026-10-03T09:15:00Z',
+    completedAt: null,
+  },
+  {
+    id: 'IRR-005',
+    title: 'Field 1B Mustard Moisture Maintenance',
+    farmId: 'farm-1',
+    fieldId: 'field-1b',
+    cropId: 'crop-cycle-3',
+    cropName: 'Mustard',
+    scheduledDate: '2026-10-05',
+    scheduledTime: '08:00 AM',
+    irrigationMethod: 'Sprinkler',
+    durationMinutes: 45,
+    waterVolumeLitres: 16000,
+    status: 'Scheduled',
+    priority: 'Low',
+    soilMoisture: 48,
+    weatherCondition: 'Clear Sky',
+    rainfallExpected: 0,
+    notes: 'Gentle rotary sprinkler pattern to prevent seedling lodging.',
+    createdAt: '2026-10-03T11:00:00Z',
+    completedAt: null,
+  },
+  {
+    id: 'IRR-006',
+    title: 'Field 2C Groundnut Pegging Drip Supplement',
+    farmId: 'farm-2',
+    fieldId: 'field-2c',
+    cropId: 'crop-cycle-7',
+    cropName: 'Groundnut',
+    scheduledDate: '2026-10-06',
+    scheduledTime: '04:30 PM',
+    irrigationMethod: 'Drip',
+    durationMinutes: 75,
+    waterVolumeLitres: 15000,
+    status: 'Scheduled',
+    priority: 'Medium',
+    soilMoisture: 42,
+    weatherCondition: 'Light Showers',
+    rainfallExpected: 12,
+    notes: 'Monitor rain gauge on Tuesday afternoon. If light showers exceed 15 mm, reduce duration to 30 mins.',
+    createdAt: '2026-10-03T12:00:00Z',
+    completedAt: null,
+  },
+  {
+    id: 'IRR-007',
+    title: 'Field 2B Pre-Storm Cycle Suspension',
+    farmId: 'farm-2',
+    fieldId: 'field-2b',
+    cropId: 'crop-maize',
+    cropName: 'Maize',
+    scheduledDate: '2026-10-07',
+    scheduledTime: '08:00 AM',
+    irrigationMethod: 'Drip',
+    durationMinutes: 60,
+    waterVolumeLitres: 18000,
+    status: 'Skipped',
+    priority: 'High',
+    soilMoisture: 62,
+    weatherCondition: 'Heavy Rain / Thunder',
+    rainfallExpected: 35,
+    notes: 'AgriTrack Advisory: Heavy rainfall forecast (35 mm > 25 mm threshold). Cycle automatically suspended to avoid waterlogging and root rot.',
+    createdAt: '2026-10-02T10:00:00Z',
+    completedAt: null,
+  },
+  {
+    id: 'IRR-008',
+    title: 'Field 1A Wheat Post-Sowing Soil Soak',
+    farmId: 'farm-1',
+    fieldId: 'field-1a',
+    cropId: 'crop-cycle-1',
+    cropName: 'Wheat',
+    scheduledDate: '2026-10-01',
+    scheduledTime: '06:00 AM',
+    irrigationMethod: 'Flood',
+    durationMinutes: 150,
+    waterVolumeLitres: 60000,
+    status: 'Completed',
+    priority: 'High',
+    soilMoisture: 58,
+    weatherCondition: 'Clear Sky',
+    rainfallExpected: 0,
+    notes: 'Initial broad-basin flood irrigation for seedbed settling and uniform emergence.',
+    createdAt: '2026-09-30T14:00:00Z',
+    completedAt: '2026-10-01T08:35:00Z',
+  },
+  {
+    id: 'IRR-009',
+    title: 'Field 2B Maize Emergence Drip Run #1',
+    farmId: 'farm-2',
+    fieldId: 'field-2b',
+    cropId: 'crop-maize',
+    cropName: 'Maize',
+    scheduledDate: '2026-09-29',
+    scheduledTime: '05:00 PM',
+    irrigationMethod: 'Drip',
+    durationMinutes: 45,
+    waterVolumeLitres: 13500,
+    status: 'Completed',
+    priority: 'Medium',
+    soilMoisture: 46,
+    weatherCondition: 'Partly Cloudy',
+    rainfallExpected: 0,
+    notes: 'Post-emergence baseline drip cycle. Soluble humic acid added to fertigation injector.',
+    createdAt: '2026-09-29T10:00:00Z',
+    completedAt: '2026-09-29T17:50:00Z',
+  },
+  {
+    id: 'IRR-010',
+    title: 'Field 3B Sesbania Green Manure Basin Flooding',
+    farmId: 'farm-3',
+    fieldId: 'field-3b',
+    cropId: 'crop-cycle-8',
+    cropName: 'Sesbania',
+    scheduledDate: '2026-09-28',
+    scheduledTime: '06:30 AM',
+    irrigationMethod: 'Flood',
+    durationMinutes: 180,
+    waterVolumeLitres: 72000,
+    status: 'Completed',
+    priority: 'Low',
+    soilMoisture: 65,
+    weatherCondition: 'Sunny',
+    rainfallExpected: 0,
+    notes: 'Full submergence flood to stimulate rapid organic matter breakdown prior to disc ploughing.',
+    createdAt: '2026-09-27T15:00:00Z',
+    completedAt: '2026-09-28T09:35:00Z',
+  },
+  {
+    id: 'IRR-011',
+    title: 'Field 1C Gram Pre-Sowing Moisture Charge',
+    farmId: 'farm-1',
+    fieldId: 'field-1c',
+    cropId: 'crop-cycle-6',
+    cropName: 'Gram',
+    scheduledDate: '2026-09-26',
+    scheduledTime: '07:30 AM',
+    irrigationMethod: 'Sprinkler',
+    durationMinutes: 60,
+    waterVolumeLitres: 22000,
+    status: 'Completed',
+    priority: 'Medium',
+    soilMoisture: 48,
+    weatherCondition: 'Clear Sky',
+    rainfallExpected: 0,
+    notes: 'Soil profile recharged to 50% field capacity prior to gram seed drilling.',
+    createdAt: '2026-09-25T11:00:00Z',
+    completedAt: '2026-09-26T08:35:00Z',
+  },
+  {
+    id: 'IRR-012',
+    title: 'Field 2A Wind Gust Cancellation',
+    farmId: 'farm-2',
+    fieldId: 'field-2a',
+    cropId: 'crop-cycle-4',
+    cropName: 'Soybean',
+    scheduledDate: '2026-09-24',
+    scheduledTime: '02:00 PM',
+    irrigationMethod: 'Sprinkler',
+    durationMinutes: 60,
+    waterVolumeLitres: 20000,
+    status: 'Cancelled',
+    priority: 'Low',
+    soilMoisture: 44,
+    weatherCondition: 'Windy / Gusts',
+    rainfallExpected: 0,
+    notes: 'Excessive crosswind (32 km/h) causing sprinkler drift and severe evaporative water loss. Manually cancelled by operator.',
+    createdAt: '2026-09-24T09:00:00Z',
+    completedAt: null,
+  },
+];
+
+/**
+ * Calculates dynamic KPI metrics from an irrigation records array.
+ * @param {Array} records 
+ * @returns {Object}
+ */
+export function getIrrigationSummary(records = []) {
+  const total = records.length;
+  let scheduled = 0;
+  let inProgress = 0;
+  let completed = 0;
+  let skipped = 0;
+  let cancelled = 0;
+  let totalWaterVolumeLitres = 0;
+
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
+    if (r.status === 'Scheduled') scheduled++;
+    else if (r.status === 'In Progress') inProgress++;
+    else if (r.status === 'Completed') completed++;
+    else if (r.status === 'Skipped') skipped++;
+    else if (r.status === 'Cancelled') cancelled++;
+
+    if (r.waterVolumeLitres && typeof r.waterVolumeLitres === 'number') {
+      totalWaterVolumeLitres += r.waterVolumeLitres;
+    }
+  }
+
+  const totalWaterVolumeM3 = (totalWaterVolumeLitres / 1000).toFixed(1);
+
+  return {
+    total,
+    scheduled,
+    inProgress,
+    completed,
+    skipped,
+    cancelled,
+    totalWaterVolumeLitres,
+    totalWaterVolumeM3,
+  };
+}

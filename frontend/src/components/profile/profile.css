@@ -1,0 +1,253 @@
+/* ==========================================================================
+   AgriTrack User Profile Module Styles (Phase 9)
+   Emerald/Forest & Slate Theme - Clean SaaS Profile Layout
+   ========================================================================== */
+
+.agri-profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Profile Hero Card */
+.agri-profile-hero {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.agri-profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.agri-profile-avatar-lg {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+  flex-shrink: 0;
+}
+
+.agri-profile-name-group h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-bottom: 0.25rem;
+}
+
+.agri-profile-meta-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--slate-600);
+}
+
+.agri-profile-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Profile Grid Layout */
+.agri-profile-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Farm Overview Summary List */
+.agri-profile-farm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.agri-profile-farm-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background-color: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.agri-profile-farm-item:hover {
+  background-color: #ffffff;
+  border-color: var(--slate-300);
+}
+
+.agri-profile-farm-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-profile-farm-meta {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  margin-top: 0.15rem;
+}
+
+/* Preferences Toggle List */
+.agri-pref-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.agri-pref-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background-color: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  gap: 1rem;
+}
+
+.agri-pref-content {
+  flex: 1;
+}
+
+.agri-pref-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-pref-desc {
+  font-size: 0.775rem;
+  color: var(--slate-500);
+  margin-top: 0.2rem;
+  line-height: 1.4;
+}
+
+/* Custom CSS Toggle Switch */
+.agri-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.agri-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.agri-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--slate-300);
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 24px;
+}
+
+.agri-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.agri-toggle-switch input:checked + .agri-toggle-slider {
+  background-color: var(--primary-600);
+}
+
+.agri-toggle-switch input:focus + .agri-toggle-slider {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.agri-toggle-switch input:checked + .agri-toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* System Settings Grid */
+.agri-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.agri-settings-item {
+  padding: 0.875rem 1rem;
+  background-color: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+}
+
+.agri-settings-label {
+  font-size: 0.725rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--slate-400);
+  letter-spacing: 0.04em;
+}
+
+.agri-settings-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  margin-top: 0.25rem;
+}
+
+.agri-settings-sub {
+  font-size: 0.725rem;
+  color: var(--slate-500);
+  margin-top: 0.15rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .agri-profile-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .agri-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .agri-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}

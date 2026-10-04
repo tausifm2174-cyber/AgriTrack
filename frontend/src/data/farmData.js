@@ -1,0 +1,77 @@
+/**
+ * AgriTrack Farm Management Demo Data (Phase 4)
+ * Grounded in the AgriTrack operational specification and hierarchy:
+ * Farmer -> Farm / Holding -> Fields -> Soil -> Crop Cycle
+ * Total: 3 Holdings, 8 Fields, 42.5 Acres
+ */
+
+export const farmData = {
+  summary: {
+    totalHoldings: 3,
+    totalFields: 8,
+    totalAreaAcres: 42.5,
+    activeHoldings: 3,
+  },
+  farms: [
+    {
+      id: 'farm-1',
+      name: 'Green Valley Farm',
+      code: 'FRM-001',
+      location: 'North Sector, Demo Village',
+      district: 'Karnal',
+      state: 'Haryana',
+      areaAcres: 18.5,
+      fieldsCount: 3,
+      fieldIds: ['field-1a', 'field-1b', 'field-1c'],
+      primaryCrops: ['Wheat (Sharbati)', 'Mustard', 'Gram'],
+      soilSummary: 'Alluvial & Sandy Loam (pH 6.5–7.1)',
+      irrigationSummary: 'Drip & Sprinkler (Tube Well #1)',
+      waterSource: 'Deep Tube Well + Rainwater Catchment',
+      status: 'Active',
+      statusVariant: 'success',
+      establishedYear: 2018,
+      owner: 'XYZ (Farmer)',
+      notes: 'Main fertile alluvial tract dedicated to high-yield Rabi wheat and oilseeds.',
+    },
+    {
+      id: 'farm-2',
+      name: 'Sunrise Agricultural Holding',
+      code: 'FRM-002',
+      location: 'South Valley, Demo Village',
+      district: 'Karnal',
+      state: 'Haryana',
+      areaAcres: 12.0,
+      fieldsCount: 3,
+      fieldIds: ['field-2a', 'field-2b', 'field-2c'],
+      primaryCrops: ['Maize (Hybrid)', 'Soybean', 'Groundnut'],
+      soilSummary: 'Deep Black & Red Loam (pH 5.6–7.4)',
+      irrigationSummary: 'Drip Irrigation System #2',
+      waterSource: 'Farm Pond & Solar Pump',
+      status: 'Active',
+      statusVariant: 'success',
+      establishedYear: 2020,
+      owner: 'XYZ (Farmer)',
+      notes: 'Kharif rotation hub equipped with precision drip automation lines.',
+    },
+    {
+      id: 'farm-3',
+      name: 'Riverbank Farm',
+      code: 'FRM-003',
+      location: 'East Canal Reach, Demo Village',
+      district: 'Karnal',
+      state: 'Haryana',
+      areaAcres: 12.0,
+      fieldsCount: 2,
+      fieldIds: ['field-3a', 'field-3b'],
+      primaryCrops: ['Potato (Kufri Jyoti)', 'Green Manure'],
+      soilSummary: 'Clay Loam & Silty Clay (pH 6.9–7.8)',
+      irrigationSummary: 'Canal Lift & Drip Network',
+      waterSource: 'Distributary Canal Lift + Borewell',
+      status: 'Active',
+      statusVariant: 'success',
+      establishedYear: 2019,
+      owner: 'XYZ (Farmer)',
+      notes: 'High-organic river basin soil utilized for intensive vegetable cultivation.',
+    },
+  ],
+};

@@ -1,0 +1,907 @@
+/* ==========================================================================
+   AgriTrack Dashboard Styles (Phase 3 - Operational Command Center)
+   ========================================================================== */
+
+.agri-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* ==========================================================================
+   Dashboard Header
+   ========================================================================== */
+.agri-dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.agri-dash-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.agri-dash-header__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary-700);
+  background-color: var(--primary-50);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  width: fit-content;
+  border: 1px solid var(--primary-200);
+}
+
+.agri-dash-header__title {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.agri-dash-header__subtitle {
+  font-size: 0.9rem;
+  color: var(--slate-600);
+  max-width: 650px;
+}
+
+.agri-dash-header__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.agri-dash-header__date-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  background: #ffffff;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-xs);
+}
+
+.agri-dash-header__updated {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+}
+
+@media (max-width: 768px) {
+  .agri-dash-header__right {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================================================
+   Top KPI & Weather Grid
+   ========================================================================== */
+.agri-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.agri-kpi-grid__weather {
+  grid-column: span 12;
+}
+
+.agri-kpi-grid__cards {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .agri-kpi-grid__weather {
+    grid-column: span 4;
+  }
+  .agri-kpi-grid__cards {
+    grid-column: span 8;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .agri-kpi-grid__weather {
+    grid-column: span 3;
+  }
+  .agri-kpi-grid__cards {
+    grid-column: span 9;
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ==========================================================================
+   Weather Card
+   ========================================================================== */
+.agri-weather-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  border: 1px solid var(--primary-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.agri-weather-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.agri-weather-card__location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.agri-weather-card__subtext {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+.agri-weather-card__main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.agri-weather-card__temp {
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  line-height: 1;
+}
+
+.agri-weather-card__condition-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-weather-card__condition {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-weather-card__icon-box {
+  background-color: var(--primary-100);
+  color: var(--primary-700);
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agri-weather-card__details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(22, 163, 74, 0.15);
+  font-size: 0.75rem;
+}
+
+.agri-weather-card__detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-weather-card__detail-label {
+  color: var(--slate-500);
+  font-size: 0.7rem;
+}
+
+.agri-weather-card__detail-val {
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-weather-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-700);
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.agri-weather-card__link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   KPI Card
+   ========================================================================== */
+.agri-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+  color: inherit;
+}
+
+.agri-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--slate-300);
+}
+
+.agri-kpi-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.agri-kpi-card__title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.agri-kpi-card__icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agri-kpi-card__icon-wrap--green {
+  background-color: var(--primary-50);
+  color: var(--primary-700);
+}
+
+.agri-kpi-card__icon-wrap--blue {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+}
+
+.agri-kpi-card__icon-wrap--amber {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.agri-kpi-card__icon-wrap--emerald {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.agri-kpi-card__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  line-height: 1.2;
+}
+
+.agri-kpi-card__sub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--slate-600);
+  margin-top: 0.35rem;
+}
+
+.agri-kpi-card__badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   Two-Column Grid Sections
+   ========================================================================== */
+.agri-dash-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .agri-dash-row--7-5 {
+    grid-template-columns: 7fr 5fr;
+  }
+  .agri-dash-row--1-1 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ==========================================================================
+   Financial Overview Section
+   ========================================================================== */
+.agri-finance-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.agri-finance-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .agri-finance-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.agri-finance-stat {
+  padding: 0.75rem;
+  background-color: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+}
+
+.agri-finance-stat__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--slate-500);
+}
+
+.agri-finance-stat__val {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-top: 0.15rem;
+}
+
+.agri-finance-stat__val--profit {
+  color: var(--primary-700);
+}
+
+.agri-finance-stat__sub {
+  font-size: 0.7rem;
+  color: var(--slate-500);
+}
+
+.agri-finance-metrics-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: #f8fafc;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--slate-300);
+  font-size: 0.775rem;
+  color: var(--slate-600);
+}
+
+.agri-finance-metrics-strip span strong {
+  color: var(--slate-800);
+}
+
+.agri-chart-wrapper {
+  width: 100%;
+  height: 280px;
+  position: relative;
+}
+
+/* Custom Tooltip */
+.agri-chart-tooltip {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.85rem;
+  box-shadow: var(--shadow-md);
+  font-size: 0.75rem;
+}
+
+.agri-chart-tooltip__title {
+  font-weight: 700;
+  color: var(--slate-800);
+  margin-bottom: 0.35rem;
+}
+
+.agri-chart-tooltip__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.2rem 0;
+  color: var(--slate-600);
+}
+
+.agri-chart-tooltip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   Activity & Irrigation Components
+   ========================================================================== */
+.agri-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.agri-activity-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.agri-activity-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background-color: var(--primary-50);
+  color: var(--primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agri-activity-icon--irrigation {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+}
+
+.agri-activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.agri-activity-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-activity-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  margin-top: 0.2rem;
+}
+
+.agri-activity-notes {
+  font-size: 0.75rem;
+  color: var(--slate-600);
+  margin-top: 0.3rem;
+  background-color: var(--slate-50);
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-xs);
+}
+
+/* Dedicated Irrigation Callout */
+.agri-irrigation-alert-box {
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-left: 4px solid #0284c7;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.agri-irrigation-alert-box__icon {
+  color: #0284c7;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.agri-irrigation-alert-box__content {
+  flex: 1;
+}
+
+.agri-irrigation-alert-box__heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-irrigation-alert-box__text {
+  font-size: 0.8rem;
+  color: #0f172a;
+  margin-top: 0.2rem;
+}
+
+.agri-irrigation-alert-box__sub {
+  font-size: 0.725rem;
+  color: #475569;
+  margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   Market Prices Card
+   ========================================================================== */
+.agri-market-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.agri-market-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.agri-market-item__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.agri-market-item__badge {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background-color: var(--primary-50);
+  color: var(--primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.agri-market-item__crop-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--slate-900);
+}
+
+.agri-market-item__crop-sub {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+.agri-market-item__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.agri-market-item__price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-market-item__trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-700);
+}
+
+/* ==========================================================================
+   Active Crops Section
+   ========================================================================== */
+.agri-crop-card {
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  background-color: var(--slate-50);
+  transition: border-color var(--transition-fast);
+}
+
+.agri-crop-card:last-child {
+  margin-bottom: 0;
+}
+
+.agri-crop-card:hover {
+  border-color: var(--primary-300);
+}
+
+.agri-crop-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.agri-crop-card__name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.agri-crop-card__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.35rem 0.75rem;
+  font-size: 0.775rem;
+  color: var(--slate-600);
+  margin-top: 0.4rem;
+}
+
+@media (min-width: 640px) {
+  .agri-crop-card__meta-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.agri-crop-card__progress {
+  margin-top: 0.6rem;
+  height: 5px;
+  background-color: var(--slate-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.agri-crop-card__progress-bar {
+  height: 100%;
+  background-color: var(--primary-600);
+  border-radius: var(--radius-full);
+}
+
+/* ==========================================================================
+   Recent Activities Timeline
+   ========================================================================== */
+.agri-recent-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-timeline-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.agri-timeline-node:last-child {
+  padding-bottom: 0;
+}
+
+.agri-timeline-node::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: 14px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--slate-200);
+}
+
+.agri-timeline-node:last-child::before {
+  display: none;
+}
+
+.agri-timeline-bullet {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid var(--slate-300);
+  color: var(--slate-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.agri-timeline-bullet--primary {
+  border-color: var(--primary-500);
+  color: var(--primary-700);
+  background-color: var(--primary-50);
+}
+
+.agri-timeline-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.agri-timeline-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-timeline-meta {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  margin-top: 0.15rem;
+}
+
+/* ==========================================================================
+   Farm Alerts & Advisories
+   ========================================================================== */
+.agri-alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.agri-alert-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.agri-alert-item__icon {
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.agri-alert-item__content {
+  flex: 1;
+}
+
+.agri-alert-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agri-alert-item__title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-alert-item__msg {
+  font-size: 0.775rem;
+  color: var(--slate-600);
+  margin-top: 0.2rem;
+}
+
+.agri-alert-item__meta {
+  font-size: 0.7rem;
+  color: var(--slate-400);
+  margin-top: 0.2rem;
+}
+
+/* ==========================================================================
+   Quick Actions Section
+   ========================================================================== */
+.agri-quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .agri-quick-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-quick-actions-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.agri-quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--slate-700);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+  gap: 0.5rem;
+}
+
+.agri-quick-action-btn:hover {
+  border-color: var(--primary-500);
+  background-color: var(--primary-50);
+  color: var(--primary-800);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.agri-quick-action-btn__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: var(--slate-100);
+  color: var(--primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.agri-quick-action-btn:hover .agri-quick-action-btn__icon {
+  background-color: var(--primary-600);
+  color: #ffffff;
+}
+
+.agri-quick-action-btn__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.agri-quick-action-btn__desc {
+  font-size: 0.7rem;
+  color: var(--slate-500);
+  line-height: 1.2;
+}
+
+/* Section Header Helper */
+.agri-card-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-700);
+  text-decoration: none;
+}
+
+.agri-card-action-link:hover {
+  text-decoration: underline;
+  color: var(--primary-800);
+}

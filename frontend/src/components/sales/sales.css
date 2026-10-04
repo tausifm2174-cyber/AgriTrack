@@ -1,0 +1,483 @@
+/* ==========================================================================
+   AgriTrack Sales Management Styles (Phase 7)
+   ========================================================================== */
+
+.agri-sales-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header */
+.agri-sales-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .agri-sales-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.agri-sales-header__left {
+  max-width: 700px;
+}
+
+.agri-sales-header__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0284c7;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.4rem;
+}
+
+.agri-sales-header__title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.agri-sales-header__desc {
+  font-size: 0.925rem;
+  color: var(--slate-600);
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+
+.agri-sales-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Summary Grid */
+.agri-sales-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .agri-sales-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-sales-summary-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.agri-sales-summary-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.agri-sales-summary-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.agri-sales-summary-card__icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agri-sales-summary-card__icon-box--green {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+}
+
+.agri-sales-summary-card__icon-box--blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.agri-sales-summary-card__icon-box--emerald {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.agri-sales-summary-card__icon-box--amber {
+  background-color: #fffbeb;
+  color: #d97706;
+}
+
+.agri-sales-summary-card__icon-box--purple {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+}
+
+.agri-sales-summary-card__content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.agri-sales-summary-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.agri-sales-summary-card__value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  margin-top: 0.2rem;
+  line-height: 1.2;
+}
+
+.agri-sales-summary-card__subtext {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  margin-top: 0.25rem;
+}
+
+/* Filters */
+.agri-sales-filters {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.agri-sales-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.agri-sales-filters__search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.agri-sales-filters__search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--slate-400);
+  pointer-events: none;
+}
+
+.agri-sales-filters__search-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem 0.55rem 2.25rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  color: var(--slate-800);
+  background-color: #ffffff;
+  transition: all var(--transition-fast);
+}
+
+.agri-sales-filters__search-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.agri-sales-filters__select {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-md);
+  background-color: #ffffff;
+  color: var(--slate-700);
+  min-width: 130px;
+  cursor: pointer;
+}
+
+.agri-sales-filters__select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+}
+
+.agri-sales-filters__view-toggles {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.agri-sales-filters__view-btn {
+  padding: 0.5rem 0.75rem;
+  background-color: #ffffff;
+  color: var(--slate-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.agri-sales-filters__view-btn--active {
+  background-color: var(--slate-100);
+  color: var(--primary-700);
+  font-weight: 600;
+}
+
+/* Table */
+.agri-sales-table-container {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.agri-sales-table-scroll {
+  overflow-x: auto;
+}
+
+.agri-sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.agri-sales-table th {
+  background-color: var(--slate-50);
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--slate-600);
+  border-bottom: 1px solid var(--slate-200);
+  white-space: nowrap;
+}
+
+.agri-sales-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--slate-100);
+  color: var(--slate-800);
+  vertical-align: middle;
+}
+
+.agri-sales-table tr:last-child td {
+  border-bottom: none;
+}
+
+.agri-sales-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+.agri-sales-table__buyer-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-sales-table__buyer-name {
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.agri-sales-table__buyer-market {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+/* Cards Grid */
+.agri-sales-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .agri-sales-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .agri-sales-cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.agri-sale-card {
+  background-color: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.agri-sale-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-300);
+}
+
+.agri-sale-card__header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--slate-100);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.agri-sale-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin: 0;
+}
+
+.agri-sale-card__subtitle {
+  font-size: 0.8125rem;
+  color: var(--slate-500);
+  margin-top: 0.2rem;
+}
+
+.agri-sale-card__body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.agri-sale-card__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  background-color: var(--slate-50);
+  padding: 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-200);
+}
+
+.agri-sale-card__stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-sale-card__stat-label {
+  font-size: 0.725rem;
+  color: var(--slate-500);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.agri-sale-card__stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-top: 0.15rem;
+}
+
+.agri-sale-card__footer {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--slate-100);
+  background-color: var(--slate-50);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Modal details enhancement */
+.agri-sale-detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  background-color: var(--slate-50);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-200);
+}
+
+@media (min-width: 600px) {
+  .agri-sale-detail-metrics {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.agri-sale-detail-metric-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.agri-sale-detail-metric-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-transform: uppercase;
+}
+
+.agri-sale-detail-metric-card__value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  margin-top: 0.2rem;
+}
+
+/* Reference Price Banner */
+.agri-reference-banner {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.agri-reference-banner--premium {
+  color: #15803d;
+}
+
+.agri-reference-banner--discount {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
