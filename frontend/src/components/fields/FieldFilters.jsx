@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
+import { translateCrop } from '../../utils/displayLabels';
 
 /**
  * FieldFilters component
@@ -15,20 +17,21 @@ export default function FieldFilters({
   crops = [],
   onClearFilters,
 }) {
+  const { t } = useTranslation();
   const isFiltered = Boolean(searchQuery || selectedFarmId || selectedCrop);
 
   return (
-    <div className="agri-field-toolbar" role="search" aria-label="Filter Fields">
+    <div className="agri-field-toolbar" role="search" aria-label={t('common.filter', 'Filter Fields')}>
       {/* Search Bar */}
       <div className="agri-field-search-box">
         <Search size={16} className="agri-field-search-icon" aria-hidden="true" />
         <input
           type="text"
-          placeholder="Search by field name (e.g. Field 2B) or activity..."
+          placeholder={t('common.search', 'Search by field name or activity...')}
           className="agri-field-search-input"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          aria-label="Search fields"
+          aria-label={t('common.search', 'Search fields')}
         />
         {searchQuery && (
           <button
@@ -42,7 +45,7 @@ export default function FieldFilters({
               color: 'var(--slate-400)',
               cursor: 'pointer',
             }}
-            aria-label="Clear search"
+            aria-label={t('common.clear', 'Clear search')}
           >
             <X size={15} />
           </button>
@@ -56,12 +59,12 @@ export default function FieldFilters({
           value={selectedFarmId}
           onChange={(e) => onFarmChange(e.target.value)}
           className="agri-field-filter-select"
-          aria-label="Filter by farm holding"
+          aria-label={t('fields.farm', 'Filter by farm holding')}
         >
-          <option value="">All Holdings</option>
+          <option value="">{t('farms.allFarms', 'All Holdings')}</option>
           {farms.map((f) => (
             <option key={f.id} value={f.id}>
-              {f.name}
+              {t(`farms.demoNames.${f.id}`, f.name)}
             </option>
           ))}
         </select>
@@ -71,12 +74,12 @@ export default function FieldFilters({
           value={selectedCrop}
           onChange={(e) => onCropChange(e.target.value)}
           className="agri-field-filter-select"
-          aria-label="Filter by crop"
+          aria-label={t('fields.currentCrop', 'Filter by crop')}
         >
-          <option value="">All Crops</option>
+          <option value="">{t('crops.allCrops', 'All Crops')}</option>
           {crops.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {translateCrop(c, t)}
             </option>
           ))}
         </select>
@@ -88,7 +91,7 @@ export default function FieldFilters({
             onClick={onClearFilters}
             className="agri-field-filter-clear-btn"
           >
-            Reset Filters
+            {t('common.clear', 'Reset Filters')}
           </button>
         )}
       </div>

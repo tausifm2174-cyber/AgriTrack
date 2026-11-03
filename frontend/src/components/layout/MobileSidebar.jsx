@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import Sidebar from './Sidebar';
 
@@ -9,6 +10,8 @@ import Sidebar from './Sidebar';
  * @param {Function} props.onClose
  */
 export default function MobileSidebar({ isOpen, onClose }) {
+  const { t } = useTranslation();
+
   // Prevent background scroll when mobile sidebar is open
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +40,7 @@ export default function MobileSidebar({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="agri-mobile-drawer-root" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+    <div className="agri-mobile-drawer-root" role="dialog" aria-modal="true" aria-label={t('navigation.mobileNavigation', 'Mobile Navigation')}>
       {/* Backdrop Overlay */}
       <div
         className="agri-mobile-backdrop"
@@ -51,10 +54,11 @@ export default function MobileSidebar({ isOpen, onClose }) {
           type="button"
           className="agri-mobile-drawer__close-btn"
           onClick={onClose}
-          aria-label="Close navigation menu"
+          aria-label={t('navigation.closeNavigation', 'Close navigation menu')}
         >
           <X size={20} />
         </button>
+
 
         <div className="agri-mobile-drawer__content">
           <Sidebar onNavigate={onClose} />

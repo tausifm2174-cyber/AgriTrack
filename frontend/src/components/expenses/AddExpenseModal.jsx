@@ -1,4 +1,5 @@
 import { useState, useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CreditCard } from 'lucide-react';
 import { Button } from '../common';
 import { farmData } from '../../data/farmData';
@@ -14,6 +15,7 @@ function getNextVoucherNumber() {
 }
 
 export default function AddExpenseModal({ onClose, onAddExpense }) {
+  const { t } = useTranslation();
   const farmSelectId = useId();
   const fieldSelectId = useId();
   const cropInputId = useId();
@@ -69,16 +71,16 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
 
   const validate = () => {
     const errs = {};
-    if (!farmId) errs.farmId = 'Please select a farm';
-    if (!fieldId) errs.fieldId = 'Please select a field';
-    if (!category) errs.category = 'Please select an expense category';
-    if (!description.trim()) errs.description = 'Description is required';
-    if (!vendor.trim()) errs.vendor = 'Vendor / Supplier is required';
-    if (!date) errs.date = 'Expense date is required';
+    if (!farmId) errs.farmId = t('validation.selectFarm', 'Please select a farm');
+    if (!fieldId) errs.fieldId = t('validation.selectField', 'Please select a field');
+    if (!category) errs.category = t('validation.required', 'Please select an expense category');
+    if (!description.trim()) errs.description = t('validation.required', 'Description is required');
+    if (!vendor.trim()) errs.vendor = t('validation.required', 'Vendor / Supplier is required');
+    if (!date) errs.date = t('validation.enterValidDate', 'Expense date is required');
 
     const numAmt = Number(amount);
     if (isNaN(numAmt) || numAmt <= 0) {
-      errs.amount = 'Amount must be greater than ₹0';
+      errs.amount = t('validation.enterValidAmount', 'Amount must be greater than ₹0');
     }
 
     setErrors(errs);
@@ -131,20 +133,20 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#dc2626', fontSize: '0.75rem', fontWeight: 600 }}>
               <CreditCard size={14} />
-              <span>Operational Expense Ledger</span>
+              <span>{t('expenses.costAccounting', 'Operational Expense Ledger')}</span>
             </div>
             <h3 id="add-expense-title" className="agri-modal-title">
-              Record Farm Expense
+              {t('expenses.addExpense', 'Record Farm Expense')}
             </h3>
             <p className="agri-modal-subtitle">
-              Log input purchase vouchers, farm labor settlements, and machinery charges.
+              {t('expenses.recordSubtitle', 'Log input purchase vouchers, farm labor settlements, and machinery charges.')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
@@ -157,7 +159,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
             <div className="agri-form-grid agri-form-grid--2">
               <div className="agri-form-group">
                 <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
-                  Farm / Holding
+                  {t('fields.farm', 'Farm / Holding')}
                 </label>
                 <select
                   id={farmSelectId}
@@ -176,7 +178,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
 
               <div className="agri-form-group">
                 <label htmlFor={fieldSelectId} className="agri-form-label agri-form-label--required">
-                  Field Cost Center
+                  {t('expenses.fieldCostCenter', 'Field Cost Center')}
                 </label>
                 <select
                   id={fieldSelectId}
@@ -198,7 +200,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={cropInputId} className="agri-form-label">
-                  Assigned Crop
+                  {t('expenses.assignedCrop', 'Assigned Crop')}
                 </label>
                 <input
                   id={cropInputId}
@@ -212,7 +214,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
 
               <div className="agri-form-group">
                 <label htmlFor={categorySelectId} className="agri-form-label agri-form-label--required">
-                  Expense Category
+                  {t('expenses.category', 'Expense Category')}
                 </label>
                 <select
                   id={categorySelectId}
@@ -231,7 +233,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
 
               <div className="agri-form-group">
                 <label htmlFor={amountInputId} className="agri-form-label agri-form-label--required">
-                  Amount (₹)
+                  {t('expenses.amount', 'Amount (₹)')}
                 </label>
                 <input
                   id={amountInputId}
@@ -250,7 +252,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
             <div className="agri-form-grid agri-form-grid--2">
               <div className="agri-form-group">
                 <label htmlFor={descInputId} className="agri-form-label agri-form-label--required">
-                  Voucher Description
+                  {t('expenses.voucherDesc', 'Voucher Description')}
                 </label>
                 <input
                   id={descInputId}
@@ -258,14 +260,14 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                   className="agri-form-input"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. Urea & NPK application for vegetative growth"
+                  placeholder={t('expenses.voucherDescPlaceholder', 'e.g. Urea & NPK application for vegetative growth')}
                 />
                 {errors.description && <span className="agri-form-help text-danger">{errors.description}</span>}
               </div>
 
               <div className="agri-form-group">
                 <label htmlFor={vendorInputId} className="agri-form-label agri-form-label--required">
-                  Vendor / Supplier / Payee
+                  {t('expenses.vendorPayee', 'Vendor / Supplier / Payee')}
                 </label>
                 <input
                   id={vendorInputId}
@@ -283,7 +285,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={dateInputId} className="agri-form-label agri-form-label--required">
-                  Date
+                  {t('common.date', 'Date')}
                 </label>
                 <input
                   id={dateInputId}
@@ -297,7 +299,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
 
               <div className="agri-form-group">
                 <label htmlFor={paymentMethodSelectId} className="agri-form-label">
-                  Payment Method
+                  {t('expenses.paymentMethod', 'Payment Method')}
                 </label>
                 <select
                   id={paymentMethodSelectId}
@@ -305,16 +307,17 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 >
-                  <option value="UPI">UPI Direct</option>
-                  <option value="Bank Transfer">Bank Transfer (NEFT)</option>
-                  <option value="Cash">Cash Voucher</option>
-                  <option value="Credit">Vendor Credit</option>
+                  <option value="UPI">{t('expenses.paymentMethods.upi', 'UPI Direct')}</option>
+                  <option value="Bank Transfer">{t('expenses.paymentMethods.bankTransfer', 'Bank Transfer (NEFT)')}</option>
+                  <option value="Cash">{t('expenses.paymentMethods.cash', 'Cash Voucher')}</option>
+                  <option value="Credit">{t('expenses.paymentMethods.credit', 'Vendor Credit')}</option>
                 </select>
+
               </div>
 
               <div className="agri-form-group">
                 <label htmlFor={paymentStatusSelectId} className="agri-form-label">
-                  Settlement Status
+                  {t('expenses.settlementStatus', 'Settlement Status')}
                 </label>
                 <select
                   id={paymentStatusSelectId}
@@ -322,8 +325,8 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
-                  <option value="PAID">Paid in Full</option>
-                  <option value="PENDING">Pending Payment</option>
+                  <option value="PAID">{t('status.paid', 'Paid in Full')}</option>
+                  <option value="PENDING">{t('status.pending', 'Pending Payment')}</option>
                 </select>
               </div>
             </div>
@@ -331,7 +334,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
             {/* Notes */}
             <div className="agri-form-group">
               <label htmlFor={notesInputId} className="agri-form-label">
-                Accounting Notes & Remarks
+                {t('expenses.accountingNotes', 'Accounting Notes & Remarks')}
               </label>
               <textarea
                 id={notesInputId}
@@ -339,7 +342,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                 rows="2"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Include invoice reference, batch details or work order comments..."
+                placeholder={t('expenses.notesPlaceholder', 'Include invoice reference, batch details or work order comments...')}
               />
             </div>
           </div>
@@ -347,10 +350,10 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
           {/* Footer */}
           <div className="agri-modal-footer">
             <Button variant="secondary" size="md" onClick={onClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button variant="primary" size="md" type="submit">
-              Save Expense Voucher
+              {t('expenses.saveVoucher', 'Save Expense Voucher')}
             </Button>
           </div>
         </form>

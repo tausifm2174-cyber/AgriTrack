@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Warehouse, Grid3X3, MapPin, CheckCircle2 } from 'lucide-react';
 import { formatAcres } from '../../utils/formatters';
 
@@ -6,6 +7,7 @@ import { formatAcres } from '../../utils/formatters';
  * Displays high-level summary KPIs for farm holdings.
  */
 export default function FarmSummaryCards({ summary }) {
+  const { t } = useTranslation();
   const {
     totalHoldings = 3,
     totalFields = 8,
@@ -16,33 +18,33 @@ export default function FarmSummaryCards({ summary }) {
   const cards = [
     {
       id: 'kpi-holdings',
-      label: 'Total Holdings',
-      value: `${totalHoldings} Holdings`,
-      sub: 'Registered properties',
+      label: t('farms.fieldsCount', 'Total Farms'),
+      value: `${totalHoldings} ${t('farms.title', 'Farms')}`,
+      sub: t('farms.subtitle', 'Registered properties'),
       icon: <Warehouse size={22} aria-hidden="true" />,
       colorClass: 'agri-farm-summary-icon--green',
     },
     {
       id: 'kpi-fields',
-      label: 'Total Fields',
-      value: `${totalFields} Fields`,
-      sub: 'Mapped operational plots',
+      label: t('fields.totalFields', 'Total Fields'),
+      value: `${totalFields} ${t('navigation.fields', 'Fields')}`,
+      sub: t('fields.subtitle', 'Mapped operational plots'),
       icon: <Grid3X3 size={22} aria-hidden="true" />,
       colorClass: 'agri-farm-summary-icon--blue',
     },
     {
       id: 'kpi-area',
-      label: 'Total Area',
-      value: formatAcres(totalAreaAcres),
-      sub: 'Cumulative acreage',
+      label: t('farms.totalArea', 'Total Area'),
+      value: formatAcres(totalAreaAcres, t),
+      sub: t('profile.totalHoldings', 'Cumulative acreage'),
       icon: <MapPin size={22} aria-hidden="true" />,
       colorClass: 'agri-farm-summary-icon--amber',
     },
     {
       id: 'kpi-active',
-      label: 'Active Holdings',
-      value: `${activeHoldings} of ${totalHoldings}`,
-      sub: '100% Operational status',
+      label: t('common.active', 'Active Holdings'),
+      value: `${activeHoldings} ${t('common.of', 'of')} ${totalHoldings}`,
+      sub: t('status.active', '100% Operational status'),
       icon: <CheckCircle2 size={22} aria-hidden="true" />,
       colorClass: 'agri-farm-summary-icon--emerald',
     },

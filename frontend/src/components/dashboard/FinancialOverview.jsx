@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   BarChart,
@@ -9,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { ArrowUpRight, TrendingUp, DollarSign } from 'lucide-react';
+import { ArrowUpRight, DollarSign } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 /**
@@ -45,6 +46,7 @@ function FinancialTooltip({ active, payload, label }) {
  * @param {Array} props.monthlyFinancials
  */
 export default function FinancialOverview({ financialSummary, monthlyFinancials = [] }) {
+  const { t, i18n } = useTranslation();
   const {
     expenses = 32000,
     revenue = 50000,
@@ -53,8 +55,27 @@ export default function FinancialOverview({ financialSummary, monthlyFinancials 
     costPerQuintal = 1280,
     harvestYieldKg = 2500,
     averageMandiRatePerKg = 20,
-    period = 'Current Season (Rabi 2025-26)',
+    period = 'Current Season (Rabi)',
   } = financialSummary || {};
+
+  const localizedFinancials = (monthlyFinancials || []).map((m) => {
+    let label = m.month || '';
+    const isCurrent = label.includes('Current');
+    const rawMonth = label.replace(/\s*\(Current\)/, '').trim();
+    const monthIndex = { Oct: 9, Nov: 10, Dec: 11, Jan: 0, Feb: 1, Mar: 2 }[rawMonth];
+    if (monthIndex !== undefined) {
+      try {
+        const localizedMonth = new Intl.DateTimeFormat(i18n.language || 'en-IN', { month: 'short' }).format(new Date(2026, monthIndex, 1));
+        label = isCurrent ? `${localizedMonth} (${t('dashboard.current', 'Current')})` : localizedMonth;
+      } catch {
+        // fallback
+      }
+    }
+    return {
+      ...m,
+      monthDisplay: label,
+    };
+  });
 
   return (
     <div className="agri-finance-card">
@@ -62,12 +83,12 @@ export default function FinancialOverview({ financialSummary, monthlyFinancials 
         <div>
           <h3 className="agri-card__title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <DollarSign size={18} className="text-primary" aria-hidden="true" />
-            Financial Performance Overview
+            {t('dashboard.financialOverview', 'Financial Performance Overview')}
           </h3>
-          <p className="agri-card__subtitle">{period} • PPT Operational Benchmark</p>
+          <p className="agri-card__subtitle">{t('dashboard.currentSeasonRabi', period)}</p>
         </div>
         <Link to="/profit-loss" className="agri-card-action-link">
-          <span>Profit & Loss statement</span>
+          <span>{t('navigation.profitLoss', 'Profit & Loss statement')}</span>
           <ArrowUpRight size={14} aria-hidden="true" />
         </Link>
       </div>
@@ -75,49 +96,49 @@ export default function FinancialOverview({ financialSummary, monthlyFinancials 
       {/* Primary 4 Metric Tiles */}
       <div className="agri-finance-stats-grid">
         <Link to="/revenue" className="agri-finance-stat" style={{ textDecoration: 'none', display: 'block' }}>
-          <span className="agri-finance-stat__label">Total Revenue</span>
+          <span className="agri-finance-stat__label">{t('revenue.totalRevenue', 'Total Revenue')}</span>
           <div className="agri-finance-stat__val" style={{ color: '#16a34a' }}>
             {formatCurrency(revenue)}
           </div>
-          <span className="agri-finance-stat__sub">Gross farm receipts →</span>
+          <span className="agri-finance-stat__sub">{t('revenue.title', 'Farm Revenue')} →</span>
         </Link>
 
         <Link to="/expenses" className="agri-finance-stat" style={{ textDecoration: 'none', display: 'block' }}>
-          <span className="agri-finance-stat__label">Total Expenses</span>
+          <span className="agri-finance-stat__label">{t('expenses.totalExpenses', 'Total Expenses')}</span>
           <div className="agri-finance-stat__val" style={{ color: '#b45309' }}>
             {formatCurrency(expenses)}
           </div>
-          <span className="agri-finance-stat__sub">Inputs, labor, power →</span>
+          <span className="agri-finance-stat__sub">{t('expenses.title', 'Farm Expenses')} →</span>
         </Link>
 
         <Link to="/profit-loss" className="agri-finance-stat" style={{ textDecoration: 'none', display: 'block' }}>
-          <span className="agri-finance-stat__label">Net Profit</span>
+          <span className="agri-finance-stat__label">{t('profitLoss.netProfit', 'Net Profit')}</span>
           <div className="agri-finance-stat__val agri-finance-stat__val--profit">
             +{formatCurrency(netProfit)}
           </div>
-          <span className="agri-finance-stat__sub">Surplus before tax →</span>
+          <span className="agri-finance-stat__sub">{t('profitLoss.title', 'Profit & Loss')} →</span>
         </Link>
 
         <Link to="/profit-loss" className="agri-finance-stat" style={{ textDecoration: 'none', display: 'block' }}>
-          <span className="agri-finance-stat__label">Net Margin</span>
+          <span className="agri-finance-stat__label">{t('dashboard.netMargin', 'Net Margin')}</span>
           <div className="agri-finance-stat__val" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             <span>{netMargin}%</span>
-            <TrendingUp size={16} className="text-success" aria-hidden="true" />
           </div>
-          <span className="agri-finance-stat__sub">Profitability ratio →</span>
+          <span className="agri-finance-stat__sub">{t('profitLoss.margin', 'Margin')} →</span>
         </Link>
       </div>
 
       {/* Recharts Bar Chart: Revenue vs Expenses */}
-      <div className="agri-chart-wrapper" aria-label="Revenue versus Expenses Chart">
+      <div className="agri-chart-wrapper" aria-label={t('profitLoss.financialComparison', 'Revenue versus Expenses Chart')}>
+
         <ResponsiveContainer width="100%" height={260}>
           <BarChart
-            data={monthlyFinancials}
+            data={localizedFinancials}
             margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
             <XAxis
-              dataKey="month"
+              dataKey="monthDisplay"
               tickLine={false}
               axisLine={{ stroke: '#cbd5e1' }}
               tick={{ fontSize: 11, fill: '#64748b' }}
@@ -136,14 +157,14 @@ export default function FinancialOverview({ financialSummary, monthlyFinancials 
               wrapperStyle={{ paddingBottom: '10px', fontSize: '12px' }}
             />
             <Bar
-              name="Revenue (₹)"
+              name={t('navigation.revenue', 'Revenue')}
               dataKey="revenue"
               fill="#16a34a"
               radius={[4, 4, 0, 0]}
               maxBarSize={32}
             />
             <Bar
-              name="Expenses (₹)"
+              name={t('navigation.expenses', 'Expenses')}
               dataKey="expenses"
               fill="#94a3b8"
               radius={[4, 4, 0, 0]}
@@ -156,18 +177,16 @@ export default function FinancialOverview({ financialSummary, monthlyFinancials 
       {/* PPT Financial Reference Metrics Strip */}
       <div className="agri-finance-metrics-strip">
         <span>
-          Cost per Quintal: <strong>{formatCurrency(costPerQuintal)}/q</strong>
+          {t('profitLoss.costPerQuintal', 'Cost per Quintal')}: <strong>{formatCurrency(costPerQuintal)}/{t('units.q', 'q')}</strong>
         </span>
         <span>•</span>
         <span>
-          Harvest Yield: <strong>{harvestYieldKg.toLocaleString('en-IN')} kg</strong>
+          {t('harvests.harvestQuantity', 'Harvest Yield')}: <strong>{harvestYieldKg.toLocaleString('en-IN')} {t('units.kg', 'kg')}</strong>
         </span>
         <span>•</span>
         <span>
-          Average Mandi Rate: <strong>₹{averageMandiRatePerKg}/kg</strong>
+          {t('marketPrices.modalPrice', 'Average Mandi Rate')}: <strong>₹{averageMandiRatePerKg}/{t('units.kg', 'kg')}</strong>
         </span>
-        <span>•</span>
-        <span style={{ color: 'var(--slate-400)' }}>Deterministic PPT Reference</span>
       </div>
     </div>
   );

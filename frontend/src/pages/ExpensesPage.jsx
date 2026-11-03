@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2 } from 'lucide-react';
 import { expenseRecords as initialExpenses } from '../data/expenseData';
 import { farmData } from '../data/farmData';
 import { fieldData } from '../data/fieldData';
 import { EmptyState } from '../components/common';
+import { formatCurrency } from '../utils/formatters';
 import {
   ExpenseHeader,
   ExpenseSummaryCards,
@@ -19,6 +21,7 @@ import { filterExpenses } from '../utils/financialCalculations';
 import '../components/expenses/expenses.css';
 
 export default function ExpensesPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
 
   // Query parameters
@@ -98,7 +101,7 @@ export default function ExpensesPage() {
     setExpenses((prev) => [newExpense, ...prev]);
     setNotification({
       type: 'success',
-      message: `Expense ${newExpense.id} for ${newExpense.description} (₹${newExpense.amount.toLocaleString('en-IN')}) successfully recorded!`,
+      message: `${t('expenses.expense', 'Expense')} ${newExpense.id} ${t('common.of', 'for')} ${newExpense.description} (${formatCurrency(newExpense.amount)}) ${t('alerts.expenseAdded', 'successfully recorded!')}`,
     });
     setTimeout(() => setNotification(null), 5000);
   };
@@ -126,7 +129,7 @@ export default function ExpensesPage() {
             type="button"
             onClick={() => setNotification(null)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#065f46' }}
-            aria-label="Dismiss notification"
+            aria-label={t('common.close', 'Dismiss notification')}
           >
             ✕
           </button>
@@ -170,9 +173,9 @@ export default function ExpensesPage() {
       {/* Main Content Area */}
       {filteredExpenses.length === 0 ? (
         <EmptyState
-          title="No expenses found"
-          message="No operational expense vouchers match the selected filter criteria. Try broadening your search or resetting filters."
-          actionText="Reset Filters"
+          title={t('expenses.noExpenses', 'No expenses found')}
+          message={t('expenses.noExpensesDesc', 'No operational expense vouchers match the selected filter criteria. Try broadening your search or resetting filters.')}
+          actionText={t('common.clearFilters', 'Reset Filters')}
           onAction={handleResetFilters}
         />
       ) : viewMode === 'table' ? (

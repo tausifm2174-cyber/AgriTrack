@@ -1,4 +1,5 @@
 import { useState, useId, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Receipt, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Button } from '../common';
 import { marketPriceRecords } from '../../data/marketPriceData';
@@ -20,6 +21,7 @@ export default function AddSaleModal({
   onClose,
   onAddSale,
 }) {
+  const { t } = useTranslation();
   const harvestSelectId = useId();
   const buyerInputId = useId();
   const dateInputId = useId();
@@ -106,30 +108,30 @@ export default function AddSaleModal({
   const validate = () => {
     const errs = {};
     if (!harvestId || !selectedHarvest) {
-      errs.harvestId = 'Please select an available harvest lot';
+      errs.harvestId = t('validation.required', 'Please select an available harvest lot');
     }
     if (!buyerName.trim()) {
-      errs.buyerName = 'Buyer name is required';
+      errs.buyerName = t('validation.required', 'Buyer name is required');
     }
     if (!saleDate) {
-      errs.saleDate = 'Sale date is required';
+      errs.saleDate = t('validation.required', 'Sale date is required');
     }
     if (isNaN(numQty) || numQty <= 0) {
-      errs.quantityKg = 'Quantity must be greater than 0';
+      errs.quantityKg = t('validation.positiveNumber', 'Quantity must be greater than 0');
     } else if (selectedHarvest && numQty > selectedHarvest.availableQuantityKg) {
-      errs.quantityKg = `Quantity cannot exceed available stock (${selectedHarvest.availableQuantityKg} kg)`;
+      errs.quantityKg = `${t('sales.cannotExceed', 'Quantity cannot exceed available stock')} (${selectedHarvest.availableQuantityKg} kg)`;
     }
 
     if (isNaN(numPriceKg) || numPriceKg <= 0) {
-      errs.pricePerKg = 'Price per kg must be greater than 0';
+      errs.pricePerKg = t('validation.positiveNumber', 'Price per kg must be greater than 0');
     }
 
     if (paymentStatus === 'PARTIAL') {
       const pAmt = Number(paidAmount);
       if (isNaN(pAmt) || pAmt < 0) {
-        errs.paidAmount = 'Paid amount must be 0 or greater';
+        errs.paidAmount = t('validation.positiveNumber', 'Paid amount must be 0 or greater');
       } else if (pAmt > totalAmount) {
-        errs.paidAmount = 'Paid amount cannot exceed total sale amount';
+        errs.paidAmount = t('validation.invalidAmount', 'Paid amount cannot exceed total sale amount');
       }
     }
 
@@ -188,20 +190,20 @@ export default function AddSaleModal({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#0284c7', fontSize: '0.75rem', fontWeight: 600 }}>
               <Receipt size={14} />
-              <span>Commercial Trade Execution</span>
+              <span>{t('sales.tradeExecution', 'Commercial Trade Execution')}</span>
             </div>
             <h3 id="add-sale-title" className="agri-modal-title">
-              Record Produce Sale
+              {t('sales.recordSaleTitle', 'Record Produce Sale')}
             </h3>
             <p className="agri-modal-subtitle">
-              Offload available harvest stock, establish buyer agreements, and invoice transaction.
+              {t('sales.recordSaleSubtitle', 'Offload available harvest stock, establish buyer agreements, and invoice transaction.')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
@@ -213,11 +215,11 @@ export default function AddSaleModal({
             {/* Harvest Selection */}
             <div className="agri-form-group">
               <label htmlFor={harvestSelectId} className="agri-form-label agri-form-label--required">
-                Select Available Harvest Lot
+                {t('sales.selectHarvestLot', 'Select Available Harvest Lot')}
               </label>
               {availableHarvests.length === 0 ? (
                 <div style={{ padding: '0.75rem', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 'var(--radius-md)', color: '#b91c1c', fontSize: '0.85rem' }}>
-                  No harvest lots currently have available inventory. Record a harvest first.
+                  {t('sales.noHarvestInventory', 'No harvest lots currently have available inventory. Record a harvest first.')}
                 </div>
               ) : (
                 <select
@@ -237,7 +239,7 @@ export default function AddSaleModal({
                 >
                   {availableHarvests.map((h) => (
                     <option key={h.id} value={h.id}>
-                      {h.id} — {h.cropName} ({h.variety}) | {h.farmName} — Available:{' '}
+                      {h.id} — {h.cropName} ({h.variety}) | {h.farmName} — {t('sales.available', 'Available')}:{' '}
                       {formatWeight(h.availableQuantityKg, 'kg')} ({(h.availableQuantityKg / 100).toFixed(1)} q)
                     </option>
                   ))}
@@ -250,7 +252,7 @@ export default function AddSaleModal({
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={buyerInputId} className="agri-form-label agri-form-label--required">
-                  Buyer Name / Trader
+                  {t('sales.buyerName', 'Buyer Name / Trader')}
                 </label>
                 <input
                   id={buyerInputId}
@@ -258,14 +260,14 @@ export default function AddSaleModal({
                   className="agri-form-input"
                   value={buyerName}
                   onChange={(e) => setBuyerName(e.target.value)}
-                  placeholder="e.g. Kisan Agro Processing"
+                  placeholder={t('sales.buyerPlaceholder', 'e.g. Kisan Agro Processing')}
                 />
                 {errors.buyerName && <span className="agri-form-help text-danger">{errors.buyerName}</span>}
               </div>
 
               <div className="agri-form-group">
                 <label htmlFor={dateInputId} className="agri-form-label agri-form-label--required">
-                  Sale Date
+                  {t('sales.saleDate', 'Sale Date')}
                 </label>
                 <input
                   id={dateInputId}
@@ -279,7 +281,7 @@ export default function AddSaleModal({
 
               <div className="agri-form-group">
                 <label htmlFor={marketSelectId} className="agri-form-label">
-                  Market / Mandi
+                  {t('sales.marketMandi', 'Market / Mandi')}
                 </label>
                 <select
                   id={marketSelectId}
@@ -300,7 +302,7 @@ export default function AddSaleModal({
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={qtyInputId} className="agri-form-label agri-form-label--required">
-                  Quantity Sold (kg)
+                  {t('sales.quantitySoldKg', 'Quantity Sold (kg)')}
                 </label>
                 <input
                   id={qtyInputId}
@@ -312,14 +314,14 @@ export default function AddSaleModal({
                   max={selectedHarvest ? selectedHarvest.availableQuantityKg : undefined}
                 />
                 <span className="agri-form-help">
-                  {(numQty / 100).toFixed(1)} q (Max: {selectedHarvest ? selectedHarvest.availableQuantityKg : 0} kg)
+                  {(numQty / 100).toFixed(1)} q ({t('sales.max', 'Max')}: {selectedHarvest ? selectedHarvest.availableQuantityKg : 0} kg)
                 </span>
                 {errors.quantityKg && <span className="agri-form-help text-danger">{errors.quantityKg}</span>}
               </div>
 
               <div className="agri-form-group">
                 <label htmlFor={priceKgInputId} className="agri-form-label agri-form-label--required">
-                  Price Per Kg (₹)
+                  {t('sales.pricePerKg', 'Price Per Kg (₹)')}
                 </label>
                 <input
                   id={priceKgInputId}
@@ -338,7 +340,7 @@ export default function AddSaleModal({
 
               <div className="agri-form-group">
                 <label className="agri-form-label">
-                  Total Sale Amount
+                  {t('sales.totalAmount', 'Total Sale Amount')}
                 </label>
                 <div
                   style={{
@@ -357,7 +359,7 @@ export default function AddSaleModal({
                   {formatCurrency(totalAmount)}
                 </div>
                 <span className="agri-form-help">
-                  Auto-calculated ({numQty} kg × ₹{numPriceKg}/kg)
+                  {t('sales.autoCalculated', 'Auto-calculated')} ({numQty} kg × ₹{numPriceKg}/kg)
                 </span>
               </div>
             </div>
@@ -373,11 +375,11 @@ export default function AddSaleModal({
                   <TrendingUp size={18} />
                   <div>
                     <div>
-                      <strong>APMC Mandi Reference:</strong> {matchedBenchmark.crop} —{' '}
+                      <strong>{t('sales.apmcReference', 'APMC Mandi Reference:')}</strong> {matchedBenchmark.crop} —{' '}
                       <strong>₹{matchedBenchmark.pricePerQuintal}/quintal</strong> (₹{matchedBenchmark.pricePerKg}/kg)
                     </div>
                     <div style={{ fontSize: '0.75rem' }}>
-                      Source: {matchedBenchmark.market} ({matchedBenchmark.date})
+                      {t('sales.source', 'Source:')} {matchedBenchmark.market} ({matchedBenchmark.date})
                     </div>
                   </div>
                 </div>
@@ -385,12 +387,12 @@ export default function AddSaleModal({
                   {diffPerQ >= 0 ? (
                     <>
                       <ArrowUpRight size={16} />
-                      <span>+₹{diffPerQ}/q Premium</span>
+                      <span>+₹{diffPerQ}/q {t('sales.premium', 'Premium')}</span>
                     </>
                   ) : (
                     <>
                       <ArrowDownRight size={16} />
-                      <span>-₹{Math.abs(diffPerQ)}/q Discount</span>
+                      <span>-₹{Math.abs(diffPerQ)}/q {t('sales.discount', 'Discount')}</span>
                     </>
                   )}
                 </div>
@@ -401,7 +403,7 @@ export default function AddSaleModal({
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={paymentStatusSelectId} className="agri-form-label">
-                  Payment Status
+                  {t('sales.paymentStatus', 'Payment Status')}
                 </label>
                 <select
                   id={paymentStatusSelectId}
@@ -409,16 +411,16 @@ export default function AddSaleModal({
                   value={paymentStatus}
                   onChange={(e) => setPaymentStatus(e.target.value)}
                 >
-                  <option value="PAID">Paid in Full</option>
-                  <option value="PARTIAL">Partial Payment</option>
-                  <option value="PENDING">Pending (Receivable)</option>
+                  <option value="PAID">{t('status.paid', 'Paid in Full')}</option>
+                  <option value="PARTIAL">{t('status.partiallyPaid', 'Partial Payment')}</option>
+                  <option value="PENDING">{t('status.unpaid', 'Pending (Receivable)')}</option>
                 </select>
               </div>
 
               {paymentStatus === 'PARTIAL' && (
                 <div className="agri-form-group">
                   <label htmlFor={paidAmountInputId} className="agri-form-label agri-form-label--required">
-                    Amount Paid (₹)
+                    {t('sales.paidAmount', 'Amount Paid (₹)')}
                   </label>
                   <input
                     id={paidAmountInputId}
@@ -429,7 +431,7 @@ export default function AddSaleModal({
                     placeholder="e.g. 10000"
                   />
                   <span className="agri-form-help">
-                    Balance due: {formatCurrency(computedBalanceDue)}
+                    {t('sales.balanceDue', 'Balance due')}: {formatCurrency(computedBalanceDue)}
                   </span>
                   {errors.paidAmount && <span className="agri-form-help text-danger">{errors.paidAmount}</span>}
                 </div>
@@ -437,7 +439,7 @@ export default function AddSaleModal({
 
               <div className="agri-form-group">
                 <label htmlFor={saleStatusSelectId} className="agri-form-label">
-                  Sale Status
+                  {t('common.status', 'Sale Status')}
                 </label>
                 <select
                   id={saleStatusSelectId}
@@ -445,15 +447,15 @@ export default function AddSaleModal({
                   value={saleStatus}
                   onChange={(e) => setSaleStatus(e.target.value)}
                 >
-                  <option value="COMPLETED">Completed</option>
-                  <option value="CONFIRMED">Confirmed</option>
-                  <option value="PENDING">Pending</option>
+                  <option value="COMPLETED">{t('status.completed', 'Completed')}</option>
+                  <option value="CONFIRMED">{t('status.confirmed', 'Confirmed')}</option>
+                  <option value="PENDING">{t('status.pending', 'Pending')}</option>
                 </select>
               </div>
 
               <div className="agri-form-group">
                 <label htmlFor={paymentMethodSelectId} className="agri-form-label">
-                  Payment Settlement Method
+                  {t('sales.settlementMethod', 'Payment Settlement Method')}
                 </label>
                 <select
                   id={paymentMethodSelectId}
@@ -461,19 +463,20 @@ export default function AddSaleModal({
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 >
-                  <option value="Bank Transfer (NEFT)">Bank Transfer (NEFT)</option>
-                  <option value="RTGS">RTGS Direct</option>
-                  <option value="UPI Direct">UPI Direct</option>
-                  <option value="Cheque / Clearing">Cheque / Clearing</option>
-                  <option value="Cash / Mandi Yard">Cash / Mandi Yard</option>
+                  <option value="Bank Transfer (NEFT)">{t('sales.paymentMethods.bankTransfer', 'Bank Transfer (NEFT)')}</option>
+                  <option value="RTGS">{t('sales.paymentMethods.rtgs', 'RTGS Direct')}</option>
+                  <option value="UPI Direct">{t('sales.paymentMethods.upi', 'UPI Direct')}</option>
+                  <option value="Cheque / Clearing">{t('sales.paymentMethods.cheque', 'Cheque / Clearing')}</option>
+                  <option value="Cash / Mandi Yard">{t('sales.paymentMethods.cash', 'Cash / Mandi Yard')}</option>
                 </select>
               </div>
+
             </div>
 
             {/* Notes */}
             <div className="agri-form-group">
               <label htmlFor={notesInputId} className="agri-form-label">
-                Contract & Delivery Notes
+                {t('sales.contractNotes', 'Contract & Delivery Notes')}
               </label>
               <textarea
                 id={notesInputId}
@@ -481,7 +484,7 @@ export default function AddSaleModal({
                 rows="2"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Dispatched from granary bay, quality inspection cleared, invoice issued..."
+                placeholder={t('sales.notesPlaceholder', 'Dispatched from granary bay, quality inspection cleared, invoice issued...')}
               />
             </div>
           </div>
@@ -489,7 +492,7 @@ export default function AddSaleModal({
           {/* Footer */}
           <div className="agri-modal-footer">
             <Button variant="secondary" size="md" onClick={onClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               variant="primary"
@@ -497,7 +500,7 @@ export default function AddSaleModal({
               type="submit"
               disabled={availableHarvests.length === 0}
             >
-              Complete Sale & Record Revenue
+              {t('sales.completeSale', 'Complete Sale & Record Revenue')}
             </Button>
           </div>
         </form>

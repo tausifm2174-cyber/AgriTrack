@@ -1,13 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { X, Award, CheckCircle2, AlertTriangle, Compass } from 'lucide-react';
 import SoilStatus from './SoilStatus';
 import { Button } from '../common';
+import {
+  formatFieldName,
+  translateSoilType,
+  translateStatus,
+} from '../../utils/displayLabels';
 
 /**
  * SoilDetailsModal component
  * Displays full laboratory analysis, benchmark comparison, and agronomist recommendations.
  */
 export default function SoilDetailsModal({ record, onClose }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!record) return null;
@@ -36,17 +43,17 @@ export default function SoilDetailsModal({ record, onClose }) {
               <SoilStatus status={record.status} variant={record.statusVariant} />
             </div>
             <h3 id="soil-modal-title" className="agri-modal-title">
-              Soil Test Report: {record.fieldName}
+              {t('soil.soilReport', 'Soil Test Report')}: {formatFieldName(record.fieldName, t)}
             </h3>
             <p className="agri-modal-subtitle">
-              {record.farmName} • Tested on {record.testDate} ({record.testedDaysAgo})
+              {t(`farms.demoNames.${record.farmId}`, record.farmName)} • {record.testDate}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -58,46 +65,43 @@ export default function SoilDetailsModal({ record, onClose }) {
           <div className="agri-demo-badge-banner" style={{ justifyContent: 'space-between' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <Award size={16} aria-hidden="true" />
-              <span><strong>Testing Lab:</strong> {record.labName}</span>
-            </span>
-            <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-              Accredited Demo Analysis
+              <span><strong>{t('soil.title', 'Testing Lab')}:</strong> {record.labName}</span>
             </span>
           </div>
 
           {/* Primary Macronutrients */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Primary Macronutrients (NPK)</h4>
+            <h4 className="agri-detail-section-title">{t('soil.nutrientBalance', 'Primary Macronutrients (NPK)')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Available Nitrogen (N)</span>
+                <span className="agri-detail-label">{t('soil.nitrogen', 'Available Nitrogen (N)')}</span>
                 <span className="agri-detail-value">{record.nitrogen} kg/ha</span>
                 <span style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                  Rating: <strong>{record.nitrogenRating}</strong> (Ideal: {record.nitrogenBenchmark})
+                  {t('common.status', 'Rating')}: <strong>{translateStatus(record.nitrogenRating, t)}</strong>
                 </span>
               </div>
 
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Available Phosphorus (P)</span>
+                <span className="agri-detail-label">{t('soil.phosphorus', 'Available Phosphorus (P)')}</span>
                 <span className="agri-detail-value">{record.phosphorus} kg/ha</span>
                 <span style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                  Rating: <strong>{record.phosphorusRating}</strong> (Ideal: {record.phosphorusBenchmark})
+                  {t('common.status', 'Rating')}: <strong>{translateStatus(record.phosphorusRating, t)}</strong>
                 </span>
               </div>
 
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Available Potassium (K)</span>
+                <span className="agri-detail-label">{t('soil.potassium', 'Available Potassium (K)')}</span>
                 <span className="agri-detail-value">{record.potassium} kg/ha</span>
                 <span style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                  Rating: <strong>{record.potassiumRating}</strong> (Ideal: {record.potassiumBenchmark})
+                  {t('common.status', 'Rating')}: <strong>{translateStatus(record.potassiumRating, t)}</strong>
                 </span>
               </div>
 
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Organic Carbon (OC)</span>
+                <span className="agri-detail-label">{t('soil.organicCarbon', 'Organic Carbon (OC)')}</span>
                 <span className="agri-detail-value">{record.organicCarbon}%</span>
                 <span style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                  Status: <strong>{record.organicCarbonRating}</strong>
+                  {t('common.status', 'Status')}: <strong>{translateStatus(record.organicCarbonRating, t)}</strong>
                 </span>
               </div>
             </div>
@@ -105,33 +109,33 @@ export default function SoilDetailsModal({ record, onClose }) {
 
           {/* Physical & Chemical Indicators */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Physiochemical Properties</h4>
+            <h4 className="agri-detail-section-title">{t('soil.soilStatus', 'Physiochemical Properties')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil pH (Reaction)</span>
-                <span className="agri-detail-value">{record.ph} ({record.phRating})</span>
+                <span className="agri-detail-label">{t('soil.ph', 'Soil pH (Reaction)')}</span>
+                <span className="agri-detail-value">{record.ph} ({translateStatus(record.phRating, t)})</span>
               </div>
 
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Electrical Conductivity</span>
-                <span className="agri-detail-value">{record.electricalConductivity} dS/m (Normal)</span>
+                <span className="agri-detail-label">{t('soil.electricalConductivity', 'Electrical Conductivity')}</span>
+                <span className="agri-detail-value">{record.electricalConductivity} dS/m</span>
               </div>
 
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil Moisture</span>
-                <span className="agri-detail-value">{record.moisturePercent}% ({record.moistureRating})</span>
+                <span className="agri-detail-label">{t('soil.moisture', 'Soil Moisture')}</span>
+                <span className="agri-detail-value">{record.moisturePercent}%</span>
               </div>
 
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil Texture</span>
-                <span className="agri-detail-value">{record.soilType}</span>
+                <span className="agri-detail-label">{t('fields.soilType', 'Soil Texture')}</span>
+                <span className="agri-detail-value">{translateSoilType(record.soilType, t)}</span>
               </div>
             </div>
           </div>
 
           {/* Agronomist Recommendations */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Advisory & Nutrient Recommendations</h4>
+            <h4 className="agri-detail-section-title">{t('soil.recommendations', 'Advisory & Nutrient Recommendations')}</h4>
             <div
               style={{
                 backgroundColor: record.status === 'Needs Attention' ? 'var(--danger-bg)' : 'var(--slate-50)',
@@ -157,14 +161,14 @@ export default function SoilDetailsModal({ record, onClose }) {
         {/* Footer */}
         <div className="agri-modal-footer">
           <Button variant="secondary" onClick={onClose}>
-            Close Report
+            {t('common.close', 'Close Report')}
           </Button>
           <Button
             variant="primary"
             icon={<Compass size={15} aria-hidden="true" />}
             onClick={handleGoToRecommendations}
           >
-            Crop Recommendations
+            {t('navigation.recommendations', 'Crop Recommendations')}
           </Button>
         </div>
       </div>

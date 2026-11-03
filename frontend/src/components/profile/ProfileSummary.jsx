@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Warehouse, Grid3X3, Sprout, Compass } from 'lucide-react';
 import { formatAcres } from '../../utils/formatters';
 
@@ -16,36 +17,38 @@ export default function ProfileSummary({
   totalArea = 42.5,
   activeCropsCount = 7,
 }) {
+  const { t } = useTranslation();
+
   const kpis = [
     {
       id: 'holdings',
-      label: 'Total Holdings',
+      label: t('profile.totalHoldings', 'Total Holdings'),
       value: totalHoldings,
-      subtext: 'Operational Farms',
+      subtext: t('profile.operationalFarms', 'Operational Farms'),
       icon: Warehouse,
       colorClass: 'total',
     },
     {
       id: 'fields',
-      label: 'Total Fields',
+      label: t('profile.activeParcels', 'Total Fields'),
       value: totalFields,
-      subtext: 'Plotted parcels',
+      subtext: t('profile.plottedParcels', 'Plotted parcels'),
       icon: Grid3X3,
       colorClass: 'unread',
     },
     {
       id: 'area',
-      label: 'Total Area',
+      label: t('common.area', 'Total Area'),
       value: formatAcres(totalArea),
-      subtext: 'Cultivable acreage',
+      subtext: t('profile.cultivableAcreage', 'Cultivable acreage'),
       icon: Compass,
       colorClass: 'warning',
     },
     {
       id: 'crops',
-      label: 'Active Crops',
+      label: t('dashboard.activeCrops', 'Active Crops'),
       value: activeCropsCount,
-      subtext: 'Growing cycles',
+      subtext: t('profile.growingCycles', 'Growing cycles'),
       icon: Sprout,
       colorClass: 'unread',
     },
@@ -71,3 +74,4 @@ export default function ProfileSummary({
     </div>
   );
 }
+

@@ -922,3 +922,137 @@
   font-weight: 500;
   border: 1px solid var(--slate-200);
 }
+
+/* ==========================================================================
+   Language Selector Component
+   ========================================================================== */
+.agri-language-selector-wrapper {
+  position: relative;
+}
+
+.agri-language-selector-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.38rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-200);
+  background-color: #ffffff;
+  color: var(--slate-700);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.agri-language-selector-btn:hover {
+  background-color: var(--slate-50);
+  border-color: var(--slate-300);
+  color: var(--slate-900);
+}
+
+.agri-language-selector-btn:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+.agri-language-globe-icon {
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+.agri-language-label {
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.agri-chevron--open {
+  transform: rotate(180deg);
+}
+
+.agri-language-dropdown {
+  width: 260px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.35rem;
+  z-index: 60;
+}
+
+.agri-language-dropdown-header {
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.agri-language-dropdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  outline: none;
+}
+
+.agri-language-option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.agri-language-option-btn:hover {
+  background-color: var(--slate-100);
+}
+
+.agri-language-option-btn:focus-visible {
+  background-color: var(--slate-100);
+  outline: 2px solid var(--primary-500);
+}
+
+.agri-language-option-btn--active {
+  background-color: var(--primary-50);
+  border-color: var(--primary-200);
+}
+
+.agri-language-option-btn--active:hover {
+  background-color: var(--primary-100);
+}
+
+.agri-language-option-info {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.agri-language-native-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-900);
+}
+
+.agri-language-en-name {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+.agri-language-check-icon {
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .agri-language-selector-btn {
+    padding: 0.35rem 0.5rem;
+  }
+  .agri-language-label {
+    display: none;
+  }
+  .agri-language-dropdown {
+    right: -40px;
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Search, X, Table as TableIcon, LayoutGrid } from 'lucide-react';
 
 /**
@@ -16,20 +17,21 @@ export default function SoilFilters({
   farms = [],
   onClearFilters,
 }) {
+  const { t } = useTranslation();
   const isFiltered = Boolean(searchQuery || selectedFarmId || selectedStatus);
 
   return (
-    <div className="agri-soil-toolbar" role="search" aria-label="Filter Soil Records">
+    <div className="agri-soil-toolbar" role="search" aria-label={t('common.filter', 'Filter Soil Records')}>
       {/* Search Input */}
       <div className="agri-soil-search-box">
         <Search size={16} className="agri-soil-search-icon" aria-hidden="true" />
         <input
           type="text"
-          placeholder="Search by field, farm, or soil type..."
+          placeholder={t('common.search', 'Search by field, farm, or soil type...')}
           className="agri-soil-search-input"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          aria-label="Search soil records"
+          aria-label={t('common.search', 'Search soil records')}
         />
         {searchQuery && (
           <button
@@ -43,7 +45,7 @@ export default function SoilFilters({
               color: 'var(--slate-400)',
               cursor: 'pointer',
             }}
-            aria-label="Clear search"
+            aria-label={t('common.clear', 'Clear search')}
           >
             <X size={15} />
           </button>
@@ -57,12 +59,12 @@ export default function SoilFilters({
           value={selectedFarmId}
           onChange={(e) => onFarmChange(e.target.value)}
           className="agri-soil-filter-select"
-          aria-label="Filter by farm"
+          aria-label={t('fields.farm', 'Filter by farm')}
         >
-          <option value="">All Holdings</option>
+          <option value="">{t('common.all', 'All Holdings')}</option>
           {farms.map((f) => (
             <option key={f.id} value={f.id}>
-              {f.name}
+              {t(`farms.demoNames.${f.id}`, f.name)}
             </option>
           ))}
         </select>
@@ -72,12 +74,12 @@ export default function SoilFilters({
           value={selectedStatus}
           onChange={(e) => onStatusChange(e.target.value)}
           className="agri-soil-filter-select"
-          aria-label="Filter by health status"
+          aria-label={t('common.status', 'Filter by health status')}
         >
-          <option value="">All Soil Statuses</option>
-          <option value="Good">Good</option>
-          <option value="Moderate">Moderate</option>
-          <option value="Needs Attention">Needs Attention</option>
+          <option value="">{t('soil.soilStatus', 'All Soil Statuses')}</option>
+          <option value="Good">{t('status.good', 'Good')}</option>
+          <option value="Moderate">{t('status.moderate', 'Moderate')}</option>
+          <option value="Needs Attention">{t('status.needsAttention', 'Needs Attention')}</option>
         </select>
 
         {/* Reset Filter Button */}
@@ -87,12 +89,12 @@ export default function SoilFilters({
             onClick={onClearFilters}
             className="agri-field-filter-clear-btn"
           >
-            Reset
+            {t('common.clear', 'Reset')}
           </button>
         )}
 
         {/* View Mode Toggle: Table / Grid */}
-        <div className="agri-soil-view-toggle" role="group" aria-label="View format">
+        <div className="agri-soil-view-toggle" role="group" aria-label={t('common.filter', 'View format')}>
           <button
             type="button"
             className={`agri-soil-toggle-btn ${viewMode === 'table' ? 'agri-soil-toggle-btn--active' : ''}`}
@@ -100,7 +102,7 @@ export default function SoilFilters({
             aria-pressed={viewMode === 'table'}
           >
             <TableIcon size={14} aria-hidden="true" />
-            <span>Table</span>
+            <span>{t('common.tableView', 'Table')}</span>
           </button>
           <button
             type="button"
@@ -109,8 +111,9 @@ export default function SoilFilters({
             aria-pressed={viewMode === 'cards'}
           >
             <LayoutGrid size={14} aria-hidden="true" />
-            <span>Cards</span>
+            <span>{t('common.cardsView', 'Cards')}</span>
           </button>
+
         </div>
       </div>
     </div>

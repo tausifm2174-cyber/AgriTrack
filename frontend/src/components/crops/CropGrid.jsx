@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Sprout, RotateCcw } from 'lucide-react';
 import CropCard from './CropCard';
 import { EmptyState, Button } from '../common';
@@ -22,16 +23,18 @@ export default function CropGrid({
   onResetFilters,
   isFiltered = false,
 }) {
+  const { t } = useTranslation();
+
   if (crops.length === 0) {
     return (
       <div className="agri-crop-empty-wrap">
         <EmptyState
           icon={<Sprout size={36} aria-hidden="true" />}
-          title={isFiltered ? 'No matching crop cycles found' : 'No crop cycles recorded'}
+          title={isFiltered ? t('common.noData', 'No matching crop cycles found') : t('common.noData', 'No crop cycles recorded')}
           description={
             isFiltered
-              ? 'Try modifying your search keywords or resetting farm, field, season, or stage filters.'
-              : 'Add your first crop cycle to begin tracking planting dates, field growth, and harvest milestones.'
+              ? t('common.noData', 'Try modifying your search keywords or resetting filters.')
+              : t('crops.subtitle', 'Add your first crop cycle to begin tracking planting dates, field growth, and harvest milestones.')
           }
           action={
             isFiltered && (
@@ -40,7 +43,7 @@ export default function CropGrid({
                 icon={<RotateCcw size={14} aria-hidden="true" />}
                 onClick={onResetFilters}
               >
-                Clear All Filters
+                {t('common.clear', 'Clear All Filters')}
               </Button>
             )
           }
@@ -50,7 +53,7 @@ export default function CropGrid({
   }
 
   return (
-    <section className="agri-crop-grid" aria-label="Crop Cycles Grid">
+    <section className="agri-crop-grid" aria-label={t('crops.title', 'Crop Cycles Grid')}>
       {crops.map((crop) => (
         <CropCard
           key={crop.id}

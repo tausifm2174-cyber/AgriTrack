@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, Droplets, MapPin, Eye } from 'lucide-react';
 import IrrigationStatusBadge from './IrrigationStatusBadge';
 import IrrigationMethodPill from './IrrigationMethodPill';
+import { translateCrop, formatFieldName } from '../../utils/displayLabels';
 
 /**
  * UpcomingIrrigation Component
@@ -16,6 +18,7 @@ export default function UpcomingIrrigation({
   onViewSchedule,
   fieldsMap = {},
 }) {
+  const { t } = useTranslation();
   // Filter schedules that are Scheduled or In Progress, and date is Today (2026-10-03) or upcoming (>= 2026-10-03)
   const todayDateStr = '2026-10-03';
   const upcomingItems = schedules.filter((s) => {
@@ -28,7 +31,7 @@ export default function UpcomingIrrigation({
         <div className="agri-upcoming-header">
           <span className="agri-upcoming-title">
             <Droplets size={18} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
-            Today & Upcoming Irrigation
+            {t('navigation.irrigation')}
           </span>
         </div>
         <div
@@ -42,28 +45,29 @@ export default function UpcomingIrrigation({
             fontSize: '0.85rem',
           }}
         >
-          No irrigation runs currently scheduled for today or upcoming days.
+          {t('common.noData')}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="agri-upcoming-irrigation-section" role="region" aria-label="Upcoming Irrigation Runs">
+    <div className="agri-upcoming-irrigation-section" role="region" aria-label={t('navigation.irrigation')}>
       <div className="agri-upcoming-header">
         <span className="agri-upcoming-title">
           <Droplets size={18} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
-          Today & Upcoming Irrigation Schedule
+          {t('status.upcoming')} {t('navigation.irrigation')}
         </span>
         <span style={{ fontSize: '0.775rem', color: 'var(--slate-500)', fontWeight: 500 }}>
-          {upcomingItems.length} imminent delivery cycle{upcomingItems.length > 1 ? 's' : ''}
+          {upcomingItems.length} {t('status.scheduled').toLowerCase()}
         </span>
       </div>
 
       <div className="agri-upcoming-grid">
         {upcomingItems.map((item) => {
           const isToday = item.scheduledDate === todayDateStr;
-          const fieldName = fieldsMap[item.fieldId]?.name || item.fieldId;
+          const rawFieldName = fieldsMap[item.fieldId]?.name || item.fieldId;
+          const fieldName = formatFieldName(rawFieldName, t);
 
           return (
             <div
@@ -77,7 +81,7 @@ export default function UpcomingIrrigation({
                     <MapPin size={13} style={{ color: 'var(--slate-400)' }} aria-hidden="true" />
                     <span>{fieldName}</span>
                   </div>
-                  <span className="agri-upcoming-card__crop">{item.cropName}</span>
+                  <span className="agri-upcoming-card__crop">{translateCrop(item.cropName, t)}</span>
                 </div>
                 <IrrigationStatusBadge status={item.status} />
               </div>
@@ -85,7 +89,7 @@ export default function UpcomingIrrigation({
               {/* Timing */}
               <div className="agri-upcoming-card__time">
                 <Calendar size={13} style={{ color: 'var(--slate-400)' }} aria-hidden="true" />
-                <span>{isToday ? 'Today' : item.scheduledDate}</span>
+                <span>{item.scheduledDate}</span>
                 <span>•</span>
                 <Clock size={13} style={{ color: 'var(--slate-400)' }} aria-hidden="true" />
                 <span>{item.scheduledTime}</span>
@@ -101,7 +105,7 @@ export default function UpcomingIrrigation({
 
               {/* Meta & View Action */}
               <div className="agri-upcoming-card__meta">
-                <span>Duration: <strong>{item.durationMinutes} min</strong></span>
+                <span>{t('irrigation.duration')}: <strong>{item.durationMinutes} min</strong></span>
                 <button
                   type="button"
                   onClick={() => onViewSchedule(item)}
@@ -117,10 +121,10 @@ export default function UpcomingIrrigation({
                     gap: '0.25rem',
                     padding: 0,
                   }}
-                  aria-label={`View details for ${item.title}`}
+                  aria-label={`${t('common.viewDetails')}: ${item.title}`}
                 >
                   <Eye size={12} aria-hidden="true" />
-                  <span>Inspect</span>
+                  <span>{t('common.viewDetails')}</span>
                 </button>
               </div>
             </div>

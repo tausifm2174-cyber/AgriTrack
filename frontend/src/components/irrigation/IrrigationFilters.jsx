@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, X, Filter } from 'lucide-react';
 import {
   IRRIGATION_METHODS,
@@ -29,6 +30,8 @@ export default function IrrigationFilters({
   crops = [],
   totalResultsCount = 0,
 }) {
+  const { t } = useTranslation();
+
   // Cascading fields based on selected farm
   const availableFields = useMemo(() => {
     if (!filters.farmId) return fields;
@@ -87,7 +90,7 @@ export default function IrrigationFilters({
   ].filter(Boolean).length;
 
   return (
-    <div className="agri-irrigation-filter-toolbar" role="search" aria-label="Filter Irrigation Schedules">
+    <div className="agri-irrigation-filter-toolbar" role="search" aria-label={t('common.filter')}>
       {/* Top Row: Search and primary selects */}
       <div className="agri-irrigation-filter-row-top">
         {/* Search Input */}
@@ -96,10 +99,10 @@ export default function IrrigationFilters({
           <input
             type="text"
             className="agri-irrigation-search-input"
-            placeholder="Search schedules, crops, methods, notes..."
+            placeholder={`${t('common.search')} ${t('navigation.irrigation').toLowerCase()}...`}
             value={filters.search || ''}
             onChange={(e) => onFilterChange({ search: e.target.value })}
-            aria-label="Search irrigation schedules"
+            aria-label={t('common.search')}
           />
         </div>
 
@@ -110,9 +113,9 @@ export default function IrrigationFilters({
             className="agri-irrigation-select"
             value={filters.farmId || ''}
             onChange={handleFarmChange}
-            aria-label="Filter by Farm"
+            aria-label={t('navigation.farms')}
           >
-            <option value="">All Farms</option>
+            <option value="">{t('common.all')} {t('navigation.farms')}</option>
             {farms.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name}
@@ -125,12 +128,12 @@ export default function IrrigationFilters({
             className="agri-irrigation-select"
             value={filters.fieldId || ''}
             onChange={(e) => onFilterChange({ fieldId: e.target.value })}
-            aria-label="Filter by Field"
+            aria-label={t('navigation.fields')}
           >
-            <option value="">{filters.farmId ? 'All Farm Fields' : 'All Fields'}</option>
+            <option value="">{t('common.all')} {t('navigation.fields')}</option>
             {availableFields.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} ({f.currentCrop || 'No Crop'})
+                {f.name} ({f.currentCrop || '—'})
               </option>
             ))}
           </select>
@@ -140,9 +143,9 @@ export default function IrrigationFilters({
             className="agri-irrigation-select"
             value={filters.cropName || ''}
             onChange={(e) => onFilterChange({ cropName: e.target.value })}
-            aria-label="Filter by Crop"
+            aria-label={t('navigation.crops')}
           >
-            <option value="">All Crops</option>
+            <option value="">{t('common.all')} {t('navigation.crops')}</option>
             {availableCrops.map((cropName) => (
               <option key={cropName} value={cropName}>
                 {cropName}
@@ -155,9 +158,9 @@ export default function IrrigationFilters({
             className="agri-irrigation-select"
             value={filters.method || ''}
             onChange={(e) => onFilterChange({ method: e.target.value })}
-            aria-label="Filter by Irrigation Method"
+            aria-label={t('irrigation.method')}
           >
-            <option value="">All Methods</option>
+            <option value="">{t('common.all')} {t('irrigation.method')}</option>
             {IRRIGATION_METHODS.map((m) => (
               <option key={m} value={m}>
                 {m}
@@ -170,9 +173,9 @@ export default function IrrigationFilters({
             className="agri-irrigation-select"
             value={filters.status || ''}
             onChange={(e) => onFilterChange({ status: e.target.value })}
-            aria-label="Filter by Status"
+            aria-label={t('common.status')}
           >
-            <option value="">All Statuses</option>
+            <option value="">{t('common.all')} {t('common.status')}</option>
             {IRRIGATION_STATUSES.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -187,10 +190,10 @@ export default function IrrigationFilters({
             onChange={(e) => onFilterChange({ priority: e.target.value })}
             aria-label="Filter by Priority"
           >
-            <option value="">All Priorities</option>
+            <option value="">{t('common.all')}</option>
             {IRRIGATION_PRIORITIES.map((p) => (
               <option key={p} value={p}>
-                {p} Priority
+                {p}
               </option>
             ))}
           </select>
@@ -202,8 +205,8 @@ export default function IrrigationFilters({
             style={{ paddingRight: '0.75rem', backgroundImage: 'none' }}
             value={filters.date || ''}
             onChange={(e) => onFilterChange({ date: e.target.value })}
-            aria-label="Filter by Date"
-            title="Filter by Scheduled Date"
+            aria-label={t('common.date')}
+            title={t('common.date')}
           />
         </div>
       </div>
@@ -212,13 +215,13 @@ export default function IrrigationFilters({
       <div className="agri-irrigation-filter-status-row">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
           <span style={{ fontWeight: 500, color: 'var(--slate-600)' }}>
-            Showing <strong>{totalResultsCount}</strong> {totalResultsCount === 1 ? 'schedule' : 'schedules'}
+            <strong>{totalResultsCount}</strong> {t('navigation.irrigation').toLowerCase()}
           </span>
 
           {hasActiveFilters && (
             <span className="agri-irrigation-active-filter-badge">
               <Filter size={12} aria-hidden="true" />
-              {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active
+              {activeFilterCount} {t('common.filter').toLowerCase()}
             </span>
           )}
 
@@ -227,7 +230,7 @@ export default function IrrigationFilters({
               className="agri-irrigation-active-filter-badge"
               style={{ backgroundColor: 'var(--slate-100)', color: 'var(--slate-700)' }}
             >
-              Field: {fields.find((f) => f.id === filters.fieldId)?.name || filters.fieldId}
+              {t('navigation.fields')}: {fields.find((f) => f.id === filters.fieldId)?.name || filters.fieldId}
             </span>
           )}
 
@@ -236,7 +239,7 @@ export default function IrrigationFilters({
               className="agri-irrigation-active-filter-badge"
               style={{ backgroundColor: 'var(--slate-100)', color: 'var(--slate-700)' }}
             >
-              Farm: {farms.find((f) => f.id === filters.farmId)?.name || filters.farmId}
+              {t('navigation.farms')}: {farms.find((f) => f.id === filters.farmId)?.name || filters.farmId}
             </span>
           )}
         </div>
@@ -249,7 +252,7 @@ export default function IrrigationFilters({
             onClick={onResetFilters}
           >
             <X size={13} aria-hidden="true" />
-            Clear Filters
+            {t('common.clear')}
           </button>
         )}
       </div>

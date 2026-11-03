@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Sprout, Calendar, ChevronDown, ChevronUp, Droplets, Clock, ArrowRight, ShieldAlert } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import RuleEvaluation from './RuleEvaluation';
+import { translateCrop, translateVariety, translateStatus } from '../../utils/displayLabels';
 
 /**
  * RecommendationCard component
  * Displays suitability results, sowing guidance, and explainable rule evaluation for a single crop.
- *
- * @param {Object} props
- * @param {Object} props.crop - Evaluated crop recommendation object
- * @param {string} [props.targetFieldId] - ID of field being evaluated
  */
 export default function RecommendationCard({ crop, targetFieldId = '' }) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
@@ -32,7 +31,7 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
   };
 
   return (
-    <article className="agri-recom-card" aria-label={`Recommendation for ${crop.crop}`}>
+    <article className="agri-recom-card" aria-label={`${t('recommendations.title', 'Recommendation')} for ${crop.crop}`}>
       {/* Top Header */}
       <div className="agri-recom-card__header">
         <div className="agri-recom-card__title-row">
@@ -40,8 +39,8 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
             <Sprout size={20} className="text-primary" aria-hidden="true" />
             <div>
               <h3 className="agri-recom-card__title">
-                {crop.crop}
-                <span className="agri-recom-card__variety"> — {crop.variety}</span>
+                {translateCrop(crop.crop, t)}
+                {crop.variety && <span className="agri-recom-card__variety"> — {translateVariety(crop.variety, t)}</span>}
               </h3>
               <span className="agri-recom-card__category">{crop.category}</span>
             </div>
@@ -49,10 +48,10 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
 
           <div className="agri-recom-card__badge-stack">
             <StatusBadge variant={crop.matchVariant || 'success'}>
-              {crop.matchTier}
+              {translateStatus(crop.matchTier, t)}
             </StatusBadge>
             <div className={`agri-recom-card__score-pill ${getScoreColorClass(crop.score)}`}>
-              <span>{crop.score}% Match</span>
+              <span>{crop.score}% {t('recommendations.match', 'Match')}</span>
             </div>
           </div>
         </div>
@@ -65,7 +64,7 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
         <div className="agri-recom-card__spec-item">
           <span className="agri-recom-card__spec-label">
             <Calendar size={13} aria-hidden="true" />
-            Sowing Window
+            {t('recommendations.sowingWindow', 'Sowing Window')}
           </span>
           <span className="agri-recom-card__spec-val">{crop.sowingWindow}</span>
         </div>
@@ -73,7 +72,7 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
         <div className="agri-recom-card__spec-item">
           <span className="agri-recom-card__spec-label">
             <Clock size={13} aria-hidden="true" />
-            Maturity
+            {t('recommendations.maturity', 'Maturity')}
           </span>
           <span className="agri-recom-card__spec-val">{crop.maturityDays}</span>
         </div>
@@ -81,7 +80,7 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
         <div className="agri-recom-card__spec-item">
           <span className="agri-recom-card__spec-label">
             <Droplets size={13} aria-hidden="true" />
-            Water Demand
+            {t('recommendations.waterDemand', 'Water Demand')}
           </span>
           <span className="agri-recom-card__spec-val">{crop.waterRequirement}</span>
         </div>
@@ -114,7 +113,7 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
           onClick={() => setIsExpanded((prev) => !prev)}
           aria-expanded={isExpanded}
         >
-          <span>{isExpanded ? 'Hide Rule Evaluation' : 'Why this recommendation? (Rule Details)'}</span>
+          <span>{isExpanded ? t('recommendations.hideRuleEval', 'Hide Rule Evaluation') : t('recommendations.whyRecommendation', 'Why this recommendation? (Rule Details)')}</span>
           {isExpanded ? <ChevronUp size={15} aria-hidden="true" /> : <ChevronDown size={15} aria-hidden="true" />}
         </button>
 
@@ -124,7 +123,7 @@ export default function RecommendationCard({ crop, targetFieldId = '' }) {
           icon={<ArrowRight size={14} aria-hidden="true" />}
           onClick={handlePlanCrop}
         >
-          View in Crops
+          {t('recommendations.viewInCrops', 'View in Crops')}
         </Button>
       </div>
     </article>

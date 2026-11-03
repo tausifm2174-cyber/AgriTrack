@@ -1,11 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
 import { StatusBadge } from '../common';
+import { translateStatus } from '../../utils/displayLabels';
 
 /**
  * SoilStatus component
  * Renders standardized soil health condition with status badge and icon.
  */
 export default function SoilStatus({ status, variant }) {
+  const { t } = useTranslation();
   let computedVariant = variant;
   let icon = null;
 
@@ -26,7 +29,7 @@ export default function SoilStatus({ status, variant }) {
 
   return (
     <StatusBadge variant={computedVariant} icon={icon}>
-      {status}
+      {translateStatus(status, t)}
     </StatusBadge>
   );
 }

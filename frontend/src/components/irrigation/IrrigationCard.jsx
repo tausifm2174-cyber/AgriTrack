@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, Edit3, Trash2, Calendar, Clock, MapPin, Sprout, Ban } from 'lucide-react';
 import { Button } from '../common';
 import IrrigationStatusBadge from './IrrigationStatusBadge';
 import IrrigationMethodPill from './IrrigationMethodPill';
+import { translateCrop, formatFieldName, translateStatus } from '../../utils/displayLabels';
 
 /**
  * IrrigationCard Component
@@ -25,8 +27,13 @@ export default function IrrigationCard({
   farmsMap = {},
   fieldsMap = {},
 }) {
-  const farmName = farmsMap[schedule.farmId]?.name || schedule.farmId;
-  const fieldName = fieldsMap[schedule.fieldId]?.name || schedule.fieldId;
+  const { t } = useTranslation();
+  const farmName = farmsMap[schedule.farmId]?.name
+    ? t(`farms.demoNames.${schedule.farmId}`, farmsMap[schedule.farmId].name)
+    : schedule.farmId;
+  const fieldName = fieldsMap[schedule.fieldId]?.name
+    ? formatFieldName(fieldsMap[schedule.fieldId].name, t)
+    : schedule.fieldId;
   const isScheduled = schedule.status === 'Scheduled';
 
   return (
@@ -39,7 +46,7 @@ export default function IrrigationCard({
             <span
               className={`agri-priority-pill agri-priority-pill--${schedule.priority.toLowerCase()}`}
             >
-              {schedule.priority}
+              {translateStatus(schedule.priority, t)}
             </span>
           )}
           <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', fontFamily: 'var(--font-mono)' }}>
@@ -65,7 +72,7 @@ export default function IrrigationCard({
         <div className="agri-irrigation-card__row">
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--slate-500)' }}>
             <MapPin size={13} aria-hidden="true" />
-            Field / Farm
+            {t('navigation.fields')} / {t('navigation.farms')}
           </span>
           <span style={{ fontWeight: 600, color: 'var(--slate-800)', textAlign: 'right' }}>
             {fieldName} • <span style={{ fontWeight: 400, color: 'var(--slate-500)' }}>{farmName}</span>
@@ -76,10 +83,10 @@ export default function IrrigationCard({
         <div className="agri-irrigation-card__row">
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--slate-500)' }}>
             <Sprout size={13} aria-hidden="true" />
-            Crop
+            {t('crops.cropName')}
           </span>
           <span style={{ fontWeight: 600, color: 'var(--primary-700)' }}>
-            {schedule.cropName || '—'}
+            {schedule.cropName ? translateCrop(schedule.cropName, t) : '—'}
           </span>
         </div>
 
@@ -87,7 +94,7 @@ export default function IrrigationCard({
         <div className="agri-irrigation-card__row">
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--slate-500)' }}>
             <Calendar size={13} aria-hidden="true" />
-            Scheduled
+            {t('common.date')}
           </span>
           <span style={{ color: 'var(--slate-700)', fontWeight: 500 }}>
             {schedule.scheduledDate} {schedule.scheduledTime ? `• ${schedule.scheduledTime}` : ''}
@@ -98,7 +105,7 @@ export default function IrrigationCard({
         <div className="agri-irrigation-card__row">
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--slate-500)' }}>
             <Clock size={13} aria-hidden="true" />
-            Duration & Volume
+            {t('irrigation.duration')} & {t('irrigation.waterQuantity')}
           </span>
           <span style={{ color: 'var(--slate-900)', fontWeight: 700 }}>
             {schedule.durationMinutes} min • {schedule.waterVolumeLitres ? `${schedule.waterVolumeLitres.toLocaleString()} L` : '—'}
@@ -108,7 +115,7 @@ export default function IrrigationCard({
         {/* Soil Moisture if present */}
         {schedule.soilMoisture !== undefined && schedule.soilMoisture !== null && (
           <div className="agri-irrigation-card__row">
-            <span style={{ color: 'var(--slate-500)' }}>Current Soil Moisture</span>
+            <span style={{ color: 'var(--slate-500)' }}>{t('soil.title')}</span>
             <span style={{ fontWeight: 600, color: schedule.soilMoisture < 40 ? 'var(--warning-text)' : 'var(--primary-700)' }}>
               {schedule.soilMoisture}%
             </span>
@@ -123,20 +130,20 @@ export default function IrrigationCard({
             variant="outline"
             size="sm"
             onClick={() => onViewSchedule(schedule)}
-            aria-label={`View details for ${schedule.title}`}
+            aria-label={`${t('common.viewDetails')}: ${schedule.title}`}
           >
             <Eye size={13} aria-hidden="true" />
-            <span>View</span>
+            <span>{t('common.viewDetails')}</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEditSchedule(schedule)}
-            aria-label={`Edit ${schedule.title}`}
+            aria-label={`${t('common.edit')}: ${schedule.title}`}
           >
             <Edit3 size={13} aria-hidden="true" />
-            <span>Edit</span>
+            <span>{t('common.edit')}</span>
           </Button>
 
           {isScheduled && onCancelSchedule && (
@@ -156,10 +163,10 @@ export default function IrrigationCard({
                 cursor: 'pointer',
               }}
               onClick={() => onCancelSchedule(schedule)}
-              aria-label={`Cancel schedule for ${schedule.title}`}
-              title="Cancel schedule"
+              aria-label={`${t('common.cancel')}: ${schedule.title}`}
+              title={t('common.cancel')}
             >
-              <Ban size={13} aria-hidden="true" />
+              <Ban size={14} aria-hidden="true" />
             </button>
           )}
 
@@ -180,8 +187,8 @@ export default function IrrigationCard({
                 cursor: 'pointer',
               }}
               onClick={() => onDeleteSchedule(schedule)}
-              aria-label={`Delete ${schedule.title}`}
-              title="Delete schedule"
+              aria-label={`${t('common.delete')}: ${schedule.title}`}
+              title={t('common.delete')}
             >
               <Trash2 size={13} aria-hidden="true" />
             </button>
@@ -191,3 +198,4 @@ export default function IrrigationCard({
     </div>
   );
 }
+

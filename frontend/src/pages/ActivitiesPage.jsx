@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, ClipboardList, Plus } from 'lucide-react';
 import {
   ActivityHeader,
@@ -26,6 +27,7 @@ import '../components/activities/activities.css';
  * Supports scheduling, tracking, filtering, details inspection, and responsive layouts.
  */
 export default function ActivitiesPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const urlFieldId = searchParams.get('fieldId') || '';
   const urlFarmId = searchParams.get('farmId') || '';
@@ -191,10 +193,10 @@ export default function ActivitiesPage() {
       setActivities((prev) =>
         prev.map((item) => (item.id === savedActivity.id ? savedActivity : item))
       );
-      showToast(`Activity "${savedActivity.title}" successfully updated`);
+      showToast(`${t('alerts.activityUpdated')}: ${savedActivity.title}`);
     } else {
       setActivities((prev) => [savedActivity, ...prev]);
-      showToast(`New activity "${savedActivity.title}" scheduled`);
+      showToast(`${t('alerts.activityAdded')}: ${savedActivity.title}`);
     }
   };
 
@@ -210,7 +212,7 @@ export default function ActivitiesPage() {
   // Delete activity
   const handleDeleteActivity = (activity) => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete activity "${activity.title}" (${activity.id})?`
+      `${t('common.delete')} "${activity.title}" (${activity.id})?`
     );
     if (!confirmed) return;
 
@@ -218,7 +220,7 @@ export default function ActivitiesPage() {
     if (selectedActivityForDetails?.id === activity.id) {
       setSelectedActivityForDetails(null);
     }
-    showToast(`Activity "${activity.title}" removed`);
+    showToast(`${t('alerts.itemDeleted')}: ${activity.title}`);
   };
 
   return (
@@ -282,21 +284,21 @@ export default function ActivitiesPage() {
           <div className="agri-activity-empty__icon" aria-hidden="true">
             <ClipboardList size={28} />
           </div>
-          <h3 className="agri-activity-empty__title">No Activities Found</h3>
+          <h3 className="agri-activity-empty__title">{t('common.noData')}</h3>
           <p className="agri-activity-empty__text">
             {Object.values(filters).some(Boolean)
-              ? 'No activities match the selected filter criteria. Try adjusting or resetting your search filters.'
-              : 'No agricultural activities have been recorded yet. Schedule your first field operation to get started.'}
+              ? t('common.noData')
+              : t('activities.subtitle')}
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
             {Object.values(filters).some(Boolean) && (
               <Button variant="outline" size="sm" onClick={handleResetFilters}>
-                Clear All Filters
+                {t('common.clear')}
               </Button>
             )}
             <Button variant="primary" size="sm" onClick={handleOpenAddModal}>
               <Plus size={14} aria-hidden="true" />
-              <span>Schedule New Activity</span>
+              <span>{t('activities.addActivity')}</span>
             </Button>
           </div>
         </div>

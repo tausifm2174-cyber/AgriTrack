@@ -1,24 +1,28 @@
+import { useTranslation } from 'react-i18next';
 import { Eye } from 'lucide-react';
 import { Button, StatusBadge } from '../common';
 import { formatCurrency } from '../../utils/formatters';
+import { formatFieldName, translateCrop } from '../../utils/displayLabels';
 
 export default function ExpenseTable({ expenses, onViewDetails }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-expense-table-container">
       <div className="agri-expense-table-scroll">
         <table className="agri-expense-table">
           <thead>
             <tr>
-              <th>Expense ID</th>
-              <th>Date</th>
-              <th>Farm & Field</th>
-              <th>Crop</th>
-              <th>Category</th>
-              <th>Description & Vendor</th>
-              <th>Amount</th>
-              <th>Payment</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>{t('expenses.expenseId', 'Expense ID')}</th>
+              <th>{t('common.date', 'Date')}</th>
+              <th>{t('expenses.farmField', 'Farm & Field')}</th>
+              <th>{t('activities.crop', 'Crop')}</th>
+              <th>{t('expenses.category', 'Category')}</th>
+              <th>{t('expenses.descVendor', 'Description & Vendor')}</th>
+              <th>{t('expenses.amount', 'Amount')}</th>
+              <th>{t('expenses.payment', 'Payment')}</th>
+              <th>{t('common.status', 'Status')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -57,16 +61,16 @@ export default function ExpenseTable({ expenses, onViewDetails }) {
                   <td>
                     <div>
                       <span style={{ fontWeight: 600, color: 'var(--slate-800)' }}>
-                        {exp.farmName}
+                        {t(`farms.demoNames.${exp.farmId}`, exp.farmName)}
                       </span>
                       <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                        {exp.fieldName}
+                        {formatFieldName(exp.fieldName, t)}
                       </div>
                     </div>
                   </td>
                   <td>
                     <span style={{ fontWeight: 600, color: 'var(--slate-700)' }}>
-                      {exp.cropName || 'General Farm'}
+                      {exp.cropName ? translateCrop(exp.cropName, t) : t('expenses.generalFarm', 'General Farm')}
                     </span>
                   </td>
                   <td>
@@ -96,7 +100,7 @@ export default function ExpenseTable({ expenses, onViewDetails }) {
                   </td>
                   <td>
                     <StatusBadge variant={exp.status === 'PAID' ? 'success' : 'warning'}>
-                      {exp.status === 'PAID' ? 'Paid' : 'Pending'}
+                      {exp.status === 'PAID' ? t('status.paid', 'Paid') : t('status.pending', 'Pending')}
                     </StatusBadge>
                   </td>
                   <td>
@@ -105,10 +109,10 @@ export default function ExpenseTable({ expenses, onViewDetails }) {
                         variant="outline"
                         size="sm"
                         onClick={() => onViewDetails(exp)}
-                        aria-label={`View details for ${exp.id}`}
+                        aria-label={`${t('common.viewDetails', 'View details for')} ${exp.id}`}
                       >
                         <Eye size={14} />
-                        <span>View</span>
+                        <span>{t('common.viewDetails', 'View')}</span>
                       </Button>
                     </div>
                   </td>

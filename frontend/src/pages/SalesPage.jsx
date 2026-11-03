@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2 } from 'lucide-react';
 import { salesRecords as initialSales } from '../data/salesData';
 import { harvestRecords as initialHarvests } from '../data/harvestData';
 import { EmptyState } from '../components/common';
+import { formatCurrency } from '../utils/formatters';
 import {
   SalesHeader,
   SalesSummaryCards,
@@ -16,6 +18,7 @@ import {
 import '../components/sales/sales.css';
 
 export default function SalesPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
 
   // Query parameters
@@ -137,7 +140,7 @@ export default function SalesPage() {
     // 3. Notification
     setNotification({
       type: 'success',
-      message: `Sale ${newSale.id} for ${newSale.cropName} (₹${newSale.totalAmount.toLocaleString('en-IN')}) successfully executed!`,
+      message: `${t('sales.sale', 'Sale')} ${newSale.id} ${t('common.of', 'of')} ${newSale.cropName} (${formatCurrency(newSale.totalAmount)}) ${t('alerts.saleAdded', 'successfully executed!')}`,
     });
     setTimeout(() => setNotification(null), 5000);
   };
@@ -165,7 +168,7 @@ export default function SalesPage() {
             type="button"
             onClick={() => setNotification(null)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#065f46' }}
-            aria-label="Dismiss notification"
+            aria-label={t('common.close', 'Dismiss notification')}
           >
             ✕
           </button>
@@ -200,9 +203,9 @@ export default function SalesPage() {
       {/* Content Area */}
       {filteredSales.length === 0 ? (
         <EmptyState
-          title="No sales records found"
-          message="No sales transactions match your selected search or filter criteria. Try adjusting your filters."
-          actionText="Reset Filters"
+          title={t('sales.noSales', 'No sales records found')}
+          message={t('sales.noSalesDesc', 'No sales transactions match your selected search or filter criteria. Try adjusting your filters.')}
+          actionText={t('common.clearFilters', 'Reset Filters')}
           onAction={handleResetFilters}
         />
       ) : viewMode === 'table' ? (

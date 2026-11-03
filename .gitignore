@@ -1,8 +1,22 @@
+# ==============================================================================
+# AgriTrack .gitignore
+# ==============================================================================
+
 # Node / React / Vite
-frontend/node_modules/
-frontend/dist/
-frontend/dist-ssr/
-frontend/.vite/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+.vite/
+**/.vite/
+
+# Java / Maven
+target/
+**/target/
+*.class
+.mvn/timing.properties
 
 # Logs
 *.log
@@ -12,30 +26,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Java / Maven
-backend/target/
-*.class
-
-# Environment / secrets
+# Environment & Secrets
 .env
 .env.*
+**/.env
+**/.env.*
 !.env.example
+!**/.env.example
 
 # Spring Boot local configuration
 application-local.properties
 application-secret.properties
+**/application-local.properties
+**/application-secret.properties
 
-# IDE
+# IDE & Editor files
 .vscode/*
 !.vscode/extensions.json
 .idea/
+**/.idea/
+*.iml
+**/*.iml
+.project
+.classpath
+.settings/
+**/.settings/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# OS
+# OS & Temporary files
 .DS_Store
 Thumbs.db
 desktop.ini

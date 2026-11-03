@@ -1,15 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { CloudRain, AlertTriangle, CheckCircle, Droplets, Info } from 'lucide-react';
 import { StatusBadge } from '../common';
 
 /**
  * WeatherAlerts component
  * Renders rule-based agronomic alerts triggered by weather conditions.
- *
- * @param {Object} props
- * @param {Array} props.alerts - List of evaluated weather alerts
- * @param {string} [props.farmName] - Currently selected farm
  */
 export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Farm' }) {
+  const { t } = useTranslation();
+
   const getAlertIcon = (type) => {
     switch (type) {
       case 'irrigation':
@@ -26,14 +25,14 @@ export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Fa
   };
 
   return (
-    <section className="agri-weather-alerts-card" aria-label="Rule-Based Weather Advisories">
+    <section className="agri-weather-alerts-card" aria-label={t('weather.ruleBasedAdvisories', 'Rule-Based Weather Advisories')}>
       <div className="agri-weather-alerts-card__header">
         <div className="agri-weather-alerts-card__title-group">
           <AlertTriangle size={18} className="text-warning" aria-hidden="true" />
-          <h2 className="agri-weather-alerts-card__title">Rule-Based Weather Advisories</h2>
+          <h2 className="agri-weather-alerts-card__title">{t('weather.ruleBasedAdvisories', 'Rule-Based Weather Advisories')}</h2>
         </div>
         <span className="agri-weather-alerts-card__sub">
-          Automated agronomic thresholds evaluated for {farmName}
+          {t('weather.thresholdsEvaluatedFor', 'Automated agronomic thresholds evaluated for')} {farmName}
         </span>
       </div>
 
@@ -61,11 +60,11 @@ export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Fa
               </div>
 
               <p className="agri-weather-alert-item__condition">
-                <strong>Trigger:</strong> {alert.condition || alert.triggerCondition}
+                <strong>{t('weather.trigger', 'Trigger')}:</strong> {alert.condition || alert.triggerCondition}
               </p>
 
               <div className="agri-weather-alert-item__recommendation">
-                <span className="agri-weather-alert-item__recom-label">Recommended Action:</span>
+                <span className="agri-weather-alert-item__recom-label">{t('weather.recommendedAction', 'Recommended Action')}:</span>
                 <span className="agri-weather-alert-item__recom-text">
                   {alert.recommendation || alert.recommendedAction}
                 </span>
@@ -73,7 +72,7 @@ export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Fa
 
               {alert.affectedFields && alert.affectedFields.length > 0 && (
                 <div className="agri-weather-alert-item__fields">
-                  <span className="text-muted">Target Parcels: </span>
+                  <span className="text-muted">{t('weather.targetParcels', 'Target Parcels')}: </span>
                   {alert.affectedFields.map((f, i) => (
                     <span key={i} className="agri-weather-alert-item__field-pill">
                       {f}

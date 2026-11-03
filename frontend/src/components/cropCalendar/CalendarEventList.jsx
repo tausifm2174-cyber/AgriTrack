@@ -1,6 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Sprout, Grid3X3, ArrowRight } from 'lucide-react';
 import { StatusBadge, Button, EmptyState } from '../common';
+import {
+  translateCrop,
+  translateVariety,
+  translateStage,
+  translateStatus,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 /**
  * CalendarEventList component
@@ -16,6 +24,7 @@ export default function CalendarEventList({
   selectedDate = '',
   onClearDateFilter,
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleGoToCrop = (fieldId) => {
@@ -30,11 +39,11 @@ export default function CalendarEventList({
     <div className="agri-cal-list-section">
       <div className="agri-cal-list-header">
         <div>
-          <h3 className="agri-cal-list-title">Upcoming Crop Milestones</h3>
+          <h3 className="agri-cal-list-title">{t('cropCalendar.timeline', 'Upcoming Crop Milestones')}</h3>
           <p className="agri-cal-list-subtitle">
             {selectedDate
-              ? `Showing scheduled activities for ${selectedDate}`
-              : 'Chronological timeline of crop lifecycle stages and field management activities'}
+              ? `${t('cropCalendar.milestoneName', 'Showing scheduled activities for')} ${selectedDate}`
+              : t('cropCalendar.subtitle', 'Chronological timeline of crop lifecycle stages and field management activities')}
           </p>
         </div>
 
@@ -44,7 +53,7 @@ export default function CalendarEventList({
             size="sm"
             onClick={onClearDateFilter}
           >
-            Show All Dates
+            {t('common.all', 'Show All Dates')}
           </Button>
         )}
       </div>
@@ -53,12 +62,12 @@ export default function CalendarEventList({
         <div className="agri-cal-list-empty">
           <EmptyState
             icon={<Calendar size={36} aria-hidden="true" />}
-            title="No milestones scheduled"
-            description="No agronomic events match the currently selected date or filters."
+            title={t('common.noData', 'No milestones scheduled')}
+            description={t('common.noData', 'No agronomic events match the currently selected date or filters.')}
             action={
               selectedDate && (
                 <Button variant="outline" size="sm" onClick={onClearDateFilter}>
-                  View All Scheduled Milestones
+                  {t('common.viewDetails', 'View All Scheduled Milestones')}
                 </Button>
               )
             }
@@ -90,7 +99,7 @@ export default function CalendarEventList({
                   <div className="agri-cal-event-card__title-row">
                     <h4 className="agri-cal-event-card__title">{event.title}</h4>
                     <StatusBadge variant={event.statusVariant || 'info'}>
-                      {event.status}
+                      {translateStatus(event.status, t)}
                     </StatusBadge>
                   </div>
 
@@ -98,18 +107,18 @@ export default function CalendarEventList({
                   <div className="agri-cal-event-card__context">
                     <span className="agri-cal-event-card__field">
                       <Grid3X3 size={13} aria-hidden="true" />
-                      <strong>{event.fieldName}</strong> ({event.farmName})
+                      <strong>{formatFieldName(event.fieldName, t)}</strong> ({t(`farms.demoNames.${event.farmId}`, event.farmName)})
                     </span>
                     <span className="agri-cal-event-card__dot">•</span>
                     <span className="agri-cal-event-card__crop">
                       <Sprout size={13} className="text-primary" aria-hidden="true" />
-                      <span>{event.crop} {event.variety ? `– ${event.variety}` : ''}</span>
+                      <span>{translateCrop(event.crop, t)} {event.variety ? `– ${translateVariety(event.variety, t)}` : ''}</span>
                     </span>
                     {event.stage && (
                       <>
                         <span className="agri-cal-event-card__dot">•</span>
                         <span className="agri-cal-event-card__stage">
-                          Stage: <strong>{event.stage}</strong>
+                          {t('crops.currentStage', 'Stage')}: <strong>{translateStage(event.stage, t)}</strong>
                         </span>
                       </>
                     )}
@@ -129,7 +138,7 @@ export default function CalendarEventList({
                     icon={<ArrowRight size={14} aria-hidden="true" />}
                     onClick={() => handleGoToCrop(event.fieldId)}
                   >
-                    Crop Details
+                    {t('crops.cropDetails', 'Crop Details')}
                   </Button>
                 </div>
               </article>

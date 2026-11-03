@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Bell, CheckCheck } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import NotificationTypeIcon from '../notifications/NotificationTypeIcon';
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -54,7 +56,7 @@ export default function NotificationBell() {
         type="button"
         className="agri-icon-btn"
         onClick={() => setIsOpen((prev) => !prev)}
-        aria-label={`Notifications (${unreadCount} unread)`}
+        aria-label={`${t('notifications.title', 'Notifications')} (${unreadCount} ${t('notifications.unread', 'unread')})`}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -70,10 +72,10 @@ export default function NotificationBell() {
         <div className="agri-dropdown-menu agri-notifications-dropdown" role="menu">
           <div className="agri-dropdown-header">
             <div className="agri-dropdown-title-group">
-              <span className="agri-dropdown-title">Notifications</span>
+              <span className="agri-dropdown-title">{t('notifications.title', 'Notifications')}</span>
               {unreadCount > 0 && (
                 <span className="agri-badge agri-badge--info" style={{ fontSize: '0.7rem' }}>
-                  {unreadCount} new
+                  {unreadCount} {t('notifications.new', 'new')}
                 </span>
               )}
             </div>
@@ -82,10 +84,10 @@ export default function NotificationBell() {
                 type="button"
                 className="agri-btn--link"
                 onClick={handleMarkAllRead}
-                title="Mark all as read"
+                title={t('notifications.markAllRead', 'Mark all as read')}
               >
                 <CheckCheck size={14} />
-                <span>Mark all read</span>
+                <span>{t('notifications.markAllRead', 'Mark all read')}</span>
               </button>
             )}
           </div>
@@ -93,7 +95,7 @@ export default function NotificationBell() {
           <div className="agri-notifications-list">
             {recentNotifications.length === 0 ? (
               <div style={{ padding: '1.5rem 1rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.8125rem' }}>
-                No notifications right now
+                {t('notifications.noNotifications', 'No notifications right now')}
               </div>
             ) : (
               recentNotifications.map((item) => {
@@ -121,7 +123,7 @@ export default function NotificationBell() {
                       <span className="agri-notification-time">{item.timestamp}</span>
                     </div>
                     {!item.isRead && (
-                      <span className="agri-notification-dot" aria-label="Unread" />
+                      <span className="agri-notification-dot" aria-label={t('notifications.unread', 'Unread')} />
                     )}
                   </div>
                 );
@@ -135,7 +137,7 @@ export default function NotificationBell() {
               className="agri-dropdown-action-btn"
               onClick={handleViewAll}
             >
-              View all notifications ({notifications.length})
+              {t('notifications.viewAllNotifications', 'View all notifications ({{count}})', { count: notifications.length })}
             </button>
           </div>
         </div>
@@ -143,3 +145,4 @@ export default function NotificationBell() {
     </div>
   );
 }
+

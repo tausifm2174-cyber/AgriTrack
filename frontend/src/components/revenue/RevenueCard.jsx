@@ -1,9 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, MapPin } from 'lucide-react';
 import { Button } from '../common';
 import { SalesStatusBadge } from '../sales';
 import { formatCurrency, formatWeight } from '../../utils/formatters';
+import {
+  formatFieldName,
+  translateCrop,
+  translateVariety,
+} from '../../utils/displayLabels';
 
 export default function RevenueCard({ sale, onViewDetails }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-revenue-card">
       <div className="agri-revenue-card__header">
@@ -16,7 +24,7 @@ export default function RevenueCard({ sale, onViewDetails }) {
             <SalesStatusBadge status={sale.paymentStatus} type="payment" />
           </div>
           <h3 className="agri-revenue-card__title">
-            {sale.cropName} ({sale.variety})
+            {translateCrop(sale.cropName, t)} ({translateVariety(sale.variety, t)})
           </h3>
           <div className="agri-revenue-card__subtitle">
             {sale.buyerName} • {sale.market}
@@ -36,19 +44,19 @@ export default function RevenueCard({ sale, onViewDetails }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', color: 'var(--slate-500)' }}>
           <MapPin size={13} />
           <span>
-            {sale.farmName} • {sale.fieldName}
+            {t(`farms.demoNames.${sale.farmId}`, sale.farmName)} • {formatFieldName(sale.fieldName, t)}
           </span>
         </div>
 
         <div className="agri-revenue-card__stats-grid">
           <div className="agri-revenue-card__stat-item">
-            <span className="agri-revenue-card__stat-label">Quantity</span>
+            <span className="agri-revenue-card__stat-label">{t('common.quantity', 'Quantity')}</span>
             <span className="agri-revenue-card__stat-value">
               {formatWeight(sale.quantityKg, 'kg')}
             </span>
           </div>
           <div className="agri-revenue-card__stat-item">
-            <span className="agri-revenue-card__stat-label">Realized Price</span>
+            <span className="agri-revenue-card__stat-label">{t('revenue.realizedPrice', 'Realized Price')}</span>
             <span className="agri-revenue-card__stat-value">
               ₹{Number(sale.pricePerKg).toFixed(2)}/kg
             </span>
@@ -58,16 +66,16 @@ export default function RevenueCard({ sale, onViewDetails }) {
 
       <div className="agri-revenue-card__footer">
         <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-          Date: <strong>{sale.saleDate}</strong>
+          {t('common.date', 'Date')}: <strong>{sale.saleDate}</strong>
         </div>
         <Button
           variant="outline"
           size="sm"
           onClick={() => onViewDetails(sale)}
-          aria-label={`View revenue details for ${sale.id}`}
+          aria-label={`${t('common.viewDetails', 'View revenue details for')} ${sale.id}`}
         >
           <Eye size={14} />
-          <span>Details</span>
+          <span>{t('common.details', 'Details')}</span>
         </Button>
       </div>
     </div>

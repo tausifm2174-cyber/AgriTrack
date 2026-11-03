@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Droplets, Plus } from 'lucide-react';
 import {
   IrrigationHeader,
@@ -28,6 +29,7 @@ import '../components/irrigation/irrigation.css';
  * Supports scheduling, telemetry, weather advisory, and cascading parcel filters.
  */
 export default function IrrigationPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const urlFieldId = searchParams.get('fieldId') || '';
   const urlFarmId = searchParams.get('farmId') || '';
@@ -197,10 +199,10 @@ export default function IrrigationPage() {
       setSchedules((prev) =>
         prev.map((item) => (item.id === savedSchedule.id ? savedSchedule : item))
       );
-      showToast(`Schedule "${savedSchedule.title}" successfully updated`);
+      showToast(`${t('alerts.activityUpdated')}: ${savedSchedule.title}`);
     } else {
       setSchedules((prev) => [savedSchedule, ...prev]);
-      showToast(`New irrigation run "${savedSchedule.title}" scheduled`);
+      showToast(`${t('alerts.irrigationScheduled')}: ${savedSchedule.title}`);
     }
   };
 
@@ -216,7 +218,7 @@ export default function IrrigationPage() {
   // Cancel schedule (sets status to Cancelled)
   const handleCancelSchedule = (schedule) => {
     const confirmed = window.confirm(
-      `Cancel scheduled irrigation "${schedule.title}" (${schedule.id})?`
+      `${t('common.cancel')} "${schedule.title}" (${schedule.id})?`
     );
     if (!confirmed) return;
 
@@ -225,28 +227,21 @@ export default function IrrigationPage() {
         item.id === schedule.id ? { ...item, status: 'Cancelled' } : item
       )
     );
-    showToast(`Irrigation schedule "${schedule.title}" marked as Cancelled`);
+    showToast(`${t('status.cancelled')}: ${schedule.title}`);
   };
 
   // Delete schedule
   const handleDeleteSchedule = (schedule) => {
-    if (schedule.status === 'Completed') {
-      const confirmHistory = window.confirm(
-        `This schedule "${schedule.title}" is already Completed. Deleting historical delivery data is not recommended. Are you sure you wish to delete this record?`
-      );
-      if (!confirmHistory) return;
-    } else {
-      const confirmed = window.confirm(
-        `Are you sure you want to permanently delete schedule "${schedule.title}" (${schedule.id})?`
-      );
-      if (!confirmed) return;
-    }
+    const confirmed = window.confirm(
+      `${t('common.delete')} "${schedule.title}" (${schedule.id})?`
+    );
+    if (!confirmed) return;
 
     setSchedules((prev) => prev.filter((item) => item.id !== schedule.id));
     if (selectedScheduleForDetails?.id === schedule.id) {
       setSelectedScheduleForDetails(null);
     }
-    showToast(`Schedule "${schedule.title}" deleted`);
+    showToast(`${t('alerts.itemDeleted')}: ${schedule.title}`);
   };
 
   return (
@@ -325,21 +320,21 @@ export default function IrrigationPage() {
           <div className="agri-irrigation-empty__icon" aria-hidden="true">
             <Droplets size={28} />
           </div>
-          <h3 className="agri-irrigation-empty__title">No Irrigation Schedules Found</h3>
+          <h3 className="agri-irrigation-empty__title">{t('common.noData')}</h3>
           <p className="agri-irrigation-empty__text">
             {Object.values(filters).some(Boolean)
-              ? 'No schedules match the selected filter criteria. Try adjusting or resetting your search filters.'
-              : 'No irrigation delivery cycles have been scheduled yet. Plan your first precision water run to get started.'}
+              ? t('common.noData')
+              : t('irrigation.subtitle')}
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
             {Object.values(filters).some(Boolean) && (
               <Button variant="outline" size="sm" onClick={handleResetFilters}>
-                Clear All Filters
+                {t('common.clear')}
               </Button>
             )}
             <Button variant="primary" size="sm" onClick={handleOpenAddModal}>
               <Plus size={14} aria-hidden="true" />
-              <span>Schedule Irrigation</span>
+              <span>{t('irrigation.addSchedule')}</span>
             </Button>
           </div>
         </div>

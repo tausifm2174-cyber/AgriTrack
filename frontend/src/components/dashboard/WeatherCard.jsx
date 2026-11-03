@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CloudSun, Droplets, Wind, Umbrella, MapPin, ArrowRight } from 'lucide-react';
+import { translateWeatherCondition } from '../../utils/displayLabels';
 
 /**
  * WeatherCard Component
@@ -8,6 +10,7 @@ import { CloudSun, Droplets, Wind, Umbrella, MapPin, ArrowRight } from 'lucide-r
  * @param {Object} props.weather
  */
 export default function WeatherCard({ weather }) {
+  const { t } = useTranslation();
   const {
     temperature = 28,
     unit = '°C',
@@ -26,11 +29,11 @@ export default function WeatherCard({ weather }) {
           <div>
             <div className="agri-weather-card__location-badge">
               <MapPin size={13} aria-hidden="true" />
-              <span>{location}</span>
+              <span>{t('weather.farmArea', location)}</span>
             </div>
-            <p className="agri-weather-card__subtext">{subtext}</p>
+            <p className="agri-weather-card__subtext">{t('weather.todaysWeather', subtext)}</p>
           </div>
-          <div className="agri-weather-card__icon-box" title={condition}>
+          <div className="agri-weather-card__icon-box" title={translateWeatherCondition(condition, t)}>
             <CloudSun size={28} aria-hidden="true" />
           </div>
         </div>
@@ -40,8 +43,8 @@ export default function WeatherCard({ weather }) {
             {temperature}{unit}
           </span>
           <div className="agri-weather-card__condition-wrap">
-            <span className="agri-weather-card__condition">{condition}</span>
-            <span className="text-muted" style={{ fontSize: '0.725rem' }}>Demo Weather</span>
+            <span className="agri-weather-card__condition">{translateWeatherCondition(condition, t)}</span>
+            <span className="text-muted" style={{ fontSize: '0.725rem' }}>{t('dashboard.weatherOverview', 'Weather Overview')}</span>
           </div>
         </div>
 
@@ -49,21 +52,21 @@ export default function WeatherCard({ weather }) {
           <div className="agri-weather-card__detail-item">
             <span className="agri-weather-card__detail-label">
               <Droplets size={11} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
-              Humidity
+              {t('dashboard.humidity', 'Humidity')}
             </span>
             <span className="agri-weather-card__detail-val">{humidity}%</span>
           </div>
           <div className="agri-weather-card__detail-item">
             <span className="agri-weather-card__detail-label">
               <Wind size={11} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
-              Wind
+              {t('dashboard.wind', 'Wind')}
             </span>
             <span className="agri-weather-card__detail-val">{windSpeed}</span>
           </div>
           <div className="agri-weather-card__detail-item">
             <span className="agri-weather-card__detail-label">
               <Umbrella size={11} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
-              Rain
+              {t('dashboard.rainfall', 'Rainfall')}
             </span>
             <span className="agri-weather-card__detail-val">{rainChance}</span>
           </div>
@@ -71,7 +74,7 @@ export default function WeatherCard({ weather }) {
       </div>
 
       <Link to="/weather" className="agri-weather-card__link">
-        <span>View weather insights</span>
+        <span>{t('navigation.weather', 'Weather & Insights')}</span>
         <ArrowRight size={13} aria-hidden="true" />
       </Link>
     </div>

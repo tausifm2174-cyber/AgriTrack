@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PlusCircle, Droplets } from 'lucide-react';
 import { PageHeader, Button } from '../common';
 
@@ -9,19 +10,21 @@ import { PageHeader, Button } from '../common';
  * @param {Function} props.onScheduleIrrigation
  */
 export default function IrrigationHeader({ onScheduleIrrigation }) {
+  const { t } = useTranslation();
+
   return (
     <PageHeader
-      title="Irrigation Scheduling"
-      subtitle="Schedule and monitor precision water delivery, methods, and volumes"
+      title={t('irrigation.title')}
+      subtitle={t('irrigation.subtitle')}
       actions={
         <Button
           variant="primary"
           onClick={onScheduleIrrigation}
-          aria-label="Schedule new irrigation run"
+          aria-label={t('irrigation.addSchedule')}
         >
           <PlusCircle size={16} aria-hidden="true" />
           <Droplets size={16} aria-hidden="true" />
-          <span>Schedule Irrigation</span>
+          <span>{t('irrigation.addSchedule')}</span>
         </Button>
       }
     />

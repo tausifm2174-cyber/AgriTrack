@@ -1,4 +1,5 @@
 import { useState, useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, PackageCheck } from 'lucide-react';
 import { Button } from '../common';
 import { farmData } from '../../data/farmData';
@@ -13,6 +14,7 @@ function getNextCropCycleId() {
 }
 
 export default function AddHarvestModal({ onClose, onAddHarvest }) {
+  const { t } = useTranslation();
   const farmSelectId = useId();
   const fieldSelectId = useId();
   const cropInputId = useId();
@@ -75,29 +77,29 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
   const validate = () => {
     const errs = {};
-    if (!farmId) errs.farmId = 'Please select a farm';
-    if (!fieldId) errs.fieldId = 'Please select a field';
-    if (!cropName.trim()) errs.cropName = 'Crop name is required';
-    if (!harvestDate) errs.harvestDate = 'Harvest date is required';
+    if (!farmId) errs.farmId = t('validation.required', 'Please select a farm');
+    if (!fieldId) errs.fieldId = t('validation.required', 'Please select a field');
+    if (!cropName.trim()) errs.cropName = t('validation.required', 'Crop name is required');
+    if (!harvestDate) errs.harvestDate = t('validation.required', 'Harvest date is required');
 
     const actualQty = Number(harvestedQuantityKg);
     if (isNaN(actualQty) || actualQty < 0) {
-      errs.harvestedQuantityKg = 'Harvested quantity must be 0 or greater';
+      errs.harvestedQuantityKg = t('validation.positiveNumber', 'Harvested quantity must be 0 or greater');
     }
 
     const expYield = Number(expectedYieldKg);
     if (isNaN(expYield) || expYield < 0) {
-      errs.expectedYieldKg = 'Expected yield must be 0 or greater';
+      errs.expectedYieldKg = t('validation.positiveNumber', 'Expected yield must be 0 or greater');
     }
 
     const score = Number(qualityScore);
     if (isNaN(score) || score < 1 || score > 100) {
-      errs.qualityScore = 'Score must be between 1 and 100';
+      errs.qualityScore = t('validation.range', 'Score must be between 1 and 100');
     }
 
     const moisture = Number(moisturePercent);
     if (isNaN(moisture) || moisture < 0 || moisture > 100) {
-      errs.moisturePercent = 'Moisture must be between 0 and 100%';
+      errs.moisturePercent = t('validation.range', 'Moisture must be between 0 and 100%');
     }
 
     setErrors(errs);
@@ -157,20 +159,20 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--primary-700)', fontSize: '0.75rem', fontWeight: 600 }}>
               <PackageCheck size={14} />
-              <span>Produce Intake & Logging</span>
+              <span>{t('harvests.intakeLogging', 'Produce Intake & Logging')}</span>
             </div>
             <h3 id="add-harvest-title" className="agri-modal-title">
-              Record New Harvest
+              {t('harvests.addHarvest', 'Record New Harvest')}
             </h3>
             <p className="agri-modal-subtitle">
-              Enter harvested lot metrics, quality evaluation, and granary storage allocation.
+              {t('harvests.intakeSubtitle', 'Enter harvested lot metrics, quality evaluation, and granary storage allocation.')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
@@ -183,7 +185,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             <div className="agri-form-grid agri-form-grid--2">
               <div className="agri-form-group">
                 <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
-                  Farm / Holding
+                  {t('farms.farm', 'Farm / Holding')}
                 </label>
                 <select
                   id={farmSelectId}
@@ -202,7 +204,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={fieldSelectId} className="agri-form-label agri-form-label--required">
-                  Field
+                  {t('fields.field', 'Field')}
                 </label>
                 <select
                   id={fieldSelectId}
@@ -212,7 +214,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                 >
                   {availableFields.map((fld) => (
                     <option key={fld.id} value={fld.id}>
-                      {fld.name} ({fld.areaAcres} Acres - {fld.currentCrop})
+                      {fld.name} ({fld.areaAcres} {t('units.acres', 'Acres')} - {fld.currentCrop})
                     </option>
                   ))}
                 </select>
@@ -224,7 +226,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={cropInputId} className="agri-form-label agri-form-label--required">
-                  Crop Name
+                  {t('crops.cropName', 'Crop Name')}
                 </label>
                 <input
                   id={cropInputId}
@@ -239,7 +241,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={varietyInputId} className="agri-form-label">
-                  Variety
+                  {t('crops.variety', 'Variety')}
                 </label>
                 <input
                   id={varietyInputId}
@@ -253,7 +255,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={seasonSelectId} className="agri-form-label">
-                  Season
+                  {t('crops.season', 'Season')}
                 </label>
                 <select
                   id={seasonSelectId}
@@ -261,9 +263,9 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   value={season}
                   onChange={(e) => setSeason(e.target.value)}
                 >
-                  <option value="Rabi">Rabi</option>
-                  <option value="Kharif">Kharif</option>
-                  <option value="Zaid">Zaid</option>
+                  <option value="Rabi">{t('crops.rabi', 'Rabi')}</option>
+                  <option value="Kharif">{t('crops.kharif', 'Kharif')}</option>
+                  <option value="Zaid">{t('crops.zaid', 'Zaid')}</option>
                 </select>
               </div>
             </div>
@@ -272,7 +274,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={dateInputId} className="agri-form-label agri-form-label--required">
-                  Harvest Date
+                  {t('harvests.harvestDate', 'Harvest Date')}
                 </label>
                 <input
                   id={dateInputId}
@@ -286,7 +288,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={expectedYieldId} className="agri-form-label">
-                  Expected Yield (kg)
+                  {t('crops.expectedYield', 'Expected Yield')} (kg)
                 </label>
                 <input
                   id={expectedYieldId}
@@ -302,7 +304,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={actualQtyId} className="agri-form-label agri-form-label--required">
-                  Harvested Qty (kg)
+                  {t('harvests.harvestQuantity', 'Harvested Qty')} (kg)
                 </label>
                 <input
                   id={actualQtyId}
@@ -314,7 +316,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   placeholder="e.g. 2400"
                 />
                 <span className="agri-form-help">
-                  {(Number(harvestedQuantityKg || 0) / 100).toFixed(1)} quintals
+                  {(Number(harvestedQuantityKg || 0) / 100).toFixed(1)} {t('units.quintals', 'quintals')}
                 </span>
                 {errors.harvestedQuantityKg && <span className="agri-form-help text-danger">{errors.harvestedQuantityKg}</span>}
               </div>
@@ -324,7 +326,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
                 <label htmlFor={qualityGradeId} className="agri-form-label">
-                  Quality Grade
+                  {t('harvests.quality', 'Quality Grade')}
                 </label>
                 <select
                   id={qualityGradeId}
@@ -332,15 +334,15 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   value={qualityGrade}
                   onChange={(e) => setQualityGrade(e.target.value)}
                 >
-                  <option value="A">Grade A (Premium)</option>
-                  <option value="B">Grade B (Standard)</option>
-                  <option value="C">Grade C (Commercial)</option>
+                  <option value="A">{t('harvests.gradeA', 'Grade A (Premium)')}</option>
+                  <option value="B">{t('harvests.gradeB', 'Grade B (Standard)')}</option>
+                  <option value="C">{t('harvests.gradeC', 'Grade C (Commercial)')}</option>
                 </select>
               </div>
 
               <div className="agri-form-group">
                 <label htmlFor={qualityScoreId} className="agri-form-label">
-                  Quality Score (1-100)
+                  {t('harvests.qualityScore', 'Quality Score')} (1-100)
                 </label>
                 <input
                   id={qualityScoreId}
@@ -356,7 +358,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={moistureId} className="agri-form-label">
-                  Moisture (%)
+                  {t('harvests.moisturePercent', 'Moisture (%)')}
                 </label>
                 <input
                   id={moistureId}
@@ -374,7 +376,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             {/* Storage Location */}
             <div className="agri-form-group">
               <label htmlFor={storageId} className="agri-form-label">
-                Storage Allocation
+                {t('harvests.storageLocation', 'Storage Allocation')}
               </label>
               <input
                 id={storageId}
@@ -389,7 +391,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             {/* Notes */}
             <div className="agri-form-group">
               <label htmlFor={notesId} className="agri-form-label">
-                Field & Grain Inspection Notes
+                {t('harvests.observations', 'Field & Grain Inspection Notes')}
               </label>
               <textarea
                 id={notesId}
@@ -405,10 +407,10 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
           {/* Footer */}
           <div className="agri-modal-footer">
             <Button variant="secondary" size="md" onClick={onClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button variant="primary" size="md" type="submit">
-              Save Harvest Record
+              {t('common.save', 'Save Harvest Record')}
             </Button>
           </div>
         </form>

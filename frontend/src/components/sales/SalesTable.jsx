@@ -1,26 +1,30 @@
+import { useTranslation } from 'react-i18next';
 import { Eye } from 'lucide-react';
 import { Button } from '../common';
 import SalesStatusBadge from './SalesStatusBadge';
 import { formatCurrency, formatWeight } from '../../utils/formatters';
+import { translateCrop, translateVariety } from '../../utils/displayLabels';
 
 export default function SalesTable({ sales, onViewDetails }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-sales-table-container">
       <div className="agri-sales-table-scroll">
         <table className="agri-sales-table">
           <thead>
             <tr>
-              <th>Sale ID</th>
-              <th>Crop & Variety</th>
-              <th>Harvest Ref</th>
-              <th>Buyer & Market</th>
-              <th>Sale Date</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Total Amount</th>
-              <th>Payment</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>{t('sales.saleId', 'Sale ID')}</th>
+              <th>{t('crops.cropVariety', 'Crop & Variety')}</th>
+              <th>{t('sales.harvestRef', 'Harvest Ref')}</th>
+              <th>{t('sales.buyerMarket', 'Buyer & Market')}</th>
+              <th>{t('sales.saleDate', 'Sale Date')}</th>
+              <th>{t('common.quantity', 'Quantity')}</th>
+              <th>{t('common.price', 'Price')}</th>
+              <th>{t('sales.totalAmount', 'Total Amount')}</th>
+              <th>{t('sales.paymentStatus', 'Payment')}</th>
+              <th>{t('common.status', 'Status')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -37,10 +41,10 @@ export default function SalesTable({ sales, onViewDetails }) {
                 <td>
                   <div>
                     <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
-                      {sale.cropName}
+                      {translateCrop(sale.cropName, t)}
                     </span>
                     <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                      {sale.variety}
+                      {translateVariety(sale.variety, t)}
                     </div>
                   </div>
                 </td>
@@ -66,7 +70,7 @@ export default function SalesTable({ sales, onViewDetails }) {
                       {formatWeight(sale.quantityKg, 'kg')}
                     </span>
                     <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                      {(sale.quantityKg / 100).toFixed(1)} q
+                      {(sale.quantityKg / 100).toFixed(1)} {t('units.q', 'q')}
                     </div>
                   </div>
                 </td>
@@ -97,10 +101,10 @@ export default function SalesTable({ sales, onViewDetails }) {
                       variant="outline"
                       size="sm"
                       onClick={() => onViewDetails(sale)}
-                      aria-label={`View details for ${sale.id}`}
+                      aria-label={`${t('common.viewDetails', 'View details')} ${sale.id}`}
                     >
                       <Eye size={14} />
-                      <span>View</span>
+                      <span>{t('common.view', 'View')}</span>
                     </Button>
                   </div>
                 </td>

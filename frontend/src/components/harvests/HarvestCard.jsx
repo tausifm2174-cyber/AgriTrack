@@ -1,9 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, PlusCircle, MapPin, Calendar } from 'lucide-react';
 import { Button } from '../common';
 import HarvestStatusBadge from './HarvestStatusBadge';
 import { formatWeight } from '../../utils/formatters';
+import {
+  translateCrop,
+  translateVariety,
+  translateSeason,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 export default function HarvestCard({ harvest, onViewDetails, onRecordSale }) {
+  const { t } = useTranslation();
   const soldPercent =
     harvest.harvestedQuantityKg > 0
       ? Math.min(100, Math.round((harvest.soldQuantityKg / harvest.harvestedQuantityKg) * 100))
@@ -27,35 +35,35 @@ export default function HarvestCard({ harvest, onViewDetails, onRecordSale }) {
             <HarvestStatusBadge status={harvest.status} />
           </div>
           <h3 className="agri-harvest-card__title">
-            {harvest.cropName} ({harvest.variety})
+            {translateCrop(harvest.cropName, t)} ({translateVariety(harvest.variety, t)})
           </h3>
           <div className="agri-harvest-card__subtitle" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <MapPin size={13} />
             <span>
-              {harvest.farmName} • {harvest.fieldName}
+              {t(`farms.demoNames.${harvest.farmId}`, harvest.farmName)} • {formatFieldName(harvest.fieldName, t)}
             </span>
           </div>
         </div>
         <span className={`agri-quality-pill ${gradeClass}`}>
-          Grade {harvest.qualityGrade}
+          {t('harvests.grade', 'Grade')} {harvest.qualityGrade}
         </span>
       </div>
 
       <div className="agri-harvest-card__body">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', color: 'var(--slate-500)' }}>
           <Calendar size={14} />
-          <span>Harvested: {harvest.harvestDate} ({harvest.season})</span>
+          <span>{t('harvests.harvested', 'Harvested')}: {harvest.harvestDate} ({translateSeason(harvest.season, t)})</span>
         </div>
 
         <div className="agri-harvest-card__stats-grid">
           <div className="agri-harvest-card__stat-item">
-            <span className="agri-harvest-card__stat-label">Harvested</span>
+            <span className="agri-harvest-card__stat-label">{t('harvests.harvestQuantity', 'Harvested')}</span>
             <span className="agri-harvest-card__stat-value">
               {formatWeight(harvest.harvestedQuantityKg, 'kg')}
             </span>
           </div>
           <div className="agri-harvest-card__stat-item">
-            <span className="agri-harvest-card__stat-label">Available</span>
+            <span className="agri-harvest-card__stat-label">{t('harvests.availableQuantity', 'Available')}</span>
             <span
               className="agri-harvest-card__stat-value"
               style={{ color: harvest.availableQuantityKg > 0 ? 'var(--primary-700)' : 'var(--slate-400)' }}
@@ -64,13 +72,13 @@ export default function HarvestCard({ harvest, onViewDetails, onRecordSale }) {
             </span>
           </div>
           <div className="agri-harvest-card__stat-item">
-            <span className="agri-harvest-card__stat-label">Sold</span>
+            <span className="agri-harvest-card__stat-label">{t('harvests.soldQuantity', 'Sold')}</span>
             <span className="agri-harvest-card__stat-value">
               {formatWeight(harvest.soldQuantityKg, 'kg')}
             </span>
           </div>
           <div className="agri-harvest-card__stat-item">
-            <span className="agri-harvest-card__stat-label">Quality Score</span>
+            <span className="agri-harvest-card__stat-label">{t('harvests.qualityScore', 'Quality Score')}</span>
             <span className="agri-harvest-card__stat-value">
               {harvest.qualityScore}/100
             </span>
@@ -79,8 +87,8 @@ export default function HarvestCard({ harvest, onViewDetails, onRecordSale }) {
 
         <div className="agri-harvest-card__progress-container">
           <div className="agri-harvest-card__progress-label">
-            <span>Sales Offload</span>
-            <span>{soldPercent}% Sold</span>
+            <span>{t('harvests.salesOffload', 'Sales Offload')}</span>
+            <span>{soldPercent}% {t('sales.soldOut', 'Sold')}</span>
           </div>
           <div className="agri-harvest-card__progress-track">
             <div
@@ -96,20 +104,20 @@ export default function HarvestCard({ harvest, onViewDetails, onRecordSale }) {
           variant="outline"
           size="sm"
           onClick={() => onViewDetails(harvest)}
-          aria-label={`View details for ${harvest.id}`}
+          aria-label={`${t('common.viewDetails', 'View details')} ${harvest.id}`}
         >
           <Eye size={14} />
-          <span>Details</span>
+          <span>{t('common.details', 'Details')}</span>
         </Button>
         {harvest.availableQuantityKg > 0 && onRecordSale && (
           <Button
             variant="primary"
             size="sm"
             onClick={() => onRecordSale(harvest)}
-            aria-label={`Record sale for ${harvest.id}`}
+            aria-label={`${t('sales.addSale', 'Record sale')} ${harvest.id}`}
           >
             <PlusCircle size={14} />
-            <span>Record Sale</span>
+            <span>{t('sales.addSale', 'Record Sale')}</span>
           </Button>
         )}
       </div>

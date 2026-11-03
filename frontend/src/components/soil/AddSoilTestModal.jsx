@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CheckCircle, Info } from 'lucide-react';
 import { Button } from '../common';
 
@@ -12,6 +13,7 @@ export default function AddSoilTestModal({
   onSoilTestAdded,
   fields = [],
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     fieldId: fields[0]?.id || 'field-1a',
     testDate: new Date().toISOString().split('T')[0],
@@ -109,17 +111,17 @@ export default function AddSoilTestModal({
         <div className="agri-modal-header">
           <div>
             <h3 id="add-soil-title" className="agri-modal-title">
-              Record Laboratory Soil Test
+              {t('soil.addSoilTest', 'Record Laboratory Soil Test')}
             </h3>
             <p className="agri-modal-subtitle">
-              Log soil macronutrients, pH balance, and organic carbon data
+              {t('soil.subtitle', 'Log soil macronutrients, pH balance, and organic carbon data')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
             disabled={submitted}
           >
             <X size={20} aria-hidden="true" />
@@ -131,7 +133,7 @@ export default function AddSoilTestModal({
             <div className="agri-demo-badge-banner">
               <Info size={16} aria-hidden="true" />
               <span>
-                <strong>Demo Mode:</strong> Recorded test data is calculated and stored in memory for this session.
+                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'Recorded test data is calculated and stored in memory for this session.')}
               </span>
             </div>
 
@@ -139,10 +141,10 @@ export default function AddSoilTestModal({
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                 <CheckCircle size={48} className="text-success" style={{ margin: '0 auto 1rem auto' }} aria-hidden="true" />
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-900)' }}>
-                  Soil Test Record Saved!
+                  {t('messages.soilTestAdded', 'Soil Test Record Saved!')}
                 </h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--slate-500)', marginTop: '0.25rem' }}>
-                  Updating field agronomic profile and nutrients...
+                  {t('common.loading', 'Updating field agronomic profile and nutrients...')}
                 </p>
               </div>
             ) : (
@@ -150,7 +152,7 @@ export default function AddSoilTestModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="soil-field" className="agri-form-label agri-form-label--required">
-                      Target Field Plot
+                      {t('fields.fieldName', 'Target Field Plot')}
                     </label>
                     <select
                       id="soil-field"
@@ -169,7 +171,7 @@ export default function AddSoilTestModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="soil-date" className="agri-form-label agri-form-label--required">
-                      Lab Sampling Date
+                      {t('soil.testDate', 'Lab Sampling Date')}
                     </label>
                     <input
                       id="soil-date"
@@ -186,7 +188,7 @@ export default function AddSoilTestModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="soil-ph" className="agri-form-label agri-form-label--required">
-                      Soil pH (0 - 14)
+                      {t('soil.ph', 'Soil pH')} (0 - 14)
                     </label>
                     <input
                       id="soil-ph"
@@ -205,7 +207,7 @@ export default function AddSoilTestModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="soil-oc" className="agri-form-label agri-form-label--required">
-                      Organic Carbon (OC %)
+                      {t('soil.organicCarbon', 'Organic Carbon (OC %)')}
                     </label>
                     <input
                       id="soil-oc"
@@ -226,7 +228,7 @@ export default function AddSoilTestModal({
                 <div className="agri-form-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem' }}>
                   <div className="agri-form-group">
                     <label htmlFor="soil-n" className="agri-form-label">
-                      Nitrogen (N)
+                      {t('soil.nitrogen', 'Nitrogen (N)')}
                     </label>
                     <input
                       id="soil-n"
@@ -241,7 +243,7 @@ export default function AddSoilTestModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="soil-p" className="agri-form-label">
-                      Phosphorus (P)
+                      {t('soil.phosphorus', 'Phosphorus (P)')}
                     </label>
                     <input
                       id="soil-p"
@@ -256,7 +258,7 @@ export default function AddSoilTestModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="soil-k" className="agri-form-label">
-                      Potassium (K)
+                      {t('soil.potassium', 'Potassium (K)')}
                     </label>
                     <input
                       id="soil-k"
@@ -272,7 +274,7 @@ export default function AddSoilTestModal({
 
                 <div className="agri-form-group">
                   <label htmlFor="soil-moist" className="agri-form-label">
-                    Soil Moisture (%)
+                    {t('soil.moisture', 'Soil Moisture')} (%)
                   </label>
                   <input
                     id="soil-moist"
@@ -289,7 +291,7 @@ export default function AddSoilTestModal({
 
                 <div className="agri-form-group">
                   <label htmlFor="soil-recom" className="agri-form-label">
-                    Lab Advisory / Recommendations
+                    {t('soil.recommendations', 'Lab Advisory / Recommendations')}
                   </label>
                   <textarea
                     id="soil-recom"
@@ -308,10 +310,10 @@ export default function AddSoilTestModal({
           {!submitted && (
             <div className="agri-modal-footer">
               <Button variant="secondary" onClick={onClose} type="button">
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button variant="primary" type="submit">
-                Save Soil Record (Demo)
+                {t('soil.addSoilTest', 'Save Soil Record')}
               </Button>
             </div>
           )}

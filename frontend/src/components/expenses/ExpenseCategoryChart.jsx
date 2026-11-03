@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   BarChart,
@@ -24,16 +25,17 @@ const CATEGORY_COLORS = [
 ];
 
 export default function ExpenseCategoryChart({ expenses = [] }) {
+  const { t } = useTranslation();
   const data = calculateExpensesByCategory(expenses);
 
   if (data.length === 0) {
     return (
       <div className="agri-expense-chart-box">
         <div className="agri-expense-chart-box__header">
-          <span className="agri-expense-chart-box__title">Expense Distribution by Category</span>
+          <span className="agri-expense-chart-box__title">{t('expenses.categoryDistribution', 'Expense Distribution by Category')}</span>
         </div>
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
-          No expense vouchers match the selected filters.
+          {t('expenses.noVouchersMatch', 'No expense vouchers match the selected filters.')}
         </div>
       </div>
     );
@@ -43,13 +45,13 @@ export default function ExpenseCategoryChart({ expenses = [] }) {
     <div className="agri-expense-chart-box">
       <div className="agri-expense-chart-box__header">
         <div>
-          <span className="agri-expense-chart-box__title">Expense Distribution by Category</span>
+          <span className="agri-expense-chart-box__title">{t('expenses.categoryDistribution', 'Expense Distribution by Category')}</span>
           <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-            Aggregated cost breakdown across active inputs & operational vouchers
+            {t('expenses.aggregatedCostDesc', 'Aggregated cost breakdown across active inputs & operational vouchers')}
           </p>
         </div>
         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-600)' }}>
-          {data.length} Active Categories
+          {data.length} {t('expenses.activeCategories', 'Active Categories')}
         </span>
       </div>
 
@@ -65,6 +67,7 @@ export default function ExpenseCategoryChart({ expenses = [] }) {
               interval={0}
               angle={-20}
               textAnchor="end"
+              tickFormatter={(cat) => t(`expenseCategories.${(cat || '').toLowerCase()}`, cat)}
             />
             <YAxis
               stroke="#64748b"
@@ -76,9 +79,9 @@ export default function ExpenseCategoryChart({ expenses = [] }) {
             <Tooltip
               formatter={(value, name, item) => [
                 `${formatCurrency(value)} (${item.payload.percentage}%)`,
-                'Total Expenditure',
+                t('expenses.totalExpenditure', 'Total Expenditure'),
               ]}
-              labelFormatter={(label) => `Category: ${label}`}
+              labelFormatter={(label) => `${t('common.category', 'Category')}: ${t(`expenseCategories.${(label || '').toLowerCase()}`, label)}`}
               contentStyle={{
                 backgroundColor: '#ffffff',
                 border: '1px solid #e2e8f0',

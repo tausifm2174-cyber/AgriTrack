@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Check,
   RotateCcw,
@@ -7,6 +8,7 @@ import {
 } from 'lucide-react';
 import StatusBadge from '../common/StatusBadge';
 import NotificationTypeIcon from './NotificationTypeIcon';
+import { translateStatus, translateTime, formatFieldName, translateCrop } from '../../utils/displayLabels';
 
 /**
  * Maps severity to StatusBadge variant
@@ -40,6 +42,7 @@ export default function NotificationItem({
   onToggleRead,
   onDismiss,
 }) {
+  const { t } = useTranslation();
   const typeClass = item.type ? item.type.toLowerCase() : 'system';
   const badgeVariant = getSeverityVariant(item.severity);
 
@@ -47,7 +50,7 @@ export default function NotificationItem({
     <div
       className={`agri-notif-card ${!item.isRead ? 'agri-notif-card--unread' : 'agri-notif-card--read'}`}
       role="article"
-      aria-label={`${item.title} (${item.isRead ? 'Read' : 'Unread'})`}
+      aria-label={`${item.title} (${item.isRead ? t('notifications.read', 'Read') : t('notifications.unread', 'Unread')})`}
     >
       {/* Type Icon */}
       <div
@@ -73,37 +76,41 @@ export default function NotificationItem({
         {/* Header line: Type tag, Severity Badge, Unread status */}
         <div className="agri-notif-header-line">
           {!item.isRead && (
-            <span className="agri-notif-unread-indicator" aria-label="Unread alert" />
+            <span className="agri-notif-unread-indicator" aria-label={t('notifications.unreadAlert', 'Unread alert')} />
           )}
-          <span className="agri-notif-type-tag">{item.type}</span>
-          <StatusBadge variant={badgeVariant}>{item.severity}</StatusBadge>
+          <span className="agri-notif-type-tag">{t(`notifications.types.${item.type.toLowerCase()}`, item.type)}</span>
+          <StatusBadge variant={badgeVariant}>{translateStatus(item.severity, t)}</StatusBadge>
           <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)', marginLeft: 'auto' }}>
-            {item.timestamp}
+            {translateTime(item.timestamp, t)}
           </span>
         </div>
 
         {/* Title */}
-        <h4 className="agri-notif-title">{item.title}</h4>
+        <h4 className="agri-notif-title">
+          {t(`notifications.items.${item.id}.title`, item.title)}
+        </h4>
 
         {/* Message */}
-        <p className="agri-notif-message">{item.message}</p>
+        <p className="agri-notif-message">
+          {t(`notifications.items.${item.id}.message`, item.message)}
+        </p>
 
         {/* Metadata Pill Tags */}
         <div className="agri-notif-meta-row">
           {item.farmName && (
             <span className="agri-notif-meta-pill">
               <MapPin size={11} aria-hidden="true" />
-              {item.farmName}
+              {t(`farms.demoNames.${item.farmId}`, item.farmName)}
             </span>
           )}
           {item.fieldName && (
             <span className="agri-notif-meta-pill">
-              {item.fieldName}
+              {formatFieldName(item.fieldName, t)}
             </span>
           )}
           {item.cropName && (
             <span className="agri-notif-meta-pill">
-              🌱 {item.cropName}
+              🌱 {translateCrop(item.cropName, t)}
             </span>
           )}
           {item.relatedRoute && (
@@ -117,7 +124,7 @@ export default function NotificationItem({
                 fontSize: '0.75rem',
               }}
             >
-              <span>{item.actionLabel || 'View details'}</span>
+              <span>{t(`notifications.items.${item.id}.actionLabel`, item.actionLabel || t('common.viewDetails', 'View details'))}</span>
               <ExternalLink size={11} aria-hidden="true" />
             </span>
           )}
@@ -133,8 +140,8 @@ export default function NotificationItem({
             e.stopPropagation();
             onToggleRead(item.id);
           }}
-          aria-label={item.isRead ? 'Mark as unread' : 'Mark as read'}
-          title={item.isRead ? 'Mark as unread' : 'Mark as read'}
+          aria-label={item.isRead ? t('notifications.markAsUnread', 'Mark as unread') : t('notifications.markAsRead', 'Mark as read')}
+          title={item.isRead ? t('notifications.markAsUnread', 'Mark as unread') : t('notifications.markAsRead', 'Mark as read')}
         >
           {item.isRead ? <RotateCcw size={14} /> : <Check size={15} />}
         </button>
@@ -146,8 +153,8 @@ export default function NotificationItem({
             e.stopPropagation();
             onDismiss(item.id);
           }}
-          aria-label="Dismiss notification"
-          title="Dismiss this notification"
+          aria-label={t('notifications.dismiss', 'Dismiss notification')}
+          title={t('notifications.dismiss', 'Dismiss notification')}
         >
           <X size={14} />
         </button>
@@ -155,3 +162,4 @@ export default function NotificationItem({
     </div>
   );
 }
+

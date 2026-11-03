@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { X, PackageCheck, Sprout, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Button } from '../common';
 import { SalesStatusBadge } from '../sales';
@@ -6,6 +7,7 @@ import { formatCurrency, formatWeight } from '../../utils/formatters';
 
 export default function RevenueDetailsModal({ sale, onClose }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (!sale) return null;
 
@@ -51,17 +53,17 @@ export default function RevenueDetailsModal({ sale, onClose }) {
               <SalesStatusBadge status={sale.paymentStatus} type="payment" />
             </div>
             <h3 id="revenue-modal-title" className="agri-modal-title">
-              Revenue Inflow: {sale.cropName} ({sale.variety})
+              {t('revenue.revenueInflow', 'Revenue Inflow')}: {sale.cropName} ({sale.variety})
             </h3>
             <p className="agri-modal-subtitle">
-              Invoiced to {sale.buyerName} • {sale.market} • {sale.invoiceNumber}
+              {t('sales.invoicedTo', 'Invoiced to')} {sale.buyerName} • {sale.market} • {sale.invoiceNumber}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
@@ -73,19 +75,19 @@ export default function RevenueDetailsModal({ sale, onClose }) {
           <div className="agri-revenue-detail-metrics" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem', backgroundColor: 'var(--slate-50)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-                Gross Revenue
+                {t('revenue.grossRevenue', 'Gross Revenue')}
               </span>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#059669', marginTop: '0.2rem' }}>
                 {formatCurrency(sale.totalAmount)}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {formatWeight(sale.quantityKg, 'kg')} total
+                {formatWeight(sale.quantityKg, 'kg')} {t('common.total', 'total')}
               </span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-                Realized Price
+                {t('revenue.realizedPrice', 'Realized Price')}
               </span>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--slate-900)', marginTop: '0.2rem' }}>
                 ₹{Number(sale.pricePerKg).toFixed(2)}/kg
@@ -97,25 +99,25 @@ export default function RevenueDetailsModal({ sale, onClose }) {
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-                Amount Collected
+                {t('revenue.amountCollected', 'Amount Collected')}
               </span>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#059669', marginTop: '0.2rem' }}>
                 {formatCurrency(sale.paidAmount || 0)}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                Via {sale.paymentMethod || 'Bank Transfer'}
+                {t('expenses.via', 'Via')} {sale.paymentMethod || 'Bank Transfer'}
               </span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-                Balance Receivable
+                {t('revenue.balanceReceivable', 'Balance Receivable')}
               </span>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: sale.balanceDue > 0 ? '#b45309' : '#059669', marginTop: '0.2rem' }}>
                 {formatCurrency(sale.balanceDue || 0)}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {sale.balanceDue > 0 ? 'Due from buyer' : 'Settled'}
+                {sale.balanceDue > 0 ? t('revenue.dueFromBuyer', 'Due from buyer') : t('revenue.settled', 'Settled')}
               </span>
             </div>
           </div>
@@ -139,7 +141,7 @@ export default function RevenueDetailsModal({ sale, onClose }) {
                 <TrendingUp size={18} />
                 <div>
                   <div style={{ fontWeight: 700 }}>
-                    Mandi Benchmark Differential ({sale.market})
+                    {t('sales.mandiDifferential', 'Mandi Benchmark Differential')} ({sale.market})
                   </div>
                   <div style={{ fontSize: '0.75rem', opacity: 0.9 }}>
                     APMC Benchmark: ₹{sale.referenceMarketPricePerQ}/q | Realized Contract: ₹{sale.pricePerQuintal}/q
@@ -150,12 +152,12 @@ export default function RevenueDetailsModal({ sale, onClose }) {
                 {diffPerQ >= 0 ? (
                   <>
                     <ArrowUpRight size={16} />
-                    <span>+₹{diffPerQ}/q Premium</span>
+                    <span>+₹{diffPerQ}/q {t('sales.premium', 'Premium')}</span>
                   </>
                 ) : (
                   <>
                     <ArrowDownRight size={16} />
-                    <span>-₹{Math.abs(diffPerQ)}/q Discount</span>
+                    <span>-₹{Math.abs(diffPerQ)}/q {t('sales.discount', 'Discount')}</span>
                   </>
                 )}
               </div>
@@ -166,25 +168,25 @@ export default function RevenueDetailsModal({ sale, onClose }) {
           <div className="agri-form-grid agri-form-grid--2">
             <div style={{ backgroundColor: 'var(--slate-50)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
-                Production Origin & Crop Lot
+                {t('revenue.productionOrigin', 'Production Origin & Crop Lot')}
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.875rem' }}>
-                <div>Farm: <strong>{sale.farmName}</strong></div>
-                <div>Field: <strong>{sale.fieldName}</strong></div>
-                <div>Crop Cycle: <strong>{sale.cropName} ({sale.variety})</strong></div>
-                <div>Harvest Lot Ref: <span style={{ fontFamily: 'monospace', color: 'var(--primary-700)', fontWeight: 700 }}>{sale.harvestId}</span></div>
+                <div>{t('fields.farm', 'Farm')}: <strong>{sale.farmName}</strong></div>
+                <div>{t('activities.field', 'Field')}: <strong>{sale.fieldName}</strong></div>
+                <div>{t('crops.cropName', 'Crop Cycle')}: <strong>{sale.cropName} ({sale.variety})</strong></div>
+                <div>{t('harvests.harvestLotRef', 'Harvest Lot Ref')}: <span style={{ fontFamily: 'monospace', color: 'var(--primary-700)', fontWeight: 700 }}>{sale.harvestId}</span></div>
               </div>
             </div>
 
             <div style={{ backgroundColor: 'var(--slate-50)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
-                Commercial Buyer & Settlement
+                {t('revenue.commercialSettlement', 'Commercial Buyer & Settlement')}
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.875rem' }}>
-                <div>Buyer Name: <strong>{sale.buyerName}</strong></div>
-                <div>Terminal Mandi: <strong>{sale.market}</strong></div>
-                <div>Payment Method: <strong>{sale.paymentMethod || 'NEFT'}</strong></div>
-                <div>Sale Execution Date: <strong>{sale.saleDate}</strong></div>
+                <div>{t('sales.buyerName', 'Buyer Name')}: <strong>{sale.buyerName}</strong></div>
+                <div>{t('marketPrices.mandi', 'Terminal Mandi')}: <strong>{sale.market}</strong></div>
+                <div>{t('expenses.paymentMethod', 'Payment Method')}: <strong>{sale.paymentMethod || 'NEFT'}</strong></div>
+                <div>{t('sales.saleDate', 'Sale Execution Date')}: <strong>{sale.saleDate}</strong></div>
               </div>
             </div>
           </div>
@@ -193,7 +195,7 @@ export default function RevenueDetailsModal({ sale, onClose }) {
           {sale.notes && (
             <div style={{ backgroundColor: 'var(--slate-50)', border: '1px solid var(--slate-200)', borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                Trade Realization Remarks
+                {t('revenue.tradeRemarks', 'Trade Realization Remarks')}
               </span>
               <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--slate-700)', lineHeight: 1.5 }}>
                 {sale.notes}
@@ -205,21 +207,21 @@ export default function RevenueDetailsModal({ sale, onClose }) {
         {/* Footer Navigation */}
         <div className="agri-modal-footer">
           <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto', flexWrap: 'wrap' }}>
-            <Button variant="outline" size="sm" onClick={handleGoToHarvest} aria-label="View Harvest Lot">
+            <Button variant="outline" size="sm" onClick={handleGoToHarvest} aria-label={t('navigation.harvests', 'View Harvest Lot')}>
               <PackageCheck size={14} />
-              <span>View Harvest</span>
+              <span>{t('navigation.harvests', 'View Harvest')}</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleGoToCrop} aria-label="View Crop">
+            <Button variant="outline" size="sm" onClick={handleGoToCrop} aria-label={t('navigation.crops', 'View Crop')}>
               <Sprout size={14} />
-              <span>View Crop</span>
+              <span>{t('navigation.crops', 'View Crop')}</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleGoToMarketPrices} aria-label="View Mandi Prices">
+            <Button variant="outline" size="sm" onClick={handleGoToMarketPrices} aria-label={t('navigation.marketPrices', 'View Mandi Prices')}>
               <TrendingUp size={14} />
-              <span>Market Prices</span>
+              <span>{t('navigation.marketPrices', 'Market Prices')}</span>
             </Button>
           </div>
           <Button variant="secondary" size="sm" onClick={onClose}>
-            Close
+            {t('common.close', 'Close')}
           </Button>
         </div>
       </div>

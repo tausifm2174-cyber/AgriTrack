@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, FlaskConical, RotateCcw } from 'lucide-react';
 import SoilStatus from './SoilStatus';
 import { Button, EmptyState } from '../common';
+import { formatFieldName, translateSoilType } from '../../utils/displayLabels';
 
 /**
  * SoilTable component
@@ -12,15 +14,17 @@ export default function SoilTable({
   onResetFilters,
   isFiltered = false,
 }) {
+  const { t } = useTranslation();
+
   if (records.length === 0) {
     return (
       <EmptyState
         icon={<FlaskConical size={32} aria-hidden="true" />}
-        title="No soil test records found"
+        title={t('common.noData', 'No soil test records found')}
         description={
           isFiltered
-            ? "No records match the current filter criteria."
-            : "No soil tests have been recorded yet."
+            ? t('common.noData', 'No records match the current filter criteria.')
+            : t('common.noData', 'No soil tests have been recorded yet.')
         }
         action={
           isFiltered && (
@@ -29,7 +33,7 @@ export default function SoilTable({
               icon={<RotateCcw size={15} aria-hidden="true" />}
               onClick={onResetFilters}
             >
-              Reset Filters
+              {t('common.clear', 'Reset Filters')}
             </Button>
           )
         }
@@ -45,18 +49,18 @@ export default function SoilTable({
 
   return (
     <div className="agri-soil-table-container">
-      <table className="agri-soil-table" aria-label="Soil Test Records Table">
+      <table className="agri-soil-table" aria-label={t('soil.soilReport', 'Soil Test Records Table')}>
         <thead>
           <tr>
-            <th scope="col">Field & Holding</th>
-            <th scope="col">Soil Type</th>
-            <th scope="col">pH Level</th>
+            <th scope="col">{t('fields.fieldName', 'Field')} & {t('fields.farm', 'Holding')}</th>
+            <th scope="col">{t('fields.soilType', 'Soil Type')}</th>
+            <th scope="col">{t('soil.ph', 'pH Level')}</th>
             <th scope="col">N-P-K (kg/ha)</th>
-            <th scope="col">Organic Carbon</th>
-            <th scope="col">Moisture</th>
-            <th scope="col">Condition</th>
-            <th scope="col">Test Date</th>
-            <th scope="col" style={{ textAlign: 'right' }}>Actions</th>
+            <th scope="col">{t('soil.organicCarbon', 'Organic Carbon')}</th>
+            <th scope="col">{t('soil.moisture', 'Moisture')}</th>
+            <th scope="col">{t('common.status', 'Condition')}</th>
+            <th scope="col">{t('soil.testDate', 'Test Date')}</th>
+            <th scope="col" style={{ textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -64,12 +68,12 @@ export default function SoilTable({
             <tr key={r.id}>
               <td>
                 <div className="agri-soil-field-cell">
-                  <span className="agri-soil-field-name">{r.fieldName}</span>
-                  <span className="agri-soil-farm-name">{r.farmName}</span>
+                  <span className="agri-soil-field-name">{formatFieldName(r.fieldName, t)}</span>
+                  <span className="agri-soil-farm-name">{t(`farms.demoNames.${r.farmId}`, r.farmName)}</span>
                 </div>
               </td>
               <td>
-                <span>{r.soilType}</span>
+                <span>{translateSoilType(r.soilType, t)}</span>
               </td>
               <td>
                 <span className={`agri-soil-ph-badge ${getPhBadgeClass(r.ph)}`}>
@@ -78,16 +82,17 @@ export default function SoilTable({
               </td>
               <td>
                 <div className="agri-soil-npk-cell">
-                  <span className="agri-soil-npk-pill agri-soil-npk-pill--n" title="Nitrogen">
+                  <span className="agri-soil-npk-pill agri-soil-npk-pill--n" title={t('soil.nitrogen', 'Nitrogen')}>
                     N:{r.nitrogen}
                   </span>
-                  <span className="agri-soil-npk-pill agri-soil-npk-pill--p" title="Phosphorus">
+                  <span className="agri-soil-npk-pill agri-soil-npk-pill--p" title={t('soil.phosphorus', 'Phosphorus')}>
                     P:{r.phosphorus}
                   </span>
-                  <span className="agri-soil-npk-pill agri-soil-npk-pill--k" title="Potassium">
+                  <span className="agri-soil-npk-pill agri-soil-npk-pill--k" title={t('soil.potassium', 'Potassium')}>
                     K:{r.potassium}
                   </span>
                 </div>
+
               </td>
               <td>
                 <strong>{r.organicCarbon}%</strong>
@@ -108,7 +113,7 @@ export default function SoilTable({
                   icon={<Eye size={14} aria-hidden="true" />}
                   onClick={() => onViewDetails(r)}
                 >
-                  Report
+                  {t('soil.soilReport', 'Report')}
                 </Button>
               </td>
             </tr>

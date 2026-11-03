@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MapPin, Grid3X3, Eye, Droplet, Sprout } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
@@ -8,6 +9,7 @@ import { formatAcres } from '../../utils/formatters';
  * Represents an individual farm holding with key statistics, crops, and navigation.
  */
 export default function FarmCard({ farm, onViewDetails }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleViewFields = () => {
@@ -38,19 +40,19 @@ export default function FarmCard({ farm, onViewDetails }) {
         {/* Key Metrics */}
         <div className="agri-farm-card__stats">
           <div className="agri-farm-card__stat-item">
-            <span className="agri-farm-card__stat-label">Total Acreage</span>
-            <span className="agri-farm-card__stat-value">{formatAcres(farm.areaAcres)}</span>
+            <span className="agri-farm-card__stat-label">{t('farms.totalArea', 'Total Acreage')}</span>
+            <span className="agri-farm-card__stat-value">{formatAcres(farm.areaAcres, t)}</span>
           </div>
           <div className="agri-farm-card__stat-item">
-            <span className="agri-farm-card__stat-label">Fields Mapped</span>
-            <span className="agri-farm-card__stat-value">{farm.fieldsCount} Plots</span>
+            <span className="agri-farm-card__stat-label">{t('farms.fieldsCount', 'Fields Mapped')}</span>
+            <span className="agri-farm-card__stat-value">{farm.fieldsCount} {t('navigation.fields', 'Plots')}</span>
           </div>
         </div>
 
         {/* Primary Crops */}
         <div className="agri-farm-card__meta-group">
           <div className="agri-farm-card__meta-row">
-            <span className="agri-farm-card__meta-label">Primary Crops</span>
+            <span className="agri-farm-card__meta-label">{t('dashboard.activeCrops', 'Primary Crops')}</span>
             <div className="agri-farm-card__crops-pills">
               {farm.primaryCrops.map((crop, idx) => (
                 <span key={idx} className="agri-farm-card__crop-pill">
@@ -62,7 +64,7 @@ export default function FarmCard({ farm, onViewDetails }) {
 
           {/* Soil & Water Summary */}
           <div className="agri-farm-card__meta-row">
-            <span className="agri-farm-card__meta-label">Soil & Irrigation</span>
+            <span className="agri-farm-card__meta-label">{t('soil.title', 'Soil')} & {t('navigation.irrigation', 'Irrigation')}</span>
             <p className="agri-farm-card__soil-text">
               <Sprout size={14} className="text-primary" aria-hidden="true" />
               <span>{farm.soilSummary}</span>
@@ -83,7 +85,7 @@ export default function FarmCard({ farm, onViewDetails }) {
           icon={<Eye size={15} aria-hidden="true" />}
           onClick={() => onViewDetails(farm)}
         >
-          View Details
+          {t('common.viewDetails', 'View Details')}
         </Button>
 
         <Button
@@ -93,7 +95,7 @@ export default function FarmCard({ farm, onViewDetails }) {
           iconPosition="left"
           onClick={handleViewFields}
         >
-          View Fields
+          {t('farms.viewFields', 'View Fields')}
         </Button>
       </div>
     </article>

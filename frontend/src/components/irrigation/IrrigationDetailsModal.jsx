@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Edit3,
@@ -37,6 +38,7 @@ export default function IrrigationDetailsModal({
   farmsMap = {},
   fieldsMap = {},
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Close on Escape key
@@ -96,7 +98,7 @@ export default function IrrigationDetailsModal({
                 <span
                   className={`agri-priority-pill agri-priority-pill--${schedule.priority.toLowerCase()}`}
                 >
-                  {schedule.priority} Priority
+                  {schedule.priority}
                 </span>
               )}
             </div>
@@ -104,14 +106,14 @@ export default function IrrigationDetailsModal({
               {schedule.title}
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)', fontFamily: 'var(--font-mono)' }}>
-              Schedule ID: {schedule.id}
+              ID: {schedule.id}
             </span>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close irrigation details modal"
+            aria-label={t('common.close')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -134,7 +136,7 @@ export default function IrrigationDetailsModal({
             {/* Farm */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Farm Holding
+                {t('navigation.farms')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                 <MapPin size={14} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
@@ -145,7 +147,7 @@ export default function IrrigationDetailsModal({
             {/* Field with deep link */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Field / Parcel
+                {t('navigation.fields')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
                 <span style={{ fontWeight: 600, color: 'var(--slate-800)' }}>{fieldName}</span>
@@ -164,9 +166,9 @@ export default function IrrigationDetailsModal({
                     gap: '0.2rem',
                     padding: 0,
                   }}
-                  title="Navigate to Field page"
+                  title={t('common.viewDetails')}
                 >
-                  <span>View</span>
+                  <span>{t('common.viewDetails')}</span>
                   <ExternalLink size={12} aria-hidden="true" />
                 </button>
               </div>
@@ -175,12 +177,12 @@ export default function IrrigationDetailsModal({
             {/* Associated Crop with deep link */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Target Crop
+                {t('crops.cropName')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                   <Sprout size={14} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
-                  <span>{schedule.cropName || 'N/A'}</span>
+                  <span>{schedule.cropName || '—'}</span>
                 </div>
                 {schedule.fieldId && (
                   <button
@@ -198,9 +200,9 @@ export default function IrrigationDetailsModal({
                       gap: '0.2rem',
                       padding: 0,
                     }}
-                    title="Navigate to Crop page"
+                    title={t('common.viewDetails')}
                   >
-                    <span>View</span>
+                    <span>{t('common.viewDetails')}</span>
                     <ExternalLink size={12} aria-hidden="true" />
                   </button>
                 )}
@@ -210,7 +212,7 @@ export default function IrrigationDetailsModal({
             {/* Timing */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Schedule Window
+                {t('common.date')} & {t('common.time')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 500, color: 'var(--slate-800)' }}>
                 <Calendar size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
@@ -221,23 +223,23 @@ export default function IrrigationDetailsModal({
             {/* Duration */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Cycle Duration
+                {t('irrigation.duration')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                 <Clock size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
-                <span>{schedule.durationMinutes} minutes</span>
+                <span>{schedule.durationMinutes} min</span>
               </div>
             </div>
 
             {/* Water Volume */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Planned Water Volume
+                {t('irrigation.waterQuantity')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 700, color: 'var(--primary-700)' }}>
                 <Droplets size={14} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
                 <span>
-                  {schedule.waterVolumeLitres ? `${schedule.waterVolumeLitres.toLocaleString()} Litres` : '—'}
+                  {schedule.waterVolumeLitres ? `${schedule.waterVolumeLitres.toLocaleString()} ${t('units.liters')}` : '—'}
                 </span>
                 {schedule.waterVolumeLitres && (
                   <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--slate-500)' }}>
@@ -251,14 +253,11 @@ export default function IrrigationDetailsModal({
             {schedule.soilMoisture !== undefined && schedule.soilMoisture !== null && (
               <div>
                 <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                  Soil Moisture Level
+                  {t('soil.title')}
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                   <Gauge size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
                   <span>{schedule.soilMoisture}%</span>
-                  <span style={{ fontSize: '0.725rem', fontWeight: 500, color: schedule.soilMoisture < 40 ? 'var(--warning-text)' : 'var(--success-text)' }}>
-                    ({schedule.soilMoisture < 40 ? 'Below 40% Target' : 'Adequate'})
-                  </span>
                 </div>
               </div>
             )}
@@ -266,12 +265,12 @@ export default function IrrigationDetailsModal({
             {/* Weather & Rainfall Expected */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Forecast Weather
+                {t('weather.forecast')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 500, color: 'var(--slate-800)' }}>
                   <CloudRain size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
-                  <span>{schedule.weatherCondition || 'Normal'} ({schedule.rainfallExpected || 0} mm rain)</span>
+                  <span>{schedule.weatherCondition || 'Normal'} ({schedule.rainfallExpected || 0} mm)</span>
                 </div>
                 <button
                   type="button"
@@ -288,9 +287,9 @@ export default function IrrigationDetailsModal({
                     gap: '0.2rem',
                     padding: 0,
                   }}
-                  title="View weather forecast"
+                  title={t('weather.forecast')}
                 >
-                  <span>Radar</span>
+                  <span>{t('navigation.weather')}</span>
                   <ExternalLink size={12} aria-hidden="true" />
                 </button>
               </div>
@@ -303,7 +302,7 @@ export default function IrrigationDetailsModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                 <FileText size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-700)', textTransform: 'uppercase' }}>
-                  Agronomic Delivery Notes
+                  {t('activities.notes')}
                 </span>
               </div>
               <p
@@ -339,7 +338,7 @@ export default function IrrigationDetailsModal({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--primary-800)' }}>
               <Lightbulb size={15} aria-hidden="true" />
-              <span>Need irrigation crop advisory recommendations for this parcel?</span>
+              <span>{t('irrigation.advisory')}</span>
             </div>
             <button
               type="button"
@@ -356,17 +355,9 @@ export default function IrrigationDetailsModal({
                 fontSize: '0.8rem',
               }}
             >
-              <span>View Advisory</span>
+              <span>{t('recommendations.title')}</span>
               <ExternalLink size={12} aria-hidden="true" />
             </button>
-          </div>
-
-          {/* Timestamps */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.725rem', color: 'var(--slate-400)' }}>
-            <span>Created: {schedule.createdAt ? new Date(schedule.createdAt).toLocaleDateString() : 'N/A'}</span>
-            {schedule.completedAt && (
-              <span>Completed: {new Date(schedule.completedAt).toLocaleDateString()} {new Date(schedule.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            )}
           </div>
         </div>
 
@@ -379,14 +370,14 @@ export default function IrrigationDetailsModal({
               onClose();
               onEdit(schedule);
             }}
-            aria-label="Edit this schedule"
+            aria-label={t('common.edit')}
           >
             <Edit3 size={14} aria-hidden="true" />
-            <span>Edit Schedule</span>
+            <span>{t('common.edit')}</span>
           </Button>
 
           <Button variant="primary" size="sm" onClick={onClose}>
-            Close
+            {t('common.close')}
           </Button>
         </div>
       </div>

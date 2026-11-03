@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Clock, Calendar, XCircle } from 'lucide-react';
 import { StatusBadge } from '../common';
 
@@ -9,6 +10,8 @@ import { StatusBadge } from '../common';
  * @param {string} [props.className]
  */
 export default function ActivityStatusBadge({ status = 'Planned', className = '' }) {
+  const { t } = useTranslation();
+
   switch (status) {
     case 'Completed':
       return (
@@ -17,7 +20,7 @@ export default function ActivityStatusBadge({ status = 'Planned', className = ''
           icon={<CheckCircle2 size={12} />}
           className={className}
         >
-          Completed
+          {t('status.completed')}
         </StatusBadge>
       );
     case 'In Progress':
@@ -27,7 +30,7 @@ export default function ActivityStatusBadge({ status = 'Planned', className = ''
           icon={<Clock size={12} />}
           className={className}
         >
-          In Progress
+          {t('status.inProgress')}
         </StatusBadge>
       );
     case 'Cancelled':
@@ -37,7 +40,7 @@ export default function ActivityStatusBadge({ status = 'Planned', className = ''
           icon={<XCircle size={12} />}
           className={className}
         >
-          Cancelled
+          {t('status.cancelled')}
         </StatusBadge>
       );
     case 'Planned':
@@ -48,7 +51,7 @@ export default function ActivityStatusBadge({ status = 'Planned', className = ''
           icon={<Calendar size={12} />}
           className={className}
         >
-          Planned
+          {t('status.planned')}
         </StatusBadge>
       );
   }

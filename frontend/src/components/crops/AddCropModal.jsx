@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CheckCircle, Info } from 'lucide-react';
 import { Button } from '../common';
 import { cropLifecycleStages, cropTypes } from '../../data/cropData';
@@ -28,6 +29,7 @@ export default function AddCropModal({
   defaultFarmId = '',
   defaultFieldId = '',
 }) {
+  const { t } = useTranslation();
   const isEditMode = Boolean(cropToEdit);
 
   // Compute initial farm and fields
@@ -76,16 +78,16 @@ export default function AddCropModal({
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.farmId) newErrors.farmId = 'Farm holding is required';
-    if (!formData.fieldId) newErrors.fieldId = 'Field parcel is required';
-    if (!formData.cropName.trim()) newErrors.cropName = 'Crop name is required';
-    if (!formData.variety.trim()) newErrors.variety = 'Crop variety is required';
-    if (!formData.sowingDate) newErrors.sowingDate = 'Sowing date is required';
-    if (!formData.expectedHarvestDate) newErrors.expectedHarvestDate = 'Expected harvest date is required';
+    if (!formData.farmId) newErrors.farmId = t('validation.required', 'Farm holding is required');
+    if (!formData.fieldId) newErrors.fieldId = t('validation.required', 'Field parcel is required');
+    if (!formData.cropName.trim()) newErrors.cropName = t('validation.required', 'Crop name is required');
+    if (!formData.variety.trim()) newErrors.variety = t('validation.required', 'Crop variety is required');
+    if (!formData.sowingDate) newErrors.sowingDate = t('validation.required', 'Sowing date is required');
+    if (!formData.expectedHarvestDate) newErrors.expectedHarvestDate = t('validation.required', 'Expected harvest date is required');
 
     if (formData.sowingDate && formData.expectedHarvestDate) {
       if (new Date(formData.expectedHarvestDate) <= new Date(formData.sowingDate)) {
-        newErrors.expectedHarvestDate = 'Harvest date must be after sowing date';
+        newErrors.expectedHarvestDate = t('validation.dateAfter', 'Harvest date must be after sowing date');
       }
     }
 
@@ -180,19 +182,19 @@ export default function AddCropModal({
         <div className="agri-modal-header">
           <div>
             <h3 id="add-crop-title" className="agri-modal-title">
-              {isEditMode ? 'Edit Crop Cycle' : 'Add New Crop Cycle'}
+              {isEditMode ? t('common.edit', 'Edit Crop Cycle') : t('crops.addCrop', 'Add New Crop Cycle')}
             </h3>
             <p className="agri-modal-subtitle">
               {isEditMode
-                ? 'Update planting details and lifecycle phase for this crop'
-                : 'Assign a new crop variety to a cultivated field parcel'}
+                ? t('crops.subtitle', 'Update planting details and lifecycle phase for this crop')
+                : t('crops.subtitle', 'Assign a new crop variety to a cultivated field parcel')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
             disabled={submitted}
           >
             <X size={20} aria-hidden="true" />
@@ -204,7 +206,7 @@ export default function AddCropModal({
             <div className="agri-demo-badge-banner">
               <Info size={16} aria-hidden="true" />
               <span>
-                <strong>Demo Mode:</strong> Crop cycle will be recorded in memory for this session without backend API calls.
+                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'Crop cycle will be recorded in memory for this session without backend API calls.')}
               </span>
             </div>
 
@@ -212,10 +214,10 @@ export default function AddCropModal({
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                 <CheckCircle size={48} className="text-primary" style={{ margin: '0 auto 1rem auto' }} aria-hidden="true" />
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-900)' }}>
-                  {isEditMode ? 'Crop Cycle Updated!' : 'Crop Cycle Registered Successfully!'}
+                  {isEditMode ? t('messages.cropUpdated', 'Crop Cycle Updated!') : t('messages.cropAdded', 'Crop Cycle Registered Successfully!')}
                 </h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--slate-500)', marginTop: '0.25rem' }}>
-                  Updating field cultivation status and agronomic milestones...
+                  {t('common.loading', 'Updating field cultivation status and agronomic milestones...')}
                 </p>
               </div>
             ) : (
@@ -224,7 +226,7 @@ export default function AddCropModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="crop-farm" className="agri-form-label agri-form-label--required">
-                      Farm Holding
+                      {t('fields.farm', 'Farm Holding')}
                     </label>
                     <select
                       id="crop-farm"
@@ -245,7 +247,7 @@ export default function AddCropModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="crop-field" className="agri-form-label agri-form-label--required">
-                      Field Parcel
+                      {t('fields.fieldName', 'Field Parcel')}
                     </label>
                     <select
                       id="crop-field"
@@ -256,11 +258,11 @@ export default function AddCropModal({
                       required
                     >
                       {availableFields.length === 0 ? (
-                        <option value="">No fields available for this farm</option>
+                        <option value="">{t('fields.noFields', 'No fields available for this farm')}</option>
                       ) : (
                         availableFields.map((f) => (
                           <option key={f.id} value={f.id}>
-                            {f.name} ({f.areaAcres} Ac)
+                            {f.name} ({f.areaAcres} {t('units.acres', 'Ac')})
                           </option>
                         ))
                       )}
@@ -273,7 +275,7 @@ export default function AddCropModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="crop-name" className="agri-form-label agri-form-label--required">
-                      Crop Name
+                      {t('crops.cropName', 'Crop Name')}
                     </label>
                     <input
                       id="crop-name"
@@ -296,7 +298,7 @@ export default function AddCropModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="crop-variety" className="agri-form-label agri-form-label--required">
-                      Variety / Hybrid
+                      {t('crops.variety', 'Variety / Hybrid')}
                     </label>
                     <input
                       id="crop-variety"
@@ -316,7 +318,7 @@ export default function AddCropModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="crop-season" className="agri-form-label agri-form-label--required">
-                      Agricultural Season
+                      {t('crops.season', 'Agricultural Season')}
                     </label>
                     <select
                       id="crop-season"
@@ -325,15 +327,15 @@ export default function AddCropModal({
                       value={formData.season}
                       onChange={handleChange}
                     >
-                      <option value="Rabi">Rabi (Winter - Spring)</option>
-                      <option value="Kharif">Kharif (Monsoon - Autumn)</option>
-                      <option value="Zaid">Zaid (Summer)</option>
+                      <option value="Rabi">{t('crops.rabi', 'Rabi')}</option>
+                      <option value="Kharif">{t('crops.kharif', 'Kharif')}</option>
+                      <option value="Zaid">{t('crops.zaid', 'Zaid')}</option>
                     </select>
                   </div>
 
                   <div className="agri-form-group">
                     <label htmlFor="crop-stage" className="agri-form-label agri-form-label--required">
-                      Lifecycle Stage
+                      {t('crops.currentStage', 'Lifecycle Stage')}
                     </label>
                     <select
                       id="crop-stage"
@@ -355,7 +357,7 @@ export default function AddCropModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="crop-sowing" className="agri-form-label agri-form-label--required">
-                      Sowing Date
+                      {t('crops.sowingDate', 'Sowing Date')}
                     </label>
                     <input
                       id="crop-sowing"
@@ -371,7 +373,7 @@ export default function AddCropModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="crop-harvest" className="agri-form-label agri-form-label--required">
-                      Expected Harvest Date
+                      {t('crops.expectedHarvest', 'Expected Harvest Date')}
                     </label>
                     <input
                       id="crop-harvest"
@@ -391,7 +393,7 @@ export default function AddCropModal({
                 {/* Notes */}
                 <div className="agri-form-group">
                   <label htmlFor="crop-notes" className="agri-form-label">
-                    Agronomic Notes & Seed Treatments
+                    {t('common.notes', 'Agronomic Notes & Seed Treatments')}
                   </label>
                   <textarea
                     id="crop-notes"
@@ -410,10 +412,10 @@ export default function AddCropModal({
           {!submitted && (
             <div className="agri-modal-footer">
               <Button variant="secondary" onClick={onClose} type="button">
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button variant="primary" type="submit">
-                {isEditMode ? 'Update Crop' : 'Save Crop Cycle (Demo)'}
+                {isEditMode ? t('common.update', 'Update Crop') : t('crops.addCrop', 'Save Crop Cycle')}
               </Button>
             </div>
           )}

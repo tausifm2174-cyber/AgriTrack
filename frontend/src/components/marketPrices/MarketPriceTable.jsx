@@ -1,23 +1,27 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, PlusCircle, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { Button } from '../common';
 import { formatCurrency } from '../../utils/formatters';
+import { translateCrop, translateVariety } from '../../utils/displayLabels';
 
 export default function MarketPriceTable({ marketPrices, onViewDetails, onCreateSale }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-market-table-container">
       <div className="agri-market-table-scroll">
         <table className="agri-market-table">
           <thead>
             <tr>
-              <th>Crop & Variety</th>
-              <th>Mandi & Location</th>
-              <th>Benchmark / Quintal</th>
-              <th>Price / Kg</th>
-              <th>Previous Rate</th>
-              <th>24h Change</th>
-              <th>Trend</th>
-              <th>Bulletin Date</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>{t('marketPrices.cropVariety', 'Crop & Variety')}</th>
+              <th>{t('marketPrices.mandiLocation', 'Mandi & Location')}</th>
+              <th>{t('marketPrices.benchmarkQuintal', 'Benchmark / Quintal')}</th>
+              <th>{t('marketPrices.priceKg', 'Price / Kg')}</th>
+              <th>{t('marketPrices.prevRate', 'Previous Rate')}</th>
+              <th>{t('marketPrices.change24h', '24h Change')}</th>
+              <th>{t('marketPrices.priceTrend', 'Trend')}</th>
+              <th>{t('marketPrices.bulletinDate', 'Bulletin Date')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -35,10 +39,10 @@ export default function MarketPriceTable({ marketPrices, onViewDetails, onCreate
                   <td>
                     <div>
                       <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
-                        {mp.crop}
+                        {translateCrop(mp.crop, t)}
                       </span>
                       <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                        {mp.variety} • Grade {mp.qualityGrade}
+                        {translateVariety(mp.variety, t)} • {t('harvests.quality', 'Grade')} {mp.qualityGrade}
                       </div>
                     </div>
                   </td>
@@ -58,7 +62,7 @@ export default function MarketPriceTable({ marketPrices, onViewDetails, onCreate
                         {formatCurrency(mp.pricePerQuintal)}
                       </span>
                       <span style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                        /quintal
+                        /{t('units.quintal', 'quintal')}
                       </span>
                     </div>
                   </td>
@@ -95,7 +99,13 @@ export default function MarketPriceTable({ marketPrices, onViewDetails, onCreate
                       ) : (
                         <Minus size={14} />
                       )}
-                      <span>{mp.trend}</span>
+                      <span>
+                        {isRising
+                          ? t('marketPrices.rising', 'Rising')
+                          : isFalling
+                          ? t('marketPrices.falling', 'Falling')
+                          : t('marketPrices.stable', 'Stable')}
+                      </span>
                     </span>
                   </td>
                   <td>
@@ -109,19 +119,19 @@ export default function MarketPriceTable({ marketPrices, onViewDetails, onCreate
                         variant="outline"
                         size="sm"
                         onClick={() => onViewDetails(mp)}
-                        aria-label={`View trend for ${mp.crop}`}
+                        aria-label={`${t('marketPrices.viewTrend', 'View trend for')} ${mp.crop}`}
                       >
                         <Eye size={14} />
-                        <span>Trend</span>
+                        <span>{t('marketPrices.trend', 'Trend')}</span>
                       </Button>
                       <Button
                         variant="primary"
                         size="sm"
                         onClick={() => onCreateSale(mp)}
-                        aria-label={`Create sale from ${mp.crop} rate`}
+                        aria-label={`${t('sales.addSale', 'Create sale from')} ${mp.crop}`}
                       >
                         <PlusCircle size={14} />
-                        <span>Sell</span>
+                        <span>{t('sales.addSale', 'Sell')}</span>
                       </Button>
                     </div>
                   </td>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   ExternalLink,
@@ -9,6 +10,12 @@ import {
 import StatusBadge from '../common/StatusBadge';
 import Button from '../common/Button';
 import NotificationTypeIcon from './NotificationTypeIcon';
+import {
+  translateCrop,
+  formatFieldName,
+  translateTime,
+  translateStatus,
+} from '../../utils/displayLabels';
 
 function getSeverityVariant(severity) {
   switch (severity) {
@@ -36,6 +43,7 @@ export default function NotificationDetailsModal({
   onClose,
   onToggleRead,
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Close on Escape key
@@ -53,6 +61,12 @@ export default function NotificationDetailsModal({
 
   const typeClass = item.type ? item.type.toLowerCase() : 'system';
   const badgeVariant = getSeverityVariant(item.severity);
+
+  const localizedTitle = t(`notifications.items.${item.id}.title`, item.title);
+  const localizedMessage = t(`notifications.items.${item.id}.message`, item.message);
+  const localizedActionLabel = item.actionLabel
+    ? t(`notifications.items.${item.id}.actionLabel`, item.actionLabel)
+    : t('notifications.viewInModule', 'View in Module');
 
   const handleNavigateToRoute = () => {
     if (item.relatedRoute) {
@@ -83,14 +97,18 @@ export default function NotificationDetailsModal({
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                <span className="agri-notif-type-tag">{item.type}</span>
-                <StatusBadge variant={badgeVariant}>{item.severity}</StatusBadge>
+                <span className="agri-notif-type-tag">
+                  {t(`notifications.type.${typeClass}`, item.type)}
+                </span>
+                <StatusBadge variant={badgeVariant}>
+                  {translateStatus(item.severity, t)}
+                </StatusBadge>
                 <StatusBadge variant={item.isRead ? 'neutral' : 'info'}>
-                  {item.isRead ? 'Read' : 'Unread'}
+                  {item.isRead ? t('notifications.read', 'Read') : t('notifications.unread', 'Unread')}
                 </StatusBadge>
               </div>
               <h3 id="notif-modal-title" className="agri-modal-title">
-                {item.title}
+                {localizedTitle}
               </h3>
             </div>
           </div>
@@ -98,7 +116,7 @@ export default function NotificationDetailsModal({
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -107,47 +125,51 @@ export default function NotificationDetailsModal({
         {/* Body */}
         <div className="agri-modal-body">
           <p style={{ fontSize: '0.925rem', color: 'var(--slate-700)', lineHeight: '1.6', marginBottom: '1rem' }}>
-            {item.message}
+            {localizedMessage}
           </p>
 
           <div className="agri-notif-modal-grid">
             <div className="agri-notif-modal-row">
-              <span className="agri-notif-modal-label">Timestamp</span>
-              <span className="agri-notif-modal-value">{item.timestamp}</span>
+              <span className="agri-notif-modal-label">{t('common.time', 'Timestamp')}</span>
+              <span className="agri-notif-modal-value">{translateTime(item.timestamp, t)}</span>
             </div>
 
             <div className="agri-notif-modal-row">
-              <span className="agri-notif-modal-label">Read Status</span>
+              <span className="agri-notif-modal-label">{t('common.status', 'Read Status')}</span>
               <span className="agri-notif-modal-value">
-                {item.isRead ? 'Marked as Read' : 'Unread / Requires Attention'}
+                {item.isRead ? t('notifications.markedRead', 'Marked as Read') : t('notifications.requiresAttention', 'Unread / Requires Attention')}
               </span>
             </div>
 
             <div className="agri-notif-modal-row">
-              <span className="agri-notif-modal-label">Associated Farm</span>
+              <span className="agri-notif-modal-label">{t('farms.farm', 'Associated Farm')}</span>
               <span className="agri-notif-modal-value">
-                {item.farmName ? `${item.farmName} (${item.farmId})` : 'System-wide / Not Applicable'}
+                {item.farmName
+                  ? `${t(`farms.demoNames.${item.farmId}`, item.farmName)}${item.farmId ? ` (${item.farmId})` : ''}`
+                  : t('notifications.systemWide', 'System-wide / Not Applicable')}
               </span>
             </div>
 
             <div className="agri-notif-modal-row">
-              <span className="agri-notif-modal-label">Field / Zone</span>
+              <span className="agri-notif-modal-label">{t('fields.field', 'Field / Zone')}</span>
               <span className="agri-notif-modal-value">
-                {item.fieldName ? `${item.fieldName} (${item.fieldId})` : 'All Fields / General'}
+                {item.fieldName
+                  ? `${formatFieldName(item.fieldName, t)}${item.fieldId ? ` (${item.fieldId})` : ''}`
+                  : t('notifications.allFieldsGeneral', 'All Fields / General')}
               </span>
             </div>
 
             <div className="agri-notif-modal-row">
-              <span className="agri-notif-modal-label">Crop Cycle</span>
+              <span className="agri-notif-modal-label">{t('crops.crop', 'Crop Cycle')}</span>
               <span className="agri-notif-modal-value">
-                {item.cropName ? item.cropName : 'N/A'}
+                {item.cropName ? translateCrop(item.cropName, t) : t('common.na', 'N/A')}
               </span>
             </div>
 
             <div className="agri-notif-modal-row">
-              <span className="agri-notif-modal-label">Target Route</span>
+              <span className="agri-notif-modal-label">{t('notifications.targetRoute', 'Target Route')}</span>
               <span className="agri-notif-modal-value" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                {item.relatedRoute || 'None'}
+                {item.relatedRoute || t('common.none', 'None')}
               </span>
             </div>
           </div>
@@ -161,12 +183,12 @@ export default function NotificationDetailsModal({
             icon={item.isRead ? <RotateCcw size={14} /> : <Check size={14} />}
             onClick={() => onToggleRead(item.id)}
           >
-            {item.isRead ? 'Mark as Unread' : 'Mark as Read'}
+            {item.isRead ? t('notifications.markAsUnread', 'Mark as Unread') : t('notifications.markAsRead', 'Mark as Read')}
           </Button>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Button variant="ghost" size="sm" onClick={onClose}>
-              Close
+              {t('common.close', 'Close')}
             </Button>
             {item.relatedRoute && (
               <Button
@@ -175,7 +197,7 @@ export default function NotificationDetailsModal({
                 icon={<ExternalLink size={14} />}
                 onClick={handleNavigateToRoute}
               >
-                {item.actionLabel || 'View in Module'}
+                {localizedActionLabel}
               </Button>
             )}
           </div>
@@ -184,3 +206,4 @@ export default function NotificationDetailsModal({
     </div>
   );
 }
+

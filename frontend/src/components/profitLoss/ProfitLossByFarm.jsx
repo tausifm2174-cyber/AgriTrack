@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Warehouse, ArrowUpRight, ArrowDownRight, Eye } from 'lucide-react';
 import { calculateProfitByFarm } from '../../utils/financialCalculations';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
@@ -5,6 +6,7 @@ import { Button } from '../common';
 import { farmData } from '../../data/farmData';
 
 export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFarm }) {
+  const { t } = useTranslation();
   const farmList = calculateProfitByFarm(sales, expenses, farmData.farms);
 
   return (
@@ -12,10 +14,10 @@ export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFa
       <div className="agri-pl-panel__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Warehouse size={18} style={{ color: 'var(--primary-700)' }} />
-          <h3 className="agri-pl-panel__title">Holding-Wise Financial Performance</h3>
+          <h3 className="agri-pl-panel__title">{t('profitLoss.profitByFarm', 'Holding-Wise Financial Performance')}</h3>
         </div>
         <span style={{ fontSize: '0.75rem', color: 'var(--slate-500)', fontWeight: 600 }}>
-          {farmList.length} Holdings
+          {t('profitLoss.holdingsCount', '{{count}} Holdings', { count: farmList.length })}
         </span>
       </div>
 
@@ -23,12 +25,12 @@ export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFa
         <table className="agri-pl-table">
           <thead>
             <tr>
-              <th>Farm / Holding</th>
-              <th>Revenue</th>
-              <th>Expenses</th>
-              <th>Net Profit / Loss</th>
-              <th>Margin</th>
-              <th style={{ textAlign: 'right' }}>Action</th>
+              <th>{t('farms.farm', 'Farm / Holding')}</th>
+              <th>{t('revenue.totalRevenue', 'Revenue')}</th>
+              <th>{t('expenses.title', 'Expenses')}</th>
+              <th>{t('profitLoss.netProfit', 'Net Profit / Loss')}</th>
+              <th>{t('profitLoss.margin', 'Margin')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
             </tr>
           </thead>
           <tbody>
@@ -38,10 +40,10 @@ export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFa
                 <tr key={item.farmId}>
                   <td>
                     <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
-                      {item.farmName}
+                      {t(`farms.demoNames.${item.farmId}`, item.farmName)}
                     </span>
                     <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                      {item.salesCount} sales • {item.expenseCount} vouchers
+                      {t('profitLoss.salesVouchersCount', '{{sales}} sales • {{expenses}} vouchers', { sales: item.salesCount, expenses: item.expenseCount })}
                     </div>
                   </td>
                   <td>
@@ -70,10 +72,10 @@ export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFa
                       variant="outline"
                       size="sm"
                       onClick={() => onSelectFarm && onSelectFarm(item)}
-                      aria-label={`View details for ${item.farmName}`}
+                      aria-label={`${t('common.viewDetails', 'View details')} ${item.farmName}`}
                     >
                       <Eye size={13} />
-                      <span>Details</span>
+                      <span>{t('common.details', 'Details')}</span>
                     </Button>
                   </td>
                 </tr>
@@ -85,3 +87,4 @@ export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFa
     </div>
   );
 }
+

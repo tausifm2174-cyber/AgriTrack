@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, ArrowRight, Store } from 'lucide-react';
 import Card from '../common/Card';
+import { translateCrop, translateVariety } from '../../utils/displayLabels';
 
 /**
  * MarketPriceCard Component
@@ -9,13 +11,15 @@ import Card from '../common/Card';
  * @param {Array} props.marketPrices
  */
 export default function MarketPriceCard({ marketPrices = [] }) {
+  const { t } = useTranslation();
+
   return (
     <Card
-      title="Live APMC Market Rates"
-      subtitle="Benchmark mandi commodity prices"
+      title={t('marketPrices.title', 'Live APMC Market Rates')}
+      subtitle={t('marketPrices.subtitle', 'Benchmark mandi commodity prices')}
       action={
         <Link to="/market-prices" className="agri-card-action-link">
-          <span>View Market Prices</span>
+          <span>{t('navigation.marketPrices', 'Market Prices')}</span>
           <ArrowRight size={14} aria-hidden="true" />
         </Link>
       }
@@ -26,7 +30,7 @@ export default function MarketPriceCard({ marketPrices = [] }) {
           style={{ fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
         >
           <Store size={11} aria-hidden="true" />
-          <span>Demo Market Data • Illustrative APMC Rates</span>
+          <span>{t('marketPrices.demoNotice', 'Demo Market Data • Illustrative APMC Rates')}</span>
         </span>
       </div>
 
@@ -39,10 +43,10 @@ export default function MarketPriceCard({ marketPrices = [] }) {
               </div>
               <div>
                 <h4 className="agri-market-item__crop-name">
-                  {item.crop} ({item.variety})
+                  {translateCrop(item.crop, t)} ({translateVariety(item.variety, t)})
                 </h4>
                 <p className="agri-market-item__crop-sub">
-                  {item.mandi} • Range: ₹{item.minRate} - ₹{item.maxRate}
+                  {item.mandi} • {t('dashboard.range', 'Range')}: ₹{item.minRate} - ₹{item.maxRate}
                 </p>
               </div>
             </div>

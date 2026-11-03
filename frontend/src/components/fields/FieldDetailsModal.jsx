@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { X, FlaskConical, Droplets, Sprout } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
@@ -8,6 +9,7 @@ import { formatAcres } from '../../utils/formatters';
  * Displays detailed agronomic information and specifications for a single plot.
  */
 export default function FieldDetailsModal({ field, onClose }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!field) return null;
@@ -51,14 +53,14 @@ export default function FieldDetailsModal({ field, onClose }) {
               {field.name}
             </h3>
             <p className="agri-modal-subtitle">
-              Located in {field.farmName}
+              {t('fields.farm', 'Located in')} {field.farmName}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -68,47 +70,47 @@ export default function FieldDetailsModal({ field, onClose }) {
         <div className="agri-modal-body">
           {/* Crop Profile */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Cultivation Status</h4>
+            <h4 className="agri-detail-section-title">{t('crops.stage', 'Cultivation Status')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Current Crop</span>
+                <span className="agri-detail-label">{t('fields.currentCrop', 'Current Crop')}</span>
                 <span className="agri-detail-value">
                   {field.currentCrop} {field.cropVariety ? `(${field.cropVariety})` : ''}
                 </span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Crop Season</span>
+                <span className="agri-detail-label">{t('crops.season', 'Crop Season')}</span>
                 <span className="agri-detail-value">{field.cropSeason}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Growth Stage</span>
+                <span className="agri-detail-label">{t('crops.stage', 'Growth Stage')}</span>
                 <span className="agri-detail-value">{field.cropStage}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Crop Progress</span>
-                <span className="agri-detail-value">{field.cropProgress}% Cycle Completed</span>
+                <span className="agri-detail-label">{t('crops.cropCycle', 'Crop Progress')}</span>
+                <span className="agri-detail-value">{field.cropProgress}%</span>
               </div>
             </div>
           </div>
 
           {/* Land & Soil Characteristics */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Soil & Moisture Properties</h4>
+            <h4 className="agri-detail-section-title">{t('soil.title', 'Soil & Moisture Properties')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Parcel Size</span>
+                <span className="agri-detail-label">{t('fields.area', 'Parcel Size')}</span>
                 <span className="agri-detail-value">{formatAcres(field.areaAcres)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil Classification</span>
+                <span className="agri-detail-label">{t('fields.soilType', 'Soil Classification')}</span>
                 <span className="agri-detail-value">{field.soilType}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil Moisture</span>
+                <span className="agri-detail-label">{t('soil.moisture', 'Soil Moisture')}</span>
                 <span className="agri-detail-value">{field.soilMoisture}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil pH & Nitrogen</span>
+                <span className="agri-detail-label">{t('soil.ph', 'Soil pH')} & {t('soil.nitrogen', 'Nitrogen')}</span>
                 <span className="agri-detail-value">{field.phLevel} pH • {field.nitrogenStatus}</span>
               </div>
             </div>
@@ -116,18 +118,18 @@ export default function FieldDetailsModal({ field, onClose }) {
 
           {/* Irrigation & Operations */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Irrigation & Management</h4>
+            <h4 className="agri-detail-section-title">{t('irrigation.title', 'Irrigation & Management')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Irrigation System</span>
+                <span className="agri-detail-label">{t('fields.irrigationSystem', 'Irrigation System')}</span>
                 <span className="agri-detail-value">{field.irrigationMethod}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Irrigation Status</span>
+                <span className="agri-detail-label">{t('irrigation.schedule', 'Irrigation Status')}</span>
                 <span className="agri-detail-value">{field.irrigationStatus}</span>
               </div>
               <div className="agri-detail-item" style={{ gridColumn: 'span 2' }}>
-                <span className="agri-detail-label">Recent Operational Activity</span>
+                <span className="agri-detail-label">{t('activities.title', 'Recent Operational Activity')}</span>
                 <span className="agri-detail-value">{field.lastActivity} ({field.lastActivityDate})</span>
               </div>
             </div>
@@ -136,7 +138,7 @@ export default function FieldDetailsModal({ field, onClose }) {
           {/* Notes */}
           {field.notes && (
             <div className="agri-detail-section">
-              <h4 className="agri-detail-section-title">Agronomic Notes</h4>
+              <h4 className="agri-detail-section-title">{t('common.notes', 'Agronomic Notes')}</h4>
               <p style={{ fontSize: '0.85rem', color: 'var(--slate-600)', lineHeight: '1.5' }}>
                 {field.notes}
               </p>
@@ -147,28 +149,28 @@ export default function FieldDetailsModal({ field, onClose }) {
         {/* Footer Actions */}
         <div className="agri-modal-footer">
           <Button variant="secondary" onClick={onClose}>
-            Close
+            {t('common.close', 'Close')}
           </Button>
           <Button
             variant="outline"
             icon={<Droplets size={15} aria-hidden="true" />}
             onClick={handleGoToIrrigation}
           >
-            Irrigation
+            {t('navigation.irrigation', 'Irrigation')}
           </Button>
           <Button
             variant="outline"
             icon={<Sprout size={15} aria-hidden="true" />}
             onClick={handleGoToCrops}
           >
-            Crop Cycle
+            {t('navigation.crops', 'Crop Cycle')}
           </Button>
           <Button
             variant="primary"
             icon={<FlaskConical size={15} aria-hidden="true" />}
             onClick={handleGoToSoil}
           >
-            Soil Records
+            {t('navigation.soil', 'Soil Records')}
           </Button>
         </div>
       </div>

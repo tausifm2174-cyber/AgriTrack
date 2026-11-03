@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, Edit3, Trash2, Calendar, Clock, MapPin } from 'lucide-react';
 import { Button } from '../common';
 import ActivityStatusBadge from './ActivityStatusBadge';
 import ActivityTypePill from './ActivityTypePill';
+import { translateCrop, formatFieldName } from '../../utils/displayLabels';
 
 /**
  * ActivityTable Component
@@ -15,26 +17,30 @@ export default function ActivityTable({
   farmsMap = {},
   fieldsMap = {},
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-activity-table-container">
       <div className="agri-activity-table-scroll">
-        <table className="agri-activity-table" aria-label="Agricultural Activities">
+        <table className="agri-activity-table" aria-label={t('navigation.activities')}>
           <thead>
             <tr>
-              <th>Activity</th>
-              <th>Type</th>
-              <th>Farm & Field</th>
-              <th>Crop</th>
-              <th>Date & Time</th>
-              <th>Duration</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>{t('navigation.activities')}</th>
+              <th>{t('activities.activityType')}</th>
+              <th>{t('navigation.farms')} & {t('navigation.fields')}</th>
+              <th>{t('navigation.crops')}</th>
+              <th>{t('common.date')} & {t('common.time')}</th>
+              <th>{t('irrigation.duration')}</th>
+              <th>{t('common.status')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {activities.map((activity) => {
-              const farmName = farmsMap[activity.farmId]?.name || activity.farmId;
-              const fieldName = fieldsMap[activity.fieldId]?.name || activity.fieldId;
+              const rawFarmName = farmsMap[activity.farmId]?.name || activity.farmId;
+              const farmName = t(`farms.demoNames.${activity.farmId}`, rawFarmName);
+              const rawFieldName = fieldsMap[activity.fieldId]?.name || activity.fieldId;
+              const fieldName = formatFieldName(rawFieldName, t);
 
               return (
                 <tr key={activity.id}>
@@ -67,7 +73,7 @@ export default function ActivityTable({
                   {/* Crop */}
                   <td>
                     <span style={{ fontWeight: 600, color: 'var(--slate-800)' }}>
-                      {activity.cropName || '—'}
+                      {activity.cropName ? translateCrop(activity.cropName, t) : '—'}
                     </span>
                   </td>
 
@@ -90,7 +96,7 @@ export default function ActivityTable({
                   {/* Duration */}
                   <td>
                     <span style={{ color: 'var(--slate-700)', fontSize: '0.8125rem' }}>
-                      {activity.duration ? `${activity.duration} hrs` : '—'}
+                      {activity.duration ? `${activity.duration} ${t('units.hours')}` : '—'}
                     </span>
                   </td>
 
@@ -106,21 +112,21 @@ export default function ActivityTable({
                         variant="outline"
                         size="sm"
                         onClick={() => onViewActivity(activity)}
-                        aria-label={`View details for ${activity.title}`}
-                        title="View details"
+                        aria-label={`${t('common.viewDetails')}: ${activity.title}`}
+                        title={t('common.viewDetails')}
                       >
                         <Eye size={13} aria-hidden="true" />
-                        <span>View</span>
+                        <span>{t('common.viewDetails')}</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => onEditActivity(activity)}
-                        aria-label={`Edit ${activity.title}`}
-                        title="Edit activity"
+                        aria-label={`${t('common.edit')}: ${activity.title}`}
+                        title={t('common.edit')}
                       >
                         <Edit3 size={13} aria-hidden="true" />
-                        <span>Edit</span>
+                        <span>{t('common.edit')}</span>
                       </Button>
                       {onDeleteActivity && (
                         <button
@@ -139,8 +145,8 @@ export default function ActivityTable({
                             cursor: 'pointer',
                           }}
                           onClick={() => onDeleteActivity(activity)}
-                          aria-label={`Delete ${activity.title}`}
-                          title="Delete activity"
+                          aria-label={`${t('common.delete')}: ${activity.title}`}
+                          title={t('common.delete')}
                         >
                           <Trash2 size={13} aria-hidden="true" />
                         </button>

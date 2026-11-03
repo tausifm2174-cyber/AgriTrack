@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CheckCircle, Info } from 'lucide-react';
 import { Button } from '../common';
 import { cropTypes } from '../../data/cropData';
@@ -13,6 +14,7 @@ export default function AddMilestoneModal({
   onMilestoneAdded,
   fields = [],
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
     fieldId: fields[0]?.id || 'field-1a',
@@ -38,7 +40,7 @@ export default function AddMilestoneModal({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
-      setError('Milestone title is required');
+      setError(t('validation.required', 'Milestone title is required'));
       return;
     }
 
@@ -102,17 +104,17 @@ export default function AddMilestoneModal({
         <div className="agri-modal-header">
           <div>
             <h3 id="add-milestone-title" className="agri-modal-title">
-              Schedule Crop Milestone
+              {t('cropCalendar.addMilestone', 'Schedule Crop Milestone')}
             </h3>
             <p className="agri-modal-subtitle">
-              Add a lifecycle event, fertigation cycle, or harvest window
+              {t('cropCalendar.subtitle', 'Add a lifecycle event, fertigation cycle, or harvest window')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
             disabled={submitted}
           >
             <X size={20} aria-hidden="true" />
@@ -124,7 +126,7 @@ export default function AddMilestoneModal({
             <div className="agri-demo-badge-banner">
               <Info size={16} aria-hidden="true" />
               <span>
-                <strong>Demo Mode:</strong> Scheduled milestone will be saved in memory for this session.
+                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'Scheduled milestone will be saved in memory for this session.')}
               </span>
             </div>
 
@@ -132,17 +134,17 @@ export default function AddMilestoneModal({
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                 <CheckCircle size={48} className="text-primary" style={{ margin: '0 auto 1rem auto' }} aria-hidden="true" />
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-900)' }}>
-                  Milestone Scheduled!
+                  {t('messages.milestoneAdded', 'Milestone Scheduled!')}
                 </h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--slate-500)', marginTop: '0.25rem' }}>
-                  Adding to crop calendar and operational agenda...
+                  {t('common.loading', 'Adding to crop calendar and operational agenda...')}
                 </p>
               </div>
             ) : (
               <div className="agri-form-grid">
                 <div className="agri-form-group">
                   <label htmlFor="mile-title" className="agri-form-label agri-form-label--required">
-                    Milestone Title
+                    {t('cropCalendar.milestoneName', 'Milestone Title')}
                   </label>
                   <input
                     id="mile-title"
@@ -160,7 +162,7 @@ export default function AddMilestoneModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="mile-field" className="agri-form-label agri-form-label--required">
-                      Target Field
+                      {t('fields.fieldName', 'Target Field')}
                     </label>
                     <select
                       id="mile-field"
@@ -179,7 +181,7 @@ export default function AddMilestoneModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="mile-crop" className="agri-form-label agri-form-label--required">
-                      Standing Crop
+                      {t('fields.currentCrop', 'Standing Crop')}
                     </label>
                     <select
                       id="mile-crop"
@@ -200,7 +202,7 @@ export default function AddMilestoneModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="mile-type" className="agri-form-label agri-form-label--required">
-                      Event Category
+                      {t('activities.type', 'Event Category')}
                     </label>
                     <select
                       id="mile-type"
@@ -209,17 +211,17 @@ export default function AddMilestoneModal({
                       value={formData.eventType}
                       onChange={handleChange}
                     >
-                      <option value="lifecycle">Crop Lifecycle Stage</option>
-                      <option value="fertilizer">Fertilizer & Nutrition</option>
-                      <option value="irrigation">Irrigation Pulse</option>
-                      <option value="crop_protection">Crop Protection & Weeding</option>
-                      <option value="harvest">Harvest Readiness Window</option>
+                      <option value="lifecycle">{t('crops.lifecycleProgress', 'Crop Lifecycle Stage')}</option>
+                      <option value="fertilizer">{t('activityTypes.fertilization', 'Fertilizer & Nutrition')}</option>
+                      <option value="irrigation">{t('irrigation.title', 'Irrigation Pulse')}</option>
+                      <option value="crop_protection">{t('activityTypes.spraying', 'Crop Protection & Weeding')}</option>
+                      <option value="harvest">{t('stages.harvestReadiness', 'Harvest Readiness Window')}</option>
                     </select>
                   </div>
 
                   <div className="agri-form-group">
                     <label htmlFor="mile-date" className="agri-form-label agri-form-label--required">
-                      Scheduled Date
+                      {t('common.date', 'Scheduled Date')}
                     </label>
                     <input
                       id="mile-date"
@@ -235,7 +237,7 @@ export default function AddMilestoneModal({
 
                 <div className="agri-form-group">
                   <label htmlFor="mile-desc" className="agri-form-label">
-                    Activity Instructions & Advisory
+                    {t('common.description', 'Activity Instructions & Advisory')}
                   </label>
                   <textarea
                     id="mile-desc"
@@ -254,10 +256,10 @@ export default function AddMilestoneModal({
           {!submitted && (
             <div className="agri-modal-footer">
               <Button variant="secondary" onClick={onClose} type="button">
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button variant="primary" type="submit">
-                Schedule Milestone
+                {t('cropCalendar.addMilestone', 'Schedule Milestone')}
               </Button>
             </div>
           )}

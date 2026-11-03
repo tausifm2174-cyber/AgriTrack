@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CloudSun, Clock, Compass, Info } from 'lucide-react';
 import { Button } from '../common';
 import FarmWeatherSelector from './FarmWeatherSelector';
@@ -6,20 +7,16 @@ import FarmWeatherSelector from './FarmWeatherSelector';
 /**
  * WeatherHeader component
  * Displays meteorological page title, demo data disclaimer, farm selector, and quick link to recommendations.
- *
- * @param {Object} props
- * @param {string} props.selectedFarmId - ID of active farm
- * @param {Function} props.onSelectFarm - Handler to change active farm
- * @param {Array} props.farms - List of farms
- * @param {string} [props.lastUpdated] - Timestamp string
  */
 export default function WeatherHeader({
   selectedFarmId,
   onSelectFarm,
   farms = [],
-  lastUpdated = 'Just now (Demo)',
+  lastUpdated,
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const displayLastUpdated = lastUpdated || t('common.justNow', 'Just now (Demo)');
 
   return (
     <header className="agri-weather-header">
@@ -27,21 +24,21 @@ export default function WeatherHeader({
         <div className="agri-weather-header__badges">
           <span className="agri-weather-badge agri-weather-badge--demo">
             <Info size={12} aria-hidden="true" />
-            <span>Demo Weather Data</span>
+            <span>{t('weather.demoNotice', 'Demo Weather Data')}</span>
           </span>
           <span className="agri-weather-badge agri-weather-badge--time">
             <Clock size={12} aria-hidden="true" />
-            <span>Updated: {lastUpdated}</span>
+            <span>{t('weather.updated', 'Updated')}: {displayLastUpdated}</span>
           </span>
         </div>
 
         <h1 className="agri-weather-header__title">
           <CloudSun size={28} className="agri-weather-header__icon text-primary" aria-hidden="true" />
-          <span>Weather & Farm Insights</span>
+          <span>{t('weather.title', 'Weather & Farm Insights')}</span>
         </h1>
 
         <p className="agri-weather-header__desc">
-          Monitor weather conditions and understand their impact on farm operations.
+          {t('weather.subtitle', 'Monitor weather conditions and understand their impact on farm operations.')}
         </p>
       </div>
 
@@ -57,7 +54,7 @@ export default function WeatherHeader({
           icon={<Compass size={15} aria-hidden="true" />}
           onClick={() => navigate('/recommendations')}
         >
-          Crop Advisory
+          {t('weather.cropAdvisory', 'Crop Advisory')}
         </Button>
       </div>
     </header>

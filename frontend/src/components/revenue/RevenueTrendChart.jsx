@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -10,6 +11,7 @@ import {
 import { formatCurrency } from '../../utils/formatters';
 
 export default function RevenueTrendChart({ sales = [] }) {
+  const { t, i18n } = useTranslation();
   // Aggregate revenue by date
   const map = {};
   sales.forEach((s) => {
@@ -20,10 +22,16 @@ export default function RevenueTrendChart({ sales = [] }) {
 
   const dates = Object.keys(map).sort();
   const data = dates.map((date) => {
-    // format "2026-09-28" to "28 Sep"
-    const parts = date.split('-');
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const label = `${parts[2]} ${months[parseInt(parts[1], 10) - 1]}`;
+    let label;
+    try {
+      label = new Intl.DateTimeFormat(i18n.language || 'en-IN', {
+        day: 'numeric',
+        month: 'short',
+      }).format(new Date(date));
+    } catch {
+      const parts = date.split('-');
+      label = `${parts[2]}/${parts[1]}`;
+    }
     return {
       date,
       displayDate: label,
@@ -35,10 +43,10 @@ export default function RevenueTrendChart({ sales = [] }) {
     return (
       <div className="agri-revenue-chart-box">
         <div className="agri-revenue-chart-box__header">
-          <span className="agri-revenue-chart-box__title">Revenue Trajectory over Time</span>
+          <span className="agri-revenue-chart-box__title">{t('revenue.trajectoryOverTime', 'Revenue Trajectory over Time')}</span>
         </div>
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
-          No revenue transactions found for chart plotting.
+          {t('revenue.noTransactionsFound', 'No revenue transactions found for chart plotting.')}
         </div>
       </div>
     );
@@ -48,13 +56,13 @@ export default function RevenueTrendChart({ sales = [] }) {
     <div className="agri-revenue-chart-box">
       <div className="agri-revenue-chart-box__header">
         <div>
-          <span className="agri-revenue-chart-box__title">Revenue Realization Timeline</span>
+          <span className="agri-revenue-chart-box__title">{t('revenue.realizationTimeline', 'Revenue Realization Timeline')}</span>
           <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-            Chronological inflow from executed produce sales
+            {t('revenue.chronologicalInflowDesc', 'Chronological inflow from executed produce sales')}
           </p>
         </div>
         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-600)' }}>
-          {data.length} Transaction Points
+          {data.length} {t('revenue.txPoints', 'Transaction Points')}
         </span>
       </div>
 
@@ -82,10 +90,10 @@ export default function RevenueTrendChart({ sales = [] }) {
               width={55}
             />
             <Tooltip
-              formatter={(value) => [formatCurrency(value), 'Gross Inflow']}
+              formatter={(value) => [formatCurrency(value), t('revenue.grossInflow', 'Gross Inflow')]}
               labelFormatter={(label, items) => {
                 const fullDate = items && items[0] ? items[0].payload.date : label;
-                return `Date: ${fullDate}`;
+                return `${t('common.date', 'Date')}: ${fullDate}`;
               }}
               contentStyle={{
                 backgroundColor: '#ffffff',

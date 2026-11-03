@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { marketPriceRecords as initialMarketPrices } from '../data/marketPriceData';
 import { EmptyState } from '../components/common';
 import {
@@ -13,6 +14,7 @@ import {
 import '../components/marketPrices/marketPrices.css';
 
 export default function MarketPricesPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -155,9 +157,9 @@ export default function MarketPricesPage() {
       {/* Main Content Area */}
       {filteredPrices.length === 0 ? (
         <EmptyState
-          title="No market prices found"
-          message="No APMC market records match your filter criteria. Try resetting or adjusting your search parameters."
-          actionText="Reset Filters"
+          title={t('marketPrices.noPrices', 'No market prices found')}
+          message={t('marketPrices.noPricesDesc', 'No APMC market records match your filter criteria. Try resetting or adjusting your search parameters.')}
+          actionText={t('common.clearFilters', 'Reset Filters')}
           onAction={handleResetFilters}
         />
       ) : viewMode === 'table' ? (

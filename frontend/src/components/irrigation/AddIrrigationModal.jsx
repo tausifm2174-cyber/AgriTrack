@@ -1,4 +1,5 @@
 import { useState, useEffect, useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Check, Edit3, AlertCircle, Droplets } from 'lucide-react';
 import { Button } from '../common';
 import {
@@ -18,6 +19,7 @@ function IrrigationFormContent({
   onSave,
   onClose,
 }) {
+  const { t } = useTranslation();
   const isEditMode = Boolean(scheduleToEdit);
 
   // Accessible unique IDs
@@ -133,52 +135,52 @@ function IrrigationFormContent({
     const newErrors = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Schedule title is required';
+      newErrors.title = t('validation.required');
     }
     if (!formData.farmId) {
-      newErrors.farmId = 'Farm selection is required';
+      newErrors.farmId = t('validation.selectFarm');
     }
     if (!formData.fieldId) {
-      newErrors.fieldId = 'Field selection is required';
+      newErrors.fieldId = t('validation.selectField');
     }
     if (!formData.cropName.trim()) {
-      newErrors.cropName = 'Crop name is required';
+      newErrors.cropName = t('validation.selectCrop');
     }
     if (!formData.irrigationMethod) {
-      newErrors.irrigationMethod = 'Irrigation method is required';
+      newErrors.irrigationMethod = t('validation.required');
     }
     if (!formData.scheduledDate) {
-      newErrors.scheduledDate = 'Date is required';
+      newErrors.scheduledDate = t('validation.enterValidDate');
     }
     if (!formData.scheduledTime.trim()) {
-      newErrors.scheduledTime = 'Time is required';
+      newErrors.scheduledTime = t('validation.required');
     }
     if (!formData.status) {
-      newErrors.status = 'Status is required';
+      newErrors.status = t('validation.required');
     }
 
     // Number validations
     const durationNum = Number(formData.durationMinutes);
     if (!formData.durationMinutes || isNaN(durationNum) || durationNum <= 0) {
-      newErrors.durationMinutes = 'Duration must be greater than 0 minutes';
+      newErrors.durationMinutes = t('validation.enterValidNumber');
     }
 
     const volumeNum = Number(formData.waterVolumeLitres);
     if (!formData.waterVolumeLitres || isNaN(volumeNum) || volumeNum <= 0) {
-      newErrors.waterVolumeLitres = 'Water volume must be greater than 0 Litres';
+      newErrors.waterVolumeLitres = t('validation.enterValidQuantity');
     }
 
     if (formData.soilMoisture !== '') {
       const moistNum = Number(formData.soilMoisture);
       if (isNaN(moistNum) || moistNum < 0 || moistNum > 100) {
-        newErrors.soilMoisture = 'Soil moisture must be between 0 and 100%';
+        newErrors.soilMoisture = t('validation.enterValidNumber');
       }
     }
 
     if (formData.rainfallExpected !== '') {
       const rainNum = Number(formData.rainfallExpected);
       if (isNaN(rainNum) || rainNum < 0) {
-        newErrors.rainfallExpected = 'Rainfall cannot be negative';
+        newErrors.rainfallExpected = t('validation.enterValidNumber');
       }
     }
 
@@ -229,13 +231,13 @@ function IrrigationFormContent({
           {/* Title (Full Width) */}
           <div className="agri-form-group agri-form-grid--full">
             <label htmlFor={titleId} className="agri-form-label agri-form-label--required">
-              Schedule Title
+              {t('common.name')}
             </label>
             <input
               id={titleId}
               name="title"
               type="text"
-              placeholder="e.g., Field 2B Maize Drip Cycle - Flowering Phase"
+              placeholder="e.g., Field 2B Maize Drip Cycle"
               className={`agri-form-input ${errors.title ? 'agri-form-input--error' : ''}`}
               value={formData.title}
               onChange={handleChange}
@@ -251,7 +253,7 @@ function IrrigationFormContent({
           {/* Farm Selection (Cascading parent) */}
           <div className="agri-form-group">
             <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
-              Farm Holding
+              {t('navigation.farms')}
             </label>
             <select
               id={farmSelectId}
@@ -260,7 +262,7 @@ function IrrigationFormContent({
               value={formData.farmId}
               onChange={handleFarmChange}
             >
-              <option value="">-- Select Farm --</option>
+              <option value="">-- {t('navigation.farms')} --</option>
               {farms.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name}
@@ -278,7 +280,7 @@ function IrrigationFormContent({
           {/* Field Selection (Cascading child) */}
           <div className="agri-form-group">
             <label htmlFor={fieldSelectId} className="agri-form-label agri-form-label--required">
-              Field / Parcel
+              {t('navigation.fields')}
             </label>
             <select
               id={fieldSelectId}
@@ -288,10 +290,10 @@ function IrrigationFormContent({
               onChange={handleFieldChange}
               disabled={availableFields.length === 0}
             >
-              <option value="">-- Select Field --</option>
+              <option value="">-- {t('navigation.fields')} --</option>
               {availableFields.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name} ({f.currentCrop || 'No standing crop'})
+                  {f.name} ({f.currentCrop || '—'})
                 </option>
               ))}
             </select>
@@ -306,7 +308,7 @@ function IrrigationFormContent({
           {/* Crop Name */}
           <div className="agri-form-group">
             <label htmlFor={cropInputId} className="agri-form-label agri-form-label--required">
-              Target Crop
+              {t('crops.cropName')}
             </label>
             <input
               id={cropInputId}
@@ -328,7 +330,7 @@ function IrrigationFormContent({
           {/* Irrigation Method */}
           <div className="agri-form-group">
             <label htmlFor={methodId} className="agri-form-label agri-form-label--required">
-              Irrigation Method
+              {t('irrigation.method')}
             </label>
             <select
               id={methodId}
@@ -354,7 +356,7 @@ function IrrigationFormContent({
           {/* Scheduled Date */}
           <div className="agri-form-group">
             <label htmlFor={dateId} className="agri-form-label agri-form-label--required">
-              Scheduled Date
+              {t('irrigation.irrigationDate')}
             </label>
             <input
               id={dateId}
@@ -375,7 +377,7 @@ function IrrigationFormContent({
           {/* Scheduled Time */}
           <div className="agri-form-group">
             <label htmlFor={timeId} className="agri-form-label agri-form-label--required">
-              Scheduled Time
+              {t('common.time')}
             </label>
             <input
               id={timeId}
@@ -397,7 +399,7 @@ function IrrigationFormContent({
           {/* Duration (mins) */}
           <div className="agri-form-group">
             <label htmlFor={durationId} className="agri-form-label agri-form-label--required">
-              Duration (minutes)
+              {t('irrigation.duration')} (min)
             </label>
             <input
               id={durationId}
@@ -421,7 +423,7 @@ function IrrigationFormContent({
           {/* Water Volume (Litres) */}
           <div className="agri-form-group">
             <label htmlFor={volumeId} className="agri-form-label agri-form-label--required">
-              Water Volume (Litres)
+              {t('irrigation.waterQuantity')} ({t('units.liters')})
             </label>
             <input
               id={volumeId}
@@ -465,7 +467,7 @@ function IrrigationFormContent({
           {/* Status */}
           <div className="agri-form-group">
             <label htmlFor={statusId} className="agri-form-label agri-form-label--required">
-              Status
+              {t('common.status')}
             </label>
             <select
               id={statusId}
@@ -491,7 +493,7 @@ function IrrigationFormContent({
           {/* Soil Moisture */}
           <div className="agri-form-group">
             <label htmlFor={moistureId} className="agri-form-label">
-              Soil Moisture (% Optional)
+              {t('soil.title')} (%)
             </label>
             <input
               id={moistureId}
@@ -515,7 +517,7 @@ function IrrigationFormContent({
           {/* Expected Rainfall */}
           <div className="agri-form-group">
             <label htmlFor={rainfallId} className="agri-form-label">
-              Expected Rainfall (mm Optional)
+              {t('dashboard.rainfall')} (mm)
             </label>
             <input
               id={rainfallId}
@@ -539,7 +541,7 @@ function IrrigationFormContent({
           {/* Weather Condition */}
           <div className="agri-form-group agri-form-grid--full">
             <label htmlFor={weatherCondId} className="agri-form-label">
-              Weather Condition / Forecast
+              {t('weather.currentWeather')}
             </label>
             <input
               id={weatherCondId}
@@ -555,7 +557,7 @@ function IrrigationFormContent({
           {/* Operational Notes */}
           <div className="agri-form-group agri-form-grid--full">
             <label htmlFor={notesId} className="agri-form-label">
-              Agronomic Delivery Notes
+              {t('activities.notes')}
             </label>
             <textarea
               id={notesId}
@@ -573,11 +575,11 @@ function IrrigationFormContent({
       {/* Footer Actions */}
       <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
         <Button variant="ghost" size="sm" type="button" onClick={onClose}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button variant="primary" size="sm" type="submit">
           <Check size={14} aria-hidden="true" />
-          <span>{isEditMode ? 'Update Schedule' : 'Schedule Irrigation'}</span>
+          <span>{isEditMode ? t('common.save') : t('irrigation.addSchedule')}</span>
         </Button>
       </div>
     </form>
@@ -604,6 +606,7 @@ export default function AddIrrigationModal({
   farms = [],
   fields = [],
 }) {
+  const { t } = useTranslation();
   const isEditMode = Boolean(scheduleToEdit);
 
   // Close on Escape key
@@ -654,12 +657,12 @@ export default function AddIrrigationModal({
             </div>
             <div>
               <h3 id="irrigation-modal-heading" className="agri-modal-title">
-                {isEditMode ? 'Edit Irrigation Schedule' : 'Schedule Precision Irrigation'}
+                {isEditMode ? t('common.edit') : t('irrigation.addSchedule')}
               </h3>
               <p style={{ fontSize: '0.75rem', color: 'var(--slate-500)', margin: 0 }}>
                 {isEditMode
-                  ? `Updating schedule ${scheduleToEdit?.id}`
-                  : 'Assign method, water volume, and field delivery window'}
+                  ? `${scheduleToEdit?.id}`
+                  : t('irrigation.subtitle')}
               </p>
             </div>
           </div>
@@ -667,7 +670,7 @@ export default function AddIrrigationModal({
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close irrigation modal"
+            aria-label={t('common.close')}
           >
             <X size={20} aria-hidden="true" />
           </button>

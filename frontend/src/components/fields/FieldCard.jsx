@@ -1,13 +1,25 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Warehouse, Droplets, FlaskConical, Eye, Sprout, Activity } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
+import {
+  translateCrop,
+  translateVariety,
+  translateSeason,
+  translateStage,
+  translateStatus,
+  translateSoilType,
+  translateIrrigationMethod,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 /**
  * FieldCard component
  * Displays operational parcel metrics, standing crop, soil type, irrigation, and quick links.
  */
 export default function FieldCard({ field, onViewDetails }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleGoToSoil = () => {
@@ -24,15 +36,15 @@ export default function FieldCard({ field, onViewDetails }) {
       <div className="agri-field-card__header">
         <div className="agri-field-card__title-group">
           <h2 id={`field-title-${field.id}`} className="agri-field-card__name">
-            {field.name}
+            {formatFieldName(field.name, t)}
           </h2>
           <span className="agri-field-card__farm-name">
             <Warehouse size={12} aria-hidden="true" />
-            <span>{field.farmName}</span>
+            <span>{t(`farms.demoNames.${field.farmId}`, field.farmName)}</span>
           </span>
         </div>
         <StatusBadge variant={field.healthVariant || 'success'}>
-          {field.healthStatus}
+          {translateStatus(field.healthStatus, t)}
         </StatusBadge>
       </div>
 
@@ -43,14 +55,17 @@ export default function FieldCard({ field, onViewDetails }) {
           <div className="agri-field-card__crop-header">
             <span className="agri-field-card__crop-title">
               <Sprout size={15} className="text-primary" aria-hidden="true" />
-              <span>{field.currentCrop} {field.cropVariety ? `(${field.cropVariety})` : ''}</span>
+              <span>
+                {translateCrop(field.currentCrop, t)}{' '}
+                {field.cropVariety ? `(${translateVariety(field.cropVariety, t)})` : ''}
+              </span>
             </span>
-            <span className="agri-field-card__crop-season">{field.cropSeason}</span>
+            <span className="agri-field-card__crop-season">{translateSeason(field.cropSeason, t)}</span>
           </div>
 
           <div className="agri-field-card__stage-row">
-            <span>Stage: <strong>{field.cropStage}</strong></span>
-            <span>{field.cropProgress}% Cycle</span>
+            <span>{t('crops.stage', 'Stage')}: <strong>{translateStage(field.cropStage, t)}</strong></span>
+            <span>{field.cropProgress}% {t('crops.cropCycle', 'Cycle')}</span>
           </div>
 
           <div className="agri-field-card__progress-bar">
@@ -64,25 +79,25 @@ export default function FieldCard({ field, onViewDetails }) {
         {/* Specs Grid */}
         <div className="agri-field-card__specs">
           <div className="agri-field-card__spec-item">
-            <span className="agri-field-card__spec-label">Area</span>
-            <span className="agri-field-card__spec-value">{formatAcres(field.areaAcres)}</span>
+            <span className="agri-field-card__spec-label">{t('fields.area', 'Area')}</span>
+            <span className="agri-field-card__spec-value">{formatAcres(field.areaAcres, t)}</span>
           </div>
 
           <div className="agri-field-card__spec-item">
-            <span className="agri-field-card__spec-label">Soil Type</span>
-            <span className="agri-field-card__spec-value">{field.soilType}</span>
+            <span className="agri-field-card__spec-label">{t('fields.soilType', 'Soil Type')}</span>
+            <span className="agri-field-card__spec-value">{translateSoilType(field.soilType, t)}</span>
           </div>
 
           <div className="agri-field-card__spec-item">
-            <span className="agri-field-card__spec-label">Irrigation</span>
+            <span className="agri-field-card__spec-label">{t('fields.irrigationSystem', 'Irrigation')}</span>
             <span className="agri-field-card__spec-value">
               <Droplets size={13} style={{ color: 'var(--info-text)' }} aria-hidden="true" />
-              <span>{field.irrigationMethod}</span>
+              <span>{translateIrrigationMethod(field.irrigationMethod, t)}</span>
             </span>
           </div>
 
           <div className="agri-field-card__spec-item">
-            <span className="agri-field-card__spec-label">Soil Moisture</span>
+            <span className="agri-field-card__spec-label">{t('soil.moisture', 'Soil Moisture')}</span>
             <span className="agri-field-card__spec-value">{field.soilMoisture || '38%'}</span>
           </div>
         </div>
@@ -90,7 +105,7 @@ export default function FieldCard({ field, onViewDetails }) {
         {/* Last Activity */}
         {field.lastActivity && (
           <div className="agri-field-card__activity">
-            <span className="agri-field-card__activity-label">Recent / Scheduled Activity</span>
+            <span className="agri-field-card__activity-label">{t('activities.title', 'Recent / Scheduled Activity')}</span>
             <span className="agri-field-card__activity-text">
               <Activity size={12} style={{ display: 'inline', marginRight: '4px' }} aria-hidden="true" />
               {field.lastActivity}
@@ -107,7 +122,7 @@ export default function FieldCard({ field, onViewDetails }) {
           icon={<Eye size={14} aria-hidden="true" />}
           onClick={() => onViewDetails(field)}
         >
-          Details
+          {t('common.details', 'Details')}
         </Button>
 
         <Button
@@ -116,7 +131,7 @@ export default function FieldCard({ field, onViewDetails }) {
           icon={<Sprout size={14} aria-hidden="true" />}
           onClick={handleGoToCrops}
         >
-          Crops
+          {t('navigation.crops', 'Crops')}
         </Button>
 
         <Button
@@ -125,7 +140,7 @@ export default function FieldCard({ field, onViewDetails }) {
           icon={<FlaskConical size={14} aria-hidden="true" />}
           onClick={handleGoToSoil}
         >
-          Soil Records
+          {t('navigation.soil', 'Soil Records')}
         </Button>
       </div>
     </article>

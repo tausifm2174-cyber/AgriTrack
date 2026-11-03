@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CloudRain, AlertTriangle, CheckCircle, ExternalLink, Cloud, Droplet } from 'lucide-react';
 import { farmWeather } from '../../data/weatherData';
 
@@ -12,6 +13,8 @@ import { farmWeather } from '../../data/weatherData';
  * @param {Object} [props.farmsMap]
  */
 export default function IrrigationAdvisory({ selectedFarmId, farmsMap = {} }) {
+  const { t } = useTranslation();
+
   // Determine target weather data
   const targetFarmId = selectedFarmId || 'farm-2'; // Default to Sunrise Holding (Field 2B context)
   const weather = farmWeather[targetFarmId];
@@ -22,7 +25,7 @@ export default function IrrigationAdvisory({ selectedFarmId, farmsMap = {} }) {
       <div className="agri-irrigation-advisory-card">
         <div className="agri-irrigation-alert-banner agri-irrigation-alert-banner--info">
           <Cloud size={18} aria-hidden="true" />
-          <span>Weather data unavailable for this farm holding.</span>
+          <span>{t('common.noData')}</span>
         </div>
       </div>
     );
@@ -38,37 +41,37 @@ export default function IrrigationAdvisory({ selectedFarmId, farmsMap = {} }) {
   // Determine advisory level
   let bannerVariant = 'optimal';
   let bannerIcon = CheckCircle;
-  let advisoryHeading = 'Optimal Irrigation Conditions';
-  let advisoryText = `Rainfall is minimal (${currentRainfall} mm) and atmospheric humidity is ${currentHumidity}%. Soil evapotranspiration is normal; proceed with precision drip and sprinkler delivery according to planned schedule.`;
+  let advisoryHeading = `${t('status.optimal')} — ${t('irrigation.advisory')}`;
+  let advisoryText = `${t('dashboard.rainfall')}: ${currentRainfall} mm, ${t('dashboard.humidity')}: ${currentHumidity}%. ${t('status.normal')}.`;
 
   if (heavyRainEvent) {
     bannerVariant = 'warning';
     bannerIcon = AlertTriangle;
-    advisoryHeading = `Heavy Rainfall Expected: Suspend Irrigation (${heavyRainEvent.day}, ${heavyRainEvent.date})`;
-    advisoryText = `AgriTrack Meteorological Advisory: Forecast predicts ${heavyRainEvent.rainMm} mm of heavy rainfall (> 25 mm critical threshold) on ${heavyRainEvent.day} (${heavyRainEvent.fullDate}). Suspend scheduled irrigation for open fields (e.g. Field 2B Maize) to prevent waterlogging, soil erosion, and nutrient leaching.`;
+    advisoryHeading = `${t('weather.advisories.heavyRain')}: ${t('weather.advisories.suspendIrrigation')} (${heavyRainEvent.day}, ${heavyRainEvent.date})`;
+    advisoryText = `${t('irrigation.suspendNotice')} (${heavyRainEvent.rainMm} mm ${t('units.mm')}).`;
   } else if (highHumidityEvent || currentHumidity > 85) {
     bannerVariant = 'warning';
     bannerIcon = CloudRain;
-    advisoryHeading = 'High Humidity Alert — Restrict Foliar Wetting';
-    advisoryText = `Atmospheric relative humidity exceeds 85% (${heavyRainEvent ? heavyRainEvent.humidity : currentHumidity}%). Prefer ground drip irrigation over overhead sprinklers to prevent foliar fungal spore germination (powdery mildew / blight).`;
+    advisoryHeading = `${t('weather.advisories.highHumidity')} (${heavyRainEvent ? heavyRainEvent.humidity : currentHumidity}%)`;
+    advisoryText = `${t('weather.advisories.highHumidity')}.`;
   }
 
   const BannerIconComponent = bannerIcon;
 
   return (
-    <div className="agri-irrigation-advisory-card" role="region" aria-label="Irrigation Weather Advisory">
+    <div className="agri-irrigation-advisory-card" role="region" aria-label={t('irrigation.advisory')}>
       <div className="agri-irrigation-advisory-header">
         <div className="agri-irrigation-advisory-title">
           <CloudRain size={18} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
-          <span>Weather-Aware Irrigation Advisory — {farmName}</span>
+          <span>{t('irrigation.advisory')} — {farmName}</span>
         </div>
         <Link
           to="/weather"
           className="agri-card-action-link"
           style={{ fontSize: '0.8rem', fontWeight: 600 }}
-          title="Open comprehensive 7-day weather forecast"
+          title={t('weather.forecast')}
         >
-          <span>View 7-Day Forecast</span>
+          <span>{t('weather.forecast')}</span>
           <ExternalLink size={13} aria-hidden="true" />
         </Link>
       </div>
@@ -88,22 +91,22 @@ export default function IrrigationAdvisory({ selectedFarmId, farmsMap = {} }) {
         {/* Quick Weather Signals */}
         <div className="agri-irrigation-weather-metrics">
           <div className="agri-irrigation-metric-row">
-            <span>Current Condition:</span>
+            <span>{t('weather.currentWeather')}:</span>
             <strong>{weather.current?.condition} ({weather.current?.temperature}°C)</strong>
           </div>
           <div className="agri-irrigation-metric-row">
-            <span>Relative Humidity:</span>
+            <span>{t('dashboard.humidity')}:</span>
             <strong>{weather.current?.humidity}%</strong>
           </div>
           <div className="agri-irrigation-metric-row">
-            <span>Forecast Max Rain:</span>
+            <span>{t('dashboard.rainfall')}:</span>
             <strong>
-              {heavyRainEvent ? `${heavyRainEvent.rainMm} mm (${heavyRainEvent.day})` : '0–12 mm (Low)'}
+              {heavyRainEvent ? `${heavyRainEvent.rainMm} mm (${heavyRainEvent.day})` : `0–12 mm (${t('status.low')})`}
             </strong>
           </div>
           <div style={{ fontSize: '0.7rem', color: 'var(--slate-400)', marginTop: '0.25rem', textAlign: 'right' }}>
             <Droplet size={10} style={{ display: 'inline', marginRight: '3px' }} aria-hidden="true" />
-            Deterministic Weather Model • Demo Karnal
+            {t('navigation.weather')}
           </div>
         </div>
       </div>

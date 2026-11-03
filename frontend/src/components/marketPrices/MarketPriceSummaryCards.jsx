@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Sprout, Building, TrendingUp, DollarSign, CalendarCheck } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 export default function MarketPriceSummaryCards({ marketPrices = [] }) {
+  const { t } = useTranslation();
   const trackedCropsCount = new Set(marketPrices.map((m) => m.crop)).size;
   const mandisCount = new Set(marketPrices.map((m) => m.market)).size;
 
@@ -26,9 +28,9 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
           <Sprout size={22} />
         </div>
         <div className="agri-market-summary-card__content">
-          <span className="agri-market-summary-card__label">Tracked Crops</span>
+          <span className="agri-market-summary-card__label">{t('marketPrices.trackedCrops', 'Tracked Crops')}</span>
           <span className="agri-market-summary-card__value">{trackedCropsCount}</span>
-          <span className="agri-market-summary-card__subtext">Major AgriTrack crops</span>
+          <span className="agri-market-summary-card__subtext">{t('marketPrices.majorCrops', 'Major AgriTrack crops')}</span>
         </div>
       </div>
 
@@ -38,7 +40,7 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
           <Building size={22} />
         </div>
         <div className="agri-market-summary-card__content">
-          <span className="agri-market-summary-card__label">Mandis Covered</span>
+          <span className="agri-market-summary-card__label">{t('marketPrices.mandisCovered', 'Mandis Covered')}</span>
           <span className="agri-market-summary-card__value">{mandisCount}</span>
           <span className="agri-market-summary-card__subtext">Nashik, Karnal, Vashi...</span>
         </div>
@@ -50,12 +52,12 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
           <TrendingUp size={22} />
         </div>
         <div className="agri-market-summary-card__content">
-          <span className="agri-market-summary-card__label">Highest Rate</span>
+          <span className="agri-market-summary-card__label">{t('marketPrices.highestRate', 'Highest Rate')}</span>
           <span className="agri-market-summary-card__value">
             {highestRecord ? formatCurrency(highestRecord.pricePerQuintal) : '₹0'}
           </span>
           <span className="agri-market-summary-card__subtext">
-            {highestRecord ? `${highestRecord.crop} (${highestRecord.variety})` : 'N/A'}
+            {highestRecord ? `${highestRecord.crop} (${highestRecord.variety})` : t('common.na', 'N/A')}
           </span>
         </div>
       </div>
@@ -66,12 +68,12 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
           <DollarSign size={22} />
         </div>
         <div className="agri-market-summary-card__content">
-          <span className="agri-market-summary-card__label">Average Price</span>
+          <span className="agri-market-summary-card__label">{t('marketPrices.averagePrice', 'Average Price')}</span>
           <span className="agri-market-summary-card__value">
             {formatCurrency(avgPriceQ)}/q
           </span>
           <span className="agri-market-summary-card__subtext">
-            ₹{(avgPriceQ / 100).toFixed(2)}/kg mean
+            ₹{(avgPriceQ / 100).toFixed(2)}/kg {t('marketPrices.mean', 'mean')}
           </span>
         </div>
       </div>
@@ -82,12 +84,12 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
           <CalendarCheck size={22} />
         </div>
         <div className="agri-market-summary-card__content">
-          <span className="agri-market-summary-card__label">Dataset Status</span>
+          <span className="agri-market-summary-card__label">{t('marketPrices.datasetStatus', 'Dataset Status')}</span>
           <span className="agri-market-summary-card__value" style={{ fontSize: '1.05rem' }}>
-            Demo Data
+            {t('common.demoData', 'Demo Data')}
           </span>
           <span className="agri-market-summary-card__subtext">
-            Last updated 02 Oct 2026
+            {t('marketPrices.lastUpdated', 'Last updated 02 Oct 2026')}
           </span>
         </div>
       </div>

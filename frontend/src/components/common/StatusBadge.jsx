@@ -1,4 +1,6 @@
 
+import { useTranslation } from 'react-i18next';
+
 /**
  * Reusable StatusBadge component
  * @param {Object} props
@@ -13,10 +15,20 @@ export default function StatusBadge({
   children,
   className = '',
 }) {
+  const { t } = useTranslation();
+
+  let content = children;
+  if (typeof children === 'string') {
+    const lower = children.trim().toLowerCase();
+    const camel = lower.replace(/[\s-_]+(\w)/g, (_, c) => c.toUpperCase());
+    const candidateKey = `status.${camel}`;
+    content = t(candidateKey, children);
+  }
+
   return (
     <span className={`agri-badge agri-badge--${variant} ${className}`.trim()}>
       {icon && <span aria-hidden="true">{icon}</span>}
-      <span>{children}</span>
+      <span>{content}</span>
     </span>
   );
 }

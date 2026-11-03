@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { Sprout, ArrowUpRight, ArrowDownRight, Eye } from 'lucide-react';
 import { calculateProfitByCrop } from '../../utils/financialCalculations';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
 import { Button } from '../common';
+import { translateCrop } from '../../utils/displayLabels';
 
 export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCrop }) {
+  const { t } = useTranslation();
   const cropList = calculateProfitByCrop(sales, expenses);
 
   return (
@@ -11,10 +14,10 @@ export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCr
       <div className="agri-pl-panel__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Sprout size={18} style={{ color: 'var(--primary-700)' }} />
-          <h3 className="agri-pl-panel__title">Crop-Wise Financial Performance</h3>
+          <h3 className="agri-pl-panel__title">{t('profitLoss.profitByCrop', 'Crop-Wise Financial Performance')}</h3>
         </div>
         <span style={{ fontSize: '0.75rem', color: 'var(--slate-500)', fontWeight: 600 }}>
-          {cropList.length} Active Crops
+          {t('profitLoss.activeCropsCount', '{{count}} Active Crops', { count: cropList.length })}
         </span>
       </div>
 
@@ -22,12 +25,12 @@ export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCr
         <table className="agri-pl-table">
           <thead>
             <tr>
-              <th>Crop</th>
-              <th>Revenue</th>
-              <th>Expenses</th>
-              <th>Net Profit / Loss</th>
-              <th>Margin</th>
-              <th style={{ textAlign: 'right' }}>Action</th>
+              <th>{t('crops.crop', 'Crop')}</th>
+              <th>{t('revenue.totalRevenue', 'Revenue')}</th>
+              <th>{t('expenses.title', 'Expenses')}</th>
+              <th>{t('profitLoss.netProfit', 'Net Profit / Loss')}</th>
+              <th>{t('profitLoss.margin', 'Margin')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
             </tr>
           </thead>
           <tbody>
@@ -37,10 +40,10 @@ export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCr
                 <tr key={item.crop}>
                   <td>
                     <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
-                      {item.crop}
+                      {translateCrop(item.crop, t)}
                     </span>
                     <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                      {item.salesCount} sales • {item.expenseCount} vouchers
+                      {t('profitLoss.salesVouchersCount', '{{sales}} sales • {{expenses}} vouchers', { sales: item.salesCount, expenses: item.expenseCount })}
                     </div>
                   </td>
                   <td>
@@ -69,10 +72,10 @@ export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCr
                       variant="outline"
                       size="sm"
                       onClick={() => onSelectCrop && onSelectCrop(item)}
-                      aria-label={`View details for ${item.crop}`}
+                      aria-label={`${t('common.viewDetails', 'View details')} ${item.crop}`}
                     >
                       <Eye size={13} />
-                      <span>Details</span>
+                      <span>{t('common.details', 'Details')}</span>
                     </Button>
                   </td>
                 </tr>
@@ -84,3 +87,4 @@ export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCr
     </div>
   );
 }
+

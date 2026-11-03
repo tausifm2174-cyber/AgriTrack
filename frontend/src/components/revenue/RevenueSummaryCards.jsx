@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Wallet, Scale, TrendingUp, CheckCircle2, Clock } from 'lucide-react';
 import { formatCurrency, formatWeight } from '../../utils/formatters';
 
 export default function RevenueSummaryCards({ sales = [] }) {
+  const { t } = useTranslation();
   const totalRevenue = sales.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
 
   const totalQuantityKg = sales.reduce((acc, curr) => acc + (curr.quantityKg || 0), 0);
@@ -23,12 +25,12 @@ export default function RevenueSummaryCards({ sales = [] }) {
           <Wallet size={22} />
         </div>
         <div className="agri-revenue-summary-card__content">
-          <span className="agri-revenue-summary-card__label">Total Revenue</span>
+          <span className="agri-revenue-summary-card__label">{t('revenue.totalRevenue', 'Total Revenue')}</span>
           <span className="agri-revenue-summary-card__value">
             {formatCurrency(totalRevenue)}
           </span>
           <span className="agri-revenue-summary-card__subtext">
-            {formatCurrency(collectedRevenue)} collected
+            {formatCurrency(collectedRevenue)} {t('revenue.collected', 'collected')}
           </span>
         </div>
       </div>
@@ -39,12 +41,12 @@ export default function RevenueSummaryCards({ sales = [] }) {
           <Scale size={22} />
         </div>
         <div className="agri-revenue-summary-card__content">
-          <span className="agri-revenue-summary-card__label">Volume Realized</span>
+          <span className="agri-revenue-summary-card__label">{t('revenue.volumeRealized', 'Volume Realized')}</span>
           <span className="agri-revenue-summary-card__value">
             {formatWeight(totalQuantityKg, 'kg')}
           </span>
           <span className="agri-revenue-summary-card__subtext">
-            {(totalQuantityKg / 100).toFixed(1)} quintals offloaded
+            {(totalQuantityKg / 100).toFixed(1)} {t('revenue.quintalsOffloaded', 'quintals offloaded')}
           </span>
         </div>
       </div>
@@ -55,12 +57,12 @@ export default function RevenueSummaryCards({ sales = [] }) {
           <TrendingUp size={22} />
         </div>
         <div className="agri-revenue-summary-card__content">
-          <span className="agri-revenue-summary-card__label">Avg Realized Price</span>
+          <span className="agri-revenue-summary-card__label">{t('revenue.avgRealizedPrice', 'Avg Realized Price')}</span>
           <span className="agri-revenue-summary-card__value">
             {formatCurrency(avgPricePerQuintal)}/q
           </span>
           <span className="agri-revenue-summary-card__subtext">
-            ₹{(avgPricePerQuintal / 100).toFixed(2)}/kg blended
+            ₹{(avgPricePerQuintal / 100).toFixed(2)}/kg {t('revenue.blended', 'blended')}
           </span>
         </div>
       </div>
@@ -71,12 +73,12 @@ export default function RevenueSummaryCards({ sales = [] }) {
           <CheckCircle2 size={22} />
         </div>
         <div className="agri-revenue-summary-card__content">
-          <span className="agri-revenue-summary-card__label">Completed Sales</span>
+          <span className="agri-revenue-summary-card__label">{t('revenue.completedSales', 'Completed Sales')}</span>
           <span className="agri-revenue-summary-card__value">
-            {completedCount} of {sales.length}
+            {completedCount} {t('common.of', 'of')} {sales.length}
           </span>
           <span className="agri-revenue-summary-card__subtext">
-            Active trade invoices
+            {t('revenue.activeInvoices', 'Active trade invoices')}
           </span>
         </div>
       </div>
@@ -87,7 +89,7 @@ export default function RevenueSummaryCards({ sales = [] }) {
           <Clock size={22} />
         </div>
         <div className="agri-revenue-summary-card__content">
-          <span className="agri-revenue-summary-card__label">Pending Balance</span>
+          <span className="agri-revenue-summary-card__label">{t('revenue.pendingBalance', 'Pending Balance')}</span>
           <span
             className="agri-revenue-summary-card__value"
             style={{ color: pendingRevenue > 0 ? '#b45309' : 'var(--slate-800)' }}
@@ -95,7 +97,7 @@ export default function RevenueSummaryCards({ sales = [] }) {
             {formatCurrency(pendingRevenue)}
           </span>
           <span className="agri-revenue-summary-card__subtext">
-            {pendingRevenue > 0 ? 'Buyer balance due' : 'All sales settled'}
+            {pendingRevenue > 0 ? t('revenue.buyerBalanceDue', 'Buyer balance due') : t('revenue.allSettled', 'All sales settled')}
           </span>
         </div>
       </div>

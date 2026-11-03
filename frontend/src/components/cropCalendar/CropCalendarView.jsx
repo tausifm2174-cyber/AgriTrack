@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -21,6 +22,7 @@ export default function CropCalendarView({
   selectedDate = '',
   onSelectDate,
 }) {
+  const { t, i18n } = useTranslation();
   // Anchored to October 2026 based on demo dataset
   const [currentYear, setCurrentYear] = useState(2026);
   const [currentMonth, setCurrentMonth] = useState(9); // 0-indexed: 9 = October
@@ -93,6 +95,15 @@ export default function CropCalendarView({
     return cells;
   }, [currentYear, currentMonth, eventsByDate, selectedDate]);
 
+  const monthYearLabel = useMemo(() => {
+    try {
+      const date = new Date(currentYear, currentMonth, 1);
+      return new Intl.DateTimeFormat(i18n.language || 'en', { month: 'long', year: 'numeric' }).format(date);
+    } catch {
+      return `${MONTH_NAMES[currentMonth]} ${currentYear}`;
+    }
+  }, [currentYear, currentMonth, i18n.language]);
+
   return (
     <div className="agri-cal-grid-card">
       {/* Month Navigation Header */}
@@ -100,7 +111,7 @@ export default function CropCalendarView({
         <div className="agri-cal-month-title">
           <CalendarIcon size={18} className="text-primary" aria-hidden="true" />
           <h2 className="agri-cal-month-heading">
-            {MONTH_NAMES[currentMonth]} {currentYear}
+            {monthYearLabel}
           </h2>
         </div>
 
@@ -109,15 +120,15 @@ export default function CropCalendarView({
             type="button"
             className="agri-cal-nav-btn"
             onClick={handleGoToOctober2026}
-            title="Jump to current demo month"
+            title={t('common.today', 'Today')}
           >
-            Today
+            {t('common.today', 'Today')}
           </button>
           <button
             type="button"
             className="agri-cal-nav-arrow"
             onClick={handlePrevMonth}
-            aria-label="Previous month"
+            aria-label={t('common.previous', 'Previous month')}
           >
             <ChevronLeft size={18} aria-hidden="true" />
           </button>
@@ -125,7 +136,7 @@ export default function CropCalendarView({
             type="button"
             className="agri-cal-nav-arrow"
             onClick={handleNextMonth}
-            aria-label="Next month"
+            aria-label={t('common.next', 'Next month')}
           >
             <ChevronRight size={18} aria-hidden="true" />
           </button>
@@ -169,7 +180,7 @@ export default function CropCalendarView({
             >
               <div className="agri-cal-cell-header">
                 <span className="agri-cal-day-num">{cell.dayNumber}</span>
-                {cell.isToday && <span className="agri-cal-today-pill">Today</span>}
+                {cell.isToday && <span className="agri-cal-today-pill">{t('common.today', 'Today')}</span>}
               </div>
 
               {/* Event Chips List */}
@@ -194,7 +205,7 @@ export default function CropCalendarView({
                 })}
                 {cell.events.length > 3 && (
                   <span className="agri-cal-more-chip">
-                    +{cell.events.length - 3} more
+                    +{cell.events.length - 3}
                   </span>
                 )}
               </div>

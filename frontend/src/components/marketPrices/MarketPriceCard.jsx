@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, PlusCircle, ArrowUpRight, ArrowDownRight, Minus, MapPin, Calendar } from 'lucide-react';
 import { Button } from '../common';
 import { formatCurrency } from '../../utils/formatters';
+import { translateCrop, translateVariety } from '../../utils/displayLabels';
 
 export default function MarketPriceCard({ marketPrice, onViewDetails, onCreateSale }) {
+  const { t } = useTranslation();
   const isRising = marketPrice.trend === 'RISING';
   const isFalling = marketPrice.trend === 'FALLING';
   const trendClass = isRising
@@ -27,11 +30,17 @@ export default function MarketPriceCard({ marketPrice, onViewDetails, onCreateSa
               ) : (
                 <Minus size={13} />
               )}
-              <span>{marketPrice.trend}</span>
+              <span>
+                {isRising
+                  ? t('marketPrices.rising', 'Rising')
+                  : isFalling
+                  ? t('marketPrices.falling', 'Falling')
+                  : t('marketPrices.stable', 'Stable')}
+              </span>
             </span>
           </div>
           <h3 className="agri-market-card__title">
-            {marketPrice.crop} ({marketPrice.variety})
+            {translateCrop(marketPrice.crop, t)} ({translateVariety(marketPrice.variety, t)})
           </h3>
           <div className="agri-market-card__subtitle" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <MapPin size={13} />
@@ -54,7 +63,7 @@ export default function MarketPriceCard({ marketPrice, onViewDetails, onCreateSa
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--slate-500)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <Calendar size={14} />
-            <span>Bulletin Date: {marketPrice.date}</span>
+            <span>{t('marketPrices.bulletinDate', 'Bulletin Date')}: {marketPrice.date}</span>
           </div>
           <div style={{ fontWeight: 700, color: isRising ? '#059669' : isFalling ? '#dc2626' : 'var(--slate-600)' }}>
             {isRising ? '+' : ''}₹{marketPrice.change} ({isRising ? '+' : ''}{marketPrice.changePercent}%)
@@ -63,27 +72,27 @@ export default function MarketPriceCard({ marketPrice, onViewDetails, onCreateSa
 
         <div className="agri-market-card__stats-grid">
           <div className="agri-market-card__stat-item">
-            <span className="agri-market-card__stat-label">Previous Rate</span>
+            <span className="agri-market-card__stat-label">{t('marketPrices.prevRate', 'Previous Rate')}</span>
             <span className="agri-market-card__stat-value">
               {formatCurrency(marketPrice.previousPrice)}/q
             </span>
           </div>
           <div className="agri-market-card__stat-item">
-            <span className="agri-market-card__stat-label">Day Range</span>
+            <span className="agri-market-card__stat-label">{t('marketPrices.dayRange', 'Day Range')}</span>
             <span className="agri-market-card__stat-value">
               ₹{marketPrice.minPrice} – ₹{marketPrice.maxPrice}
             </span>
           </div>
           <div className="agri-market-card__stat-item">
-            <span className="agri-market-card__stat-label">Arrival Volume</span>
+            <span className="agri-market-card__stat-label">{t('marketPrices.arrivals', 'Arrival Volume')}</span>
             <span className="agri-market-card__stat-value">
-              {marketPrice.arrivalVolumeQ ? `${marketPrice.arrivalVolumeQ} q` : 'N/A'}
+              {marketPrice.arrivalVolumeQ ? `${marketPrice.arrivalVolumeQ} q` : t('common.na', 'N/A')}
             </span>
           </div>
           <div className="agri-market-card__stat-item">
-            <span className="agri-market-card__stat-label">Quality Grade</span>
+            <span className="agri-market-card__stat-label">{t('harvests.quality', 'Quality Grade')}</span>
             <span className="agri-market-card__stat-value">
-              Grade {marketPrice.qualityGrade} Standard
+              {t('harvests.quality', 'Grade')} {marketPrice.qualityGrade} {t('common.standard', 'Standard')}
             </span>
           </div>
         </div>
@@ -94,19 +103,19 @@ export default function MarketPriceCard({ marketPrice, onViewDetails, onCreateSa
           variant="outline"
           size="sm"
           onClick={() => onViewDetails(marketPrice)}
-          aria-label={`View trend for ${marketPrice.crop}`}
+          aria-label={`${t('marketPrices.viewTrend', 'View trend for')} ${marketPrice.crop}`}
         >
           <Eye size={14} />
-          <span>Trend Chart</span>
+          <span>{t('marketPrices.trendChart', 'Trend Chart')}</span>
         </Button>
         <Button
           variant="primary"
           size="sm"
           onClick={() => onCreateSale(marketPrice)}
-          aria-label={`Create sale from ${marketPrice.crop}`}
+          aria-label={`${t('sales.addSale', 'Create sale from')} ${marketPrice.crop}`}
         >
           <PlusCircle size={14} />
-          <span>Create Sale</span>
+          <span>{t('sales.addSale', 'Create Sale')}</span>
         </Button>
       </div>
     </div>

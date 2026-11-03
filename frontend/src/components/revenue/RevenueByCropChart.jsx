@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   BarChart,
@@ -10,6 +11,7 @@ import {
 } from 'recharts';
 import { calculateRevenueByCrop } from '../../utils/financialCalculations';
 import { formatCurrency, formatWeight } from '../../utils/formatters';
+import { translateCrop } from '../../utils/displayLabels';
 
 const CROP_REVENUE_COLORS = [
   '#059669', // Emerald
@@ -21,16 +23,17 @@ const CROP_REVENUE_COLORS = [
 ];
 
 export default function RevenueByCropChart({ sales = [] }) {
+  const { t } = useTranslation();
   const data = calculateRevenueByCrop(sales);
 
   if (data.length === 0) {
     return (
       <div className="agri-revenue-chart-box">
         <div className="agri-revenue-chart-box__header">
-          <span className="agri-revenue-chart-box__title">Revenue by Crop</span>
+          <span className="agri-revenue-chart-box__title">{t('revenue.revenueByCrop', 'Revenue by Crop')}</span>
         </div>
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
-          No crop sales match the selected filters.
+          {t('revenue.noCropSalesMatch', 'No crop sales match the selected filters.')}
         </div>
       </div>
     );
@@ -40,13 +43,13 @@ export default function RevenueByCropChart({ sales = [] }) {
     <div className="agri-revenue-chart-box">
       <div className="agri-revenue-chart-box__header">
         <div>
-          <span className="agri-revenue-chart-box__title">Crop-Wise Revenue Distribution</span>
+          <span className="agri-revenue-chart-box__title">{t('revenue.cropWiseRevenue', 'Crop-Wise Revenue Distribution')}</span>
           <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-            Gross commercial realization across standing and harvested crops
+            {t('revenue.grossRealizationDesc', 'Gross commercial realization across standing and harvested crops')}
           </p>
         </div>
         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-600)' }}>
-          {data.length} Traded Crops
+          {data.length} {t('revenue.tradedCrops', 'Traded Crops')}
         </span>
       </div>
 
@@ -59,6 +62,7 @@ export default function RevenueByCropChart({ sales = [] }) {
               stroke="#64748b"
               fontSize={12}
               tickLine={false}
+              tickFormatter={(crop) => translateCrop(crop, t)}
             />
             <YAxis
               stroke="#64748b"
@@ -70,9 +74,9 @@ export default function RevenueByCropChart({ sales = [] }) {
             <Tooltip
               formatter={(value, name, item) => [
                 `${formatCurrency(value)} (${formatWeight(item.payload.quantityKg, 'kg')})`,
-                'Invoiced Revenue',
+                t('revenue.invoicedRevenue', 'Invoiced Revenue'),
               ]}
-              labelFormatter={(label) => `Crop: ${label}`}
+              labelFormatter={(label) => `${t('activities.crop', 'Crop')}: ${translateCrop(label, t)}`}
               contentStyle={{
                 backgroundColor: '#ffffff',
                 border: '1px solid #e2e8f0',

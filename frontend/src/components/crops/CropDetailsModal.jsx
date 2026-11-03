@@ -1,8 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { X, Grid3X3, FlaskConical, Calendar, Clock, Info, PackageCheck, TrendingUp } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
 import CropLifecycleProgress from './CropLifecycleProgress';
+import {
+  translateCrop,
+  translateVariety,
+  translateSeason,
+  translateStage,
+  translateStatus,
+  translateSoilType,
+  translateIrrigationMethod,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 /**
  * CropDetailsModal component
@@ -14,6 +25,7 @@ import CropLifecycleProgress from './CropLifecycleProgress';
  * @param {Function} props.onEdit - Callback to edit this crop
  */
 export default function CropDetailsModal({ crop, onClose, onEdit }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!crop) return null;
@@ -58,23 +70,23 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
         <div className="agri-modal-header">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-              <span className="agri-crop-card__season-badge">{crop.season} Season</span>
+              <span className="agri-crop-card__season-badge">{translateSeason(crop.season, t)} {t('crops.season', 'Season')}</span>
               <StatusBadge variant={crop.statusVariant || 'success'}>
-                {crop.status}
+                {translateStatus(crop.status, t)}
               </StatusBadge>
             </div>
             <h3 id="crop-modal-title" className="agri-modal-title">
-              {crop.cropName} {crop.variety ? `(${crop.variety})` : ''}
+              {translateCrop(crop.cropName, t)} {crop.variety ? `(${translateVariety(crop.variety, t)})` : ''}
             </h3>
             <p className="agri-modal-subtitle">
-              Assigned to {crop.fieldName} • {crop.farmName}
+              {formatFieldName(crop.fieldName, t)} • {t(`farms.demoNames.${crop.farmId}`, crop.farmName)}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close crop details"
+            aria-label={t('common.close', 'Close crop details')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -86,10 +98,10 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
           <div className="agri-detail-section">
             <div className="agri-detail-section-header">
               <h4 className="agri-detail-section-title">
-                5-Stage Crop Lifecycle Progress
+                {t('crops.lifecycleProgress', '5-Stage Crop Lifecycle Progress')}
               </h4>
               <span className="agri-detail-section-subtitle">
-                Current Stage: <strong>{crop.currentStage}</strong> ({crop.progressPercent}%)
+                {t('crops.currentStage', 'Current Stage')}: <strong>{translateStage(crop.currentStage, t)}</strong> ({crop.progressPercent}%)
               </span>
             </div>
 
@@ -107,38 +119,38 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
 
           {/* Agronomic & Field Specifications */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Cultivation & Field Specifications</h4>
+            <h4 className="agri-detail-section-title">{t('crops.cropDetails', 'Cultivation & Field Specifications')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Field Plot</span>
-                <span className="agri-detail-value">{crop.fieldName}</span>
+                <span className="agri-detail-label">{t('fields.fieldName', 'Field Plot')}</span>
+                <span className="agri-detail-value">{formatFieldName(crop.fieldName, t)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Farm Holding</span>
-                <span className="agri-detail-value">{crop.farmName}</span>
+                <span className="agri-detail-label">{t('fields.farm', 'Farm Holding')}</span>
+                <span className="agri-detail-value">{t(`farms.demoNames.${crop.farmId}`, crop.farmName)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Cultivated Area</span>
+                <span className="agri-detail-label">{t('fields.area', 'Cultivated Area')}</span>
                 <span className="agri-detail-value">{formatAcres(crop.areaAcres)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Soil Type</span>
-                <span className="agri-detail-value">{crop.soilType || 'Alluvial Loam'}</span>
+                <span className="agri-detail-label">{t('fields.soilType', 'Soil Type')}</span>
+                <span className="agri-detail-value">{translateSoilType(crop.soilType, t)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Sowing Date</span>
+                <span className="agri-detail-label">{t('crops.sowingDate', 'Sowing Date')}</span>
                 <span className="agri-detail-value">{crop.sowingDate}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Expected Harvest</span>
+                <span className="agri-detail-label">{t('crops.expectedHarvest', 'Expected Harvest')}</span>
                 <span className="agri-detail-value">{crop.expectedHarvestDate}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Irrigation System</span>
-                <span className="agri-detail-value">{crop.irrigationMethod || 'Drip Irrigation'}</span>
+                <span className="agri-detail-label">{t('fields.irrigationSystem', 'Irrigation System')}</span>
+                <span className="agri-detail-value">{translateIrrigationMethod(crop.irrigationMethod, t)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Crop Category</span>
+                <span className="agri-detail-label">{t('crops.variety', 'Crop Category')}</span>
                 <span className="agri-detail-value">{crop.category || 'Cereals & Grains'}</span>
               </div>
             </div>
@@ -147,7 +159,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
           {/* Upcoming Milestone */}
           {crop.upcomingMilestone && (
             <div className="agri-detail-section">
-              <h4 className="agri-detail-section-title">Next Scheduled Milestone</h4>
+              <h4 className="agri-detail-section-title">{t('cropCalendar.milestoneName', 'Next Scheduled Milestone')}</h4>
               <div className="agri-milestone-banner">
                 <Clock size={18} className="text-primary" aria-hidden="true" />
                 <div className="agri-milestone-banner__text">
@@ -156,7 +168,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
                   </span>
                   {crop.upcomingMilestoneDate && (
                     <span className="agri-milestone-banner__date">
-                      Scheduled Window: {crop.upcomingMilestoneDate}
+                      {crop.upcomingMilestoneDate}
                     </span>
                   )}
                 </div>
@@ -167,7 +179,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
           {/* Agronomic Notes */}
           {crop.notes && (
             <div className="agri-detail-section">
-              <h4 className="agri-detail-section-title">Agronomic Field Notes</h4>
+              <h4 className="agri-detail-section-title">{t('common.notes', 'Agronomic Field Notes')}</h4>
               <div className="agri-notes-box">
                 <Info size={16} aria-hidden="true" />
                 <p>{crop.notes}</p>
@@ -185,7 +197,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
               icon={<Grid3X3 size={14} aria-hidden="true" />}
               onClick={handleGoToField}
             >
-              Field Details
+              {t('fields.fieldDetails', 'Field Details')}
             </Button>
             <Button
               variant="outline"
@@ -193,7 +205,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
               icon={<FlaskConical size={14} aria-hidden="true" />}
               onClick={handleGoToSoil}
             >
-              Soil Records
+              {t('navigation.soil', 'Soil Records')}
             </Button>
             <Button
               variant="outline"
@@ -201,7 +213,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
               icon={<Calendar size={14} aria-hidden="true" />}
               onClick={handleGoToCalendar}
             >
-              Calendar
+              {t('cropCalendar.title', 'Calendar')}
             </Button>
             <Button
               variant="outline"
@@ -209,7 +221,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
               icon={<PackageCheck size={14} aria-hidden="true" />}
               onClick={handleGoToHarvests}
             >
-              Harvests
+              {t('navigation.harvests', 'Harvests')}
             </Button>
             <Button
               variant="outline"
@@ -217,13 +229,13 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
               icon={<TrendingUp size={14} aria-hidden="true" />}
               onClick={handleGoToMarketPrices}
             >
-              Market Prices
+              {t('navigation.marketPrices', 'Market Prices')}
             </Button>
           </div>
 
           <div className="agri-modal-footer__right">
             <Button variant="secondary" onClick={onClose}>
-              Close
+              {t('common.close', 'Close')}
             </Button>
             {onEdit && (
               <Button
@@ -233,7 +245,7 @@ export default function CropDetailsModal({ crop, onClose, onEdit }) {
                   onEdit(crop);
                 }}
               >
-                Edit Crop
+                {t('common.edit', 'Edit Crop')}
               </Button>
             )}
           </div>

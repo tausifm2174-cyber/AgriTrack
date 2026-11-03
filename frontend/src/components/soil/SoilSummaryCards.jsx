@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { FlaskConical, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 
 /**
@@ -5,6 +6,7 @@ import { FlaskConical, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-reac
  * Displays high-level summary KPIs for soil test records and agronomic health.
  */
 export default function SoilSummaryCards({ summary }) {
+  const { t } = useTranslation();
   const {
     fieldsTested = 8,
     goodSoil = 5,
@@ -15,40 +17,40 @@ export default function SoilSummaryCards({ summary }) {
   const cards = [
     {
       id: 'kpi-tested',
-      label: 'Fields Tested',
-      value: `${fieldsTested} of 8`,
-      sub: '100% Laboratory coverage',
+      label: t('fields.title', 'Fields Tested'),
+      value: `${fieldsTested}`,
+      sub: t('soil.title', 'Laboratory coverage'),
       icon: <FlaskConical size={22} aria-hidden="true" />,
       colorClass: 'agri-soil-summary-icon--green',
     },
     {
       id: 'kpi-good',
-      label: 'Good Soil Profile',
-      value: `${goodSoil} Plots`,
-      sub: 'Optimal NPK & pH balance',
+      label: t('status.good', 'Good Soil Profile'),
+      value: `${goodSoil}`,
+      sub: t('status.optimal', 'Optimal NPK & pH balance'),
       icon: <CheckCircle2 size={22} aria-hidden="true" />,
       colorClass: 'agri-soil-summary-icon--blue',
     },
     {
       id: 'kpi-attention',
-      label: 'Needs Attention',
-      value: `${needsAttention} Plot`,
-      sub: 'Corrective action recommended',
+      label: t('status.needsAttention', 'Needs Attention'),
+      value: `${needsAttention}`,
+      sub: t('status.warning', 'Corrective action recommended'),
       icon: <AlertTriangle size={22} aria-hidden="true" />,
       colorClass: 'agri-soil-summary-icon--red',
     },
     {
       id: 'kpi-ph',
-      label: 'Average Soil pH',
+      label: t('soil.ph', 'Average Soil pH'),
       value: `${averagePh} pH`,
-      sub: 'Neutral & fertile range',
+      sub: t('soil.optimalRange', 'Neutral & fertile range'),
       icon: <Sparkles size={22} aria-hidden="true" />,
       colorClass: 'agri-soil-summary-icon--amber',
     },
   ];
 
   return (
-    <section className="agri-soil-summary-grid" aria-label="Soil Health Metrics">
+    <section className="agri-soil-summary-grid" aria-label={t('soil.title', 'Soil Health Metrics')}>
       {cards.map((card) => (
         <div key={card.id} className="agri-soil-summary-card">
           <div className={`agri-soil-summary-icon ${card.colorClass}`}>

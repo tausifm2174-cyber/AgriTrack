@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../hooks/useNotifications';
 import {
   NotificationHeader,
@@ -14,6 +15,7 @@ import {
  * Full-featured Notification Center for AgriTrack (Phase 9)
  */
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const {
     notifications,
     unreadCount,
@@ -180,12 +182,11 @@ export default function NotificationsPage() {
         >
           <div className="agri-modal-dialog" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
             <div className="agri-modal-header">
-              <h3 className="agri-modal-title">Clear All Notifications?</h3>
+              <h3 className="agri-modal-title">{t('notifications.clearAllConfirmTitle', 'Clear All Notifications?')}</h3>
             </div>
             <div className="agri-modal-body">
               <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: '1.5' }}>
-                Are you sure you want to clear all {notifications.length} notifications from this session?
-                You can restore the demo notification dataset at any time using the &quot;Reset Demo&quot; button.
+                {t('notifications.clearAllConfirmDesc', 'Are you sure you want to clear all {{count}} notifications from this session? You can restore the demo notification dataset at any time using the "Reset Demo" button.', { count: notifications.length })}
               </p>
             </div>
             <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
@@ -194,14 +195,14 @@ export default function NotificationsPage() {
                 className="agri-btn agri-btn--ghost agri-btn--sm"
                 onClick={() => setConfirmClearOpen(false)}
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="button"
                 className="agri-btn agri-btn--danger agri-btn--sm"
                 onClick={handleConfirmClearAll}
               >
-                Clear All
+                {t('notifications.clearAll', 'Clear All')}
               </button>
             </div>
           </div>
@@ -210,3 +211,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

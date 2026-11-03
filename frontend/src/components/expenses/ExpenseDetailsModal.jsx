@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { X, Warehouse, Grid3X3, Sprout } from 'lucide-react';
 import { Button, StatusBadge } from '../common';
 import { formatCurrency } from '../../utils/formatters';
 
 export default function ExpenseDetailsModal({ expense, onClose }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (!expense) return null;
 
@@ -46,7 +48,7 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
                 {expense.id}
               </span>
               <StatusBadge variant={expense.status === 'PAID' ? 'success' : 'warning'}>
-                {expense.status === 'PAID' ? 'Paid' : 'Pending'}
+                {expense.status === 'PAID' ? t('status.paid', 'Paid') : t('status.pending', 'Pending')}
               </StatusBadge>
               <span style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
                 {expense.receiptNumber}
@@ -56,14 +58,14 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
               {expense.description}
             </h3>
             <p className="agri-modal-subtitle">
-              Category: <strong>{expense.category}</strong> • Date: {expense.date}
+              {t('expenses.category', 'Category')}: <strong>{expense.category}</strong> • {t('common.date', 'Date')}: {expense.date}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
@@ -74,27 +76,27 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
           {/* Key Metric Tiles */}
           <div className="agri-expense-detail-metrics">
             <div className="agri-expense-detail-metric-card">
-              <span className="agri-expense-detail-metric-card__label">Amount Incurred</span>
+              <span className="agri-expense-detail-metric-card__label">{t('expenses.amountIncurred', 'Amount Incurred')}</span>
               <span className="agri-expense-detail-metric-card__value" style={{ color: '#dc2626' }}>
                 {formatCurrency(expense.amount)}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                Voucher gross amount
+                {t('expenses.voucherGross', 'Voucher gross amount')}
               </span>
             </div>
 
             <div className="agri-expense-detail-metric-card">
-              <span className="agri-expense-detail-metric-card__label">Payment Status</span>
+              <span className="agri-expense-detail-metric-card__label">{t('expenses.paymentStatus', 'Payment Status')}</span>
               <span className="agri-expense-detail-metric-card__value" style={{ color: expense.status === 'PAID' ? '#059669' : '#d97706', fontSize: '1.1rem' }}>
-                {expense.status === 'PAID' ? 'Settled in Full' : 'Pending Settlement'}
+                {expense.status === 'PAID' ? t('expenses.settledInFull', 'Settled in Full') : t('expenses.pendingSettlement', 'Pending Settlement')}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                Via {expense.paymentMethod}
+                {t('expenses.via', 'Via')} {expense.paymentMethod}
               </span>
             </div>
 
             <div className="agri-expense-detail-metric-card">
-              <span className="agri-expense-detail-metric-card__label">Farm Cost Center</span>
+              <span className="agri-expense-detail-metric-card__label">{t('expenses.farmCostCenter', 'Farm Cost Center')}</span>
               <span className="agri-expense-detail-metric-card__value" style={{ fontSize: '1rem', color: 'var(--slate-900)' }}>
                 {expense.farmName}
               </span>
@@ -104,12 +106,12 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
             </div>
 
             <div className="agri-expense-detail-metric-card">
-              <span className="agri-expense-detail-metric-card__label">Target Crop</span>
+              <span className="agri-expense-detail-metric-card__label">{t('expenses.targetCrop', 'Target Crop')}</span>
               <span className="agri-expense-detail-metric-card__value" style={{ fontSize: '1rem', color: 'var(--slate-900)' }}>
-                {expense.cropName || 'General Farm'}
+                {expense.cropName || t('expenses.generalFarm', 'General Farm')}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                Agronomic crop link
+                {t('expenses.cropLink', 'Agronomic crop link')}
               </span>
             </div>
           </div>
@@ -118,23 +120,23 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
           <div className="agri-form-grid agri-form-grid--2">
             <div style={{ backgroundColor: 'var(--slate-50)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
-                Vendor & Commercial Details
+                {t('expenses.vendorCommercial', 'Vendor & Commercial Details')}
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.875rem' }}>
-                <div>Vendor: <strong>{expense.vendor}</strong></div>
-                <div>Receipt / Voucher Ref: <span style={{ fontFamily: 'monospace' }}>{expense.receiptNumber}</span></div>
-                <div>Transaction Date: <strong>{expense.date}</strong></div>
+                <div>{t('expenses.vendor', 'Vendor')}: <strong>{expense.vendor}</strong></div>
+                <div>{t('expenses.voucherRef', 'Receipt / Voucher Ref')}: <span style={{ fontFamily: 'monospace' }}>{expense.receiptNumber}</span></div>
+                <div>{t('expenses.txDate', 'Transaction Date')}: <strong>{expense.date}</strong></div>
               </div>
             </div>
 
             <div style={{ backgroundColor: 'var(--slate-50)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
-                Accounting & Payment Specs
+                {t('expenses.accountingSpecs', 'Accounting & Payment Specs')}
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.875rem' }}>
-                <div>Payment Method: <strong>{expense.paymentMethod}</strong></div>
-                <div>Category Allocation: <strong>{expense.category}</strong></div>
-                <div>Settlement Status: <strong style={{ color: expense.status === 'PAID' ? '#059669' : '#d97706' }}>{expense.status}</strong></div>
+                <div>{t('expenses.paymentMethod', 'Payment Method')}: <strong>{expense.paymentMethod}</strong></div>
+                <div>{t('expenses.categoryAlloc', 'Category Allocation')}: <strong>{expense.category}</strong></div>
+                <div>{t('expenses.settlementStatus', 'Settlement Status')}: <strong style={{ color: expense.status === 'PAID' ? '#059669' : '#d97706' }}>{expense.status}</strong></div>
               </div>
             </div>
           </div>
@@ -143,7 +145,7 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
           {expense.notes && (
             <div style={{ backgroundColor: 'var(--slate-50)', border: '1px solid var(--slate-200)', borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                Voucher & Technical Remarks
+                {t('expenses.voucherRemarks', 'Voucher & Technical Remarks')}
               </span>
               <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--slate-700)', lineHeight: 1.5 }}>
                 {expense.notes}
@@ -155,23 +157,23 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
         {/* Footer Navigation */}
         <div className="agri-modal-footer">
           <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto', flexWrap: 'wrap' }}>
-            <Button variant="outline" size="sm" onClick={handleGoToFarm} aria-label="View Farm">
+            <Button variant="outline" size="sm" onClick={handleGoToFarm} aria-label={t('navigation.farms', 'View Farm')}>
               <Warehouse size={14} />
-              <span>View Farm</span>
+              <span>{t('navigation.farms', 'View Farm')}</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleGoToField} aria-label="View Field">
+            <Button variant="outline" size="sm" onClick={handleGoToField} aria-label={t('navigation.fields', 'View Field')}>
               <Grid3X3 size={14} />
-              <span>View Field</span>
+              <span>{t('navigation.fields', 'View Field')}</span>
             </Button>
             {expense.cropName && (
-              <Button variant="outline" size="sm" onClick={handleGoToCrop} aria-label="View Crop">
+              <Button variant="outline" size="sm" onClick={handleGoToCrop} aria-label={t('navigation.crops', 'View Crop')}>
                 <Sprout size={14} />
-                <span>View Crop</span>
+                <span>{t('navigation.crops', 'View Crop')}</span>
               </Button>
             )}
           </div>
           <Button variant="secondary" size="sm" onClick={onClose}>
-            Close
+            {t('common.close', 'Close')}
           </Button>
         </div>
       </div>

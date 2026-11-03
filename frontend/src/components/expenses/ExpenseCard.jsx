@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, MapPin } from 'lucide-react';
 import { Button, StatusBadge } from '../common';
 import { formatCurrency } from '../../utils/formatters';
+import { formatFieldName, translateCrop } from '../../utils/displayLabels';
 
 export default function ExpenseCard({ expense, onViewDetails }) {
+  const { t } = useTranslation();
   const catLower = expense.category?.toLowerCase() || 'other';
   const catClass =
     catLower.includes('seed')
@@ -31,14 +34,14 @@ export default function ExpenseCard({ expense, onViewDetails }) {
               {expense.category}
             </span>
             <StatusBadge variant={expense.status === 'PAID' ? 'success' : 'warning'}>
-              {expense.status === 'PAID' ? 'Paid' : 'Pending'}
+              {expense.status === 'PAID' ? t('status.paid', 'Paid') : t('status.pending', 'Pending')}
             </StatusBadge>
           </div>
           <h3 className="agri-expense-card__title">
             {expense.description}
           </h3>
           <div className="agri-expense-card__subtitle">
-            Vendor: <strong>{expense.vendor}</strong>
+            {t('expenses.vendor', 'Vendor')}: <strong>{expense.vendor}</strong>
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -55,19 +58,19 @@ export default function ExpenseCard({ expense, onViewDetails }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', color: 'var(--slate-500)' }}>
           <MapPin size={13} />
           <span>
-            {expense.farmName} • {expense.fieldName} {expense.cropName ? `(${expense.cropName})` : ''}
+            {t(`farms.demoNames.${expense.farmId}`, expense.farmName)} • {formatFieldName(expense.fieldName, t)} {expense.cropName ? `(${translateCrop(expense.cropName, t)})` : ''}
           </span>
         </div>
 
         <div className="agri-expense-card__stats-grid">
           <div className="agri-expense-card__stat-item">
-            <span className="agri-expense-card__stat-label">Date</span>
+            <span className="agri-expense-card__stat-label">{t('common.date', 'Date')}</span>
             <span className="agri-expense-card__stat-value" style={{ fontSize: '0.875rem' }}>
               {expense.date}
             </span>
           </div>
           <div className="agri-expense-card__stat-item">
-            <span className="agri-expense-card__stat-label">Payment Method</span>
+            <span className="agri-expense-card__stat-label">{t('expenses.paymentMethod', 'Payment Method')}</span>
             <span className="agri-expense-card__stat-value" style={{ fontSize: '0.875rem' }}>
               {expense.paymentMethod}
             </span>
@@ -77,16 +80,16 @@ export default function ExpenseCard({ expense, onViewDetails }) {
 
       <div className="agri-expense-card__footer">
         <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-          Status: <strong>{expense.status === 'PAID' ? 'Settled Voucher' : 'Pending Payment'}</strong>
+          {t('common.status', 'Status')}: <strong>{expense.status === 'PAID' ? t('expenses.settledVoucher', 'Settled Voucher') : t('expenses.pendingPayment', 'Pending Payment')}</strong>
         </div>
         <Button
           variant="outline"
           size="sm"
           onClick={() => onViewDetails(expense)}
-          aria-label={`View details for ${expense.id}`}
+          aria-label={`${t('common.viewDetails', 'View details for')} ${expense.id}`}
         >
           <Eye size={14} />
-          <span>Details</span>
+          <span>{t('common.details', 'Details')}</span>
         </Button>
       </div>
     </div>

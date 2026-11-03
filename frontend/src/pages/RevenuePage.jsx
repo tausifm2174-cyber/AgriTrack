@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { salesRecords as initialSales } from '../data/salesData';
 import { farmData } from '../data/farmData';
 import { EmptyState } from '../components/common';
@@ -17,6 +18,7 @@ import { filterSales } from '../utils/financialCalculations';
 import '../components/revenue/revenue.css';
 
 export default function RevenuePage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
 
   // Query parameters
@@ -130,9 +132,9 @@ export default function RevenuePage() {
       {/* Content Table / Cards */}
       {filteredSales.length === 0 ? (
         <EmptyState
-          title="No revenue records found"
-          message="No commercial sales transactions match your current search and filter selections."
-          actionText="Reset Filters"
+          title={t('revenue.noRevenue', 'No revenue records found')}
+          message={t('revenue.noRevenueDesc', 'No commercial sales transactions match your current search and filter selections.')}
+          actionText={t('common.clearFilters', 'Reset Filters')}
           onAction={handleResetFilters}
         />
       ) : viewMode === 'table' ? (

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   LineChart,
@@ -7,12 +8,15 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
+import { translateCrop } from '../../utils/displayLabels';
 
 export default function MarketTrendChart({ history = [], crop, market }) {
+  const { t } = useTranslation();
+
   if (!history || history.length === 0) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
-        No historical price records available for chart rendering.
+        {t('marketPrices.noHistory', 'No historical price records available for chart rendering.')}
       </div>
     );
   }
@@ -26,10 +30,10 @@ export default function MarketTrendChart({ history = [], crop, market }) {
     <div className="agri-trend-chart-box">
       <div className="agri-trend-chart-box__header">
         <span className="agri-trend-chart-box__title">
-          5-Day Mandi Price Movement ({crop} • {market})
+          {t('marketPrices.mandiMovement', '5-Day Mandi Price Movement')} ({translateCrop(crop, t)} • {market})
         </span>
         <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-          Sample Historical Points
+          {t('marketPrices.sampleHistorical', 'Sample Historical Points')}
         </span>
       </div>
 
@@ -53,10 +57,10 @@ export default function MarketTrendChart({ history = [], crop, market }) {
             />
             <Tooltip
               formatter={(value, name) => [
-                name === 'price' ? `₹${value} / quintal` : `${value} q`,
-                name === 'price' ? 'Reference Rate' : 'Arrival Volume',
+                name === 'price' ? `₹${value} / ${t('units.quintal', 'quintal')}` : `${value} ${t('units.q', 'q')}`,
+                name === 'price' ? t('marketPrices.refRate', 'Reference Rate') : t('marketPrices.arrivals', 'Arrival Volume'),
               ]}
-              labelFormatter={(label) => `Date: ${label} 2026`}
+              labelFormatter={(label) => `${t('common.date', 'Date')}: ${label} 2026`}
               contentStyle={{
                 backgroundColor: '#ffffff',
                 border: '1px solid #e2e8f0',

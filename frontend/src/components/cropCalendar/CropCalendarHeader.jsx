@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Sprout, Plus, LayoutGrid, List } from 'lucide-react';
 import { Button } from '../common';
@@ -11,6 +12,7 @@ export default function CropCalendarHeader({
   onViewChange,
   onAddMilestone,
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -18,17 +20,17 @@ export default function CropCalendarHeader({
       <div className="agri-cal-header__left">
         <div className="agri-cal-header__badge">
           <Calendar size={16} aria-hidden="true" />
-          <span>Agronomic Scheduling</span>
+          <span>{t('cropCalendar.title', 'Agronomic Scheduling')}</span>
         </div>
-        <h1 className="agri-cal-header__title">Crop Calendar</h1>
+        <h1 className="agri-cal-header__title">{t('cropCalendar.title', 'Crop Calendar')}</h1>
         <p className="agri-cal-header__desc">
-          Interactive schedule of crop growth stages, fertigation cycles, irrigation triggers, and expected harvest windows.
+          {t('cropCalendar.subtitle', 'Interactive schedule of crop growth stages, fertigation cycles, irrigation triggers, and expected harvest windows.')}
         </p>
       </div>
 
       <div className="agri-cal-header__actions">
         {/* View Toggle */}
-        <div className="agri-cal-view-toggle" role="group" aria-label="Calendar view options">
+        <div className="agri-cal-view-toggle" role="group" aria-label={t('cropCalendar.calendarView', 'Calendar view options')}>
           <button
             type="button"
             className={`agri-cal-toggle-btn ${activeView === 'hybrid' ? 'agri-cal-toggle-btn--active' : ''}`}
@@ -36,7 +38,7 @@ export default function CropCalendarHeader({
             aria-pressed={activeView === 'hybrid'}
           >
             <LayoutGrid size={15} aria-hidden="true" />
-            <span>Calendar Grid</span>
+            <span>{t('cropCalendar.calendarView', 'Calendar Grid')}</span>
           </button>
           <button
             type="button"
@@ -45,7 +47,7 @@ export default function CropCalendarHeader({
             aria-pressed={activeView === 'list'}
           >
             <List size={15} aria-hidden="true" />
-            <span>Milestones List</span>
+            <span>{t('cropCalendar.timeline', 'Milestones List')}</span>
           </button>
         </div>
 
@@ -54,7 +56,7 @@ export default function CropCalendarHeader({
           icon={<Sprout size={16} aria-hidden="true" />}
           onClick={() => navigate('/crops')}
         >
-          Manage Crops
+          {t('navigation.crops', 'Manage Crops')}
         </Button>
 
         <Button
@@ -62,7 +64,7 @@ export default function CropCalendarHeader({
           icon={<Plus size={16} aria-hidden="true" />}
           onClick={onAddMilestone}
         >
-          Schedule Milestone
+          {t('cropCalendar.addMilestone', 'Schedule Milestone')}
         </Button>
       </div>
     </header>

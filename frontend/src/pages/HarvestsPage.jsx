@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2 } from 'lucide-react';
 import { harvestRecords as initialHarvests } from '../data/harvestData';
 import { farmData } from '../data/farmData';
@@ -16,6 +17,7 @@ import {
 import '../components/harvests/harvests.css';
 
 export default function HarvestsPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -199,9 +201,9 @@ export default function HarvestsPage() {
       {/* Main Content Area */}
       {filteredHarvests.length === 0 ? (
         <EmptyState
-          title="No harvests found"
-          message="No harvest records match your selected filters. Try broadening your criteria or reset the search filters."
-          actionText="Reset Filters"
+          title={t('harvests.noHarvestsFound', 'No harvests found')}
+          message={t('harvests.noHarvestsMessage', 'No harvest records match your selected filters. Try broadening your criteria or reset the search filters.')}
+          actionText={t('common.clearFilters', 'Reset Filters')}
           onAction={handleResetFilters}
         />
       ) : viewMode === 'table' ? (

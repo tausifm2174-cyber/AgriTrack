@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { Check, CircleDot, Clock } from 'lucide-react';
 import { cropLifecycleStages } from '../../data/cropData';
+import { translateStage } from '../../utils/displayLabels';
 
 /**
  * CropLifecycleProgress component
@@ -22,11 +24,21 @@ export default function CropLifecycleProgress({
   sowingDate,
   expectedHarvestDate,
 }) {
+  const { t } = useTranslation();
   // Find current stage index (1-based, default 2)
   const currentStageObj = cropLifecycleStages.find(
     (s) => s.name.toLowerCase() === (currentStage || '').toLowerCase()
   );
   const currentStep = currentStageObj ? currentStageObj.step : 2;
+
+  const getStageName = (stage) => {
+    if (stage.id === 'sowing') return t('stages.sowing', stage.name);
+    if (stage.id === 'vegetative') return t('stages.vegetative', stage.name);
+    if (stage.id === 'flowering') return t('stages.flowering', stage.name);
+    if (stage.id === 'ripening') return t('stages.ripening', stage.name);
+    if (stage.id === 'harvest_readiness') return t('stages.harvestReadiness', stage.name);
+    return stage.name;
+  };
 
   return (
     <div className={`agri-lifecycle ${compact ? 'agri-lifecycle--compact' : ''}`}>
@@ -35,10 +47,10 @@ export default function CropLifecycleProgress({
         <div className="agri-lifecycle__label-row">
           <span className="agri-lifecycle__current-tag">
             <span className="agri-lifecycle__pulse-dot" aria-hidden="true" />
-            Current: <strong>{currentStage || 'Vegetative Growth'}</strong>
+            {t('crops.currentStage', 'Current')}: <strong>{translateStage(currentStage || 'Vegetative Growth', t)}</strong>
           </span>
           <span className="agri-lifecycle__percent-text">
-            {progressPercent}% Cycle Completed
+            {progressPercent}% {t('crops.lifecycleProgress', 'Cycle Completed')}
           </span>
         </div>
 
@@ -58,7 +70,7 @@ export default function CropLifecycleProgress({
       </div>
 
       {/* 5-Stage Stepper Track */}
-      <div className="agri-lifecycle__timeline" role="list" aria-label="Crop lifecycle stages">
+      <div className="agri-lifecycle__timeline" role="list" aria-label={t('crops.lifecycleProgress', 'Crop lifecycle stages')}>
         {cropLifecycleStages.map((stage) => {
           const isCompleted = stage.step < currentStep;
           const isCurrent = stage.step === currentStep;
@@ -106,13 +118,13 @@ export default function CropLifecycleProgress({
               {/* Label & Details */}
               <div className="agri-lifecycle__content">
                 <span className="agri-lifecycle__step-name">
-                  {stage.name}
+                  {getStageName(stage)}
                 </span>
 
                 <span className="agri-lifecycle__step-status">
-                  {isCompleted && 'Completed'}
-                  {isCurrent && 'In Progress'}
-                  {isUpcoming && 'Upcoming'}
+                  {isCompleted && t('status.completed', 'Completed')}
+                  {isCurrent && t('status.inProgress', 'In Progress')}
+                  {isUpcoming && t('status.planned', 'Upcoming')}
                 </span>
 
                 {stageDate && (

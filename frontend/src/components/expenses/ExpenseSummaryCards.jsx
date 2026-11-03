@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { CreditCard, CheckCircle2, Clock, Calendar, BarChart3 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 export default function ExpenseSummaryCards({ expenses = [] }) {
+  const { t } = useTranslation();
   const totalAmount = expenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
   const paidAmount = expenses
@@ -26,12 +28,12 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
           <CreditCard size={22} />
         </div>
         <div className="agri-expense-summary-card__content">
-          <span className="agri-expense-summary-card__label">Total Expenses</span>
+          <span className="agri-expense-summary-card__label">{t('expenses.totalExpenses', 'Total Expenses')}</span>
           <span className="agri-expense-summary-card__value">
             {formatCurrency(totalAmount)}
           </span>
           <span className="agri-expense-summary-card__subtext">
-            {expenses.length} input vouchers logged
+            {expenses.length} {t('expenses.vouchersLogged', 'input vouchers logged')}
           </span>
         </div>
       </div>
@@ -42,12 +44,12 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
           <CheckCircle2 size={22} />
         </div>
         <div className="agri-expense-summary-card__content">
-          <span className="agri-expense-summary-card__label">Paid Outflows</span>
+          <span className="agri-expense-summary-card__label">{t('expenses.paidOutflows', 'Paid Outflows')}</span>
           <span className="agri-expense-summary-card__value" style={{ color: '#059669' }}>
             {formatCurrency(paidAmount)}
           </span>
           <span className="agri-expense-summary-card__subtext">
-            {totalAmount > 0 ? `${Math.round((paidAmount / totalAmount) * 100)}% settled` : '100% settled'}
+            {totalAmount > 0 ? `${Math.round((paidAmount / totalAmount) * 100)}% ${t('expenses.settled', 'settled')}` : `100% ${t('expenses.settled', 'settled')}`}
           </span>
         </div>
       </div>
@@ -58,7 +60,7 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
           <Clock size={22} />
         </div>
         <div className="agri-expense-summary-card__content">
-          <span className="agri-expense-summary-card__label">Pending Payables</span>
+          <span className="agri-expense-summary-card__label">{t('expenses.pendingPayables', 'Pending Payables')}</span>
           <span
             className="agri-expense-summary-card__value"
             style={{ color: pendingAmount > 0 ? '#b45309' : 'var(--slate-800)' }}
@@ -66,7 +68,7 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
             {formatCurrency(pendingAmount)}
           </span>
           <span className="agri-expense-summary-card__subtext">
-            {pendingAmount > 0 ? 'Vendor credit pending' : 'Zero outstanding debt'}
+            {pendingAmount > 0 ? t('expenses.vendorCreditPending', 'Vendor credit pending') : t('expenses.zeroDebt', 'Zero outstanding debt')}
           </span>
         </div>
       </div>
@@ -77,7 +79,7 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
           <Calendar size={22} />
         </div>
         <div className="agri-expense-summary-card__content">
-          <span className="agri-expense-summary-card__label">This Month</span>
+          <span className="agri-expense-summary-card__label">{t('expenses.thisMonth', 'This Month')}</span>
           <span className="agri-expense-summary-card__value">
             {formatCurrency(thisMonthExpenses)}
           </span>
@@ -93,12 +95,12 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
           <BarChart3 size={22} />
         </div>
         <div className="agri-expense-summary-card__content">
-          <span className="agri-expense-summary-card__label">Avg Expense</span>
+          <span className="agri-expense-summary-card__label">{t('expenses.avgExpense', 'Avg Expense')}</span>
           <span className="agri-expense-summary-card__value">
             {formatCurrency(avgExpense)}
           </span>
           <span className="agri-expense-summary-card__subtext">
-            Per voucher entry
+            {t('expenses.perVoucher', 'Per voucher entry')}
           </span>
         </div>
       </div>

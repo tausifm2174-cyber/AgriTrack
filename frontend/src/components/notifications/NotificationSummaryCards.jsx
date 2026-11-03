@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Bell, Inbox, AlertTriangle, AlertOctagon } from 'lucide-react';
 
 /**
@@ -15,12 +16,14 @@ export default function NotificationSummaryCards({
   activeSeverityFilter,
   onSelectFilter,
 }) {
+  const { t } = useTranslation();
+
   const cards = [
     {
       id: 'total',
-      label: 'Total Notifications',
+      label: t('notifications.totalNotifications', 'Total Notifications'),
       value: summary.total,
-      subtext: 'Across all modules',
+      subtext: t('notifications.acrossAllModules', 'Across all modules'),
       icon: Bell,
       type: 'total',
       isActive: activeStatusFilter === 'all' && activeSeverityFilter === 'all',
@@ -28,9 +31,9 @@ export default function NotificationSummaryCards({
     },
     {
       id: 'unread',
-      label: 'Unread Alerts',
+      label: t('notifications.unreadAlerts', 'Unread Alerts'),
       value: summary.unread,
-      subtext: `${summary.unread} action required`,
+      subtext: t('notifications.actionRequiredCount', '{{count}} action required', { count: summary.unread }),
       icon: Inbox,
       type: 'unread',
       isActive: activeStatusFilter === 'unread',
@@ -38,9 +41,9 @@ export default function NotificationSummaryCards({
     },
     {
       id: 'warnings',
-      label: 'Warnings',
+      label: t('notifications.warnings', 'Warnings'),
       value: summary.warnings,
-      subtext: 'Cautionary operational notices',
+      subtext: t('notifications.cautionaryNotices', 'Cautionary operational notices'),
       icon: AlertTriangle,
       type: 'warning',
       isActive: activeSeverityFilter === 'WARNING',
@@ -48,9 +51,9 @@ export default function NotificationSummaryCards({
     },
     {
       id: 'critical',
-      label: 'Critical Alerts',
+      label: t('notifications.criticalAlerts', 'Critical Alerts'),
       value: summary.critical,
-      subtext: 'High-priority farm hazards',
+      subtext: t('notifications.highPriorityHazards', 'High-priority farm hazards'),
       icon: AlertOctagon,
       type: 'critical',
       isActive: activeSeverityFilter === 'CRITICAL',
@@ -91,3 +94,4 @@ export default function NotificationSummaryCards({
     </div>
   );
 }
+

@@ -1,25 +1,34 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, PlusCircle } from 'lucide-react';
 import { Button } from '../common';
 import HarvestStatusBadge from './HarvestStatusBadge';
 import { formatWeight } from '../../utils/formatters';
+import {
+  translateCrop,
+  translateVariety,
+  translateSeason,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 export default function HarvestTable({ harvests, onViewDetails, onRecordSale }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-harvest-table-container">
       <div className="agri-harvest-table-scroll">
         <table className="agri-harvest-table">
           <thead>
             <tr>
-              <th>Harvest ID</th>
-              <th>Crop & Variety</th>
-              <th>Farm & Field</th>
-              <th>Harvest Date</th>
-              <th>Harvested Qty</th>
-              <th>Available Qty</th>
-              <th>Sold Qty</th>
-              <th>Quality</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>{t('harvests.harvestId', 'Harvest ID')}</th>
+              <th>{t('crops.cropVariety', 'Crop & Variety')}</th>
+              <th>{t('fields.farmAndField', 'Farm & Field')}</th>
+              <th>{t('harvests.harvestDate', 'Harvest Date')}</th>
+              <th>{t('harvests.harvestQuantity', 'Harvested Qty')}</th>
+              <th>{t('harvests.availableQuantity', 'Available Qty')}</th>
+              <th>{t('harvests.soldQuantity', 'Sold Qty')}</th>
+              <th>{t('harvests.quality', 'Quality')}</th>
+              <th>{t('common.status', 'Status')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -40,16 +49,16 @@ export default function HarvestTable({ harvests, onViewDetails, onRecordSale }) 
                   </td>
                   <td>
                     <div className="agri-harvest-table__crop-cell">
-                      <span className="agri-harvest-table__crop-name">{harvest.cropName}</span>
+                      <span className="agri-harvest-table__crop-name">{translateCrop(harvest.cropName, t)}</span>
                       <span className="agri-harvest-table__crop-variety">
-                        {harvest.variety} • {harvest.season}
+                        {translateVariety(harvest.variety, t)} • {translateSeason(harvest.season, t)}
                       </span>
                     </div>
                   </td>
                   <td>
                     <div className="agri-harvest-table__farm-cell">
-                      <span className="agri-harvest-table__farm-name">{harvest.farmName}</span>
-                      <span className="agri-harvest-table__field-name">{harvest.fieldName}</span>
+                      <span className="agri-harvest-table__farm-name">{t(`farms.demoNames.${harvest.farmId}`, harvest.farmName)}</span>
+                      <span className="agri-harvest-table__field-name">{formatFieldName(harvest.fieldName, t)}</span>
                     </div>
                   </td>
                   <td>
@@ -63,7 +72,7 @@ export default function HarvestTable({ harvests, onViewDetails, onRecordSale }) 
                         {formatWeight(harvest.harvestedQuantityKg, 'kg')}
                       </span>
                       <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                        {(harvest.harvestedQuantityKg / 100).toFixed(1)} q
+                        {(harvest.harvestedQuantityKg / 100).toFixed(1)} {t('units.q', 'q')}
                       </div>
                     </div>
                   </td>
@@ -84,7 +93,7 @@ export default function HarvestTable({ harvests, onViewDetails, onRecordSale }) 
                   </td>
                   <td>
                     <span className={`agri-quality-pill ${gradeClass}`}>
-                      Grade {harvest.qualityGrade} ({harvest.qualityScore})
+                      {t('harvests.grade', 'Grade')} {harvest.qualityGrade} ({harvest.qualityScore})
                     </span>
                   </td>
                   <td>
@@ -96,20 +105,20 @@ export default function HarvestTable({ harvests, onViewDetails, onRecordSale }) 
                         variant="outline"
                         size="sm"
                         onClick={() => onViewDetails(harvest)}
-                        aria-label={`View details for ${harvest.id}`}
+                        aria-label={`${t('common.viewDetails', 'View details')} ${harvest.id}`}
                       >
                         <Eye size={14} />
-                        <span>View</span>
+                        <span>{t('common.view', 'View')}</span>
                       </Button>
                       {harvest.availableQuantityKg > 0 && onRecordSale && (
                         <Button
                           variant="primary"
                           size="sm"
                           onClick={() => onRecordSale(harvest)}
-                          aria-label={`Record sale for ${harvest.id}`}
+                          aria-label={`${t('sales.addSale', 'Record sale')} ${harvest.id}`}
                         >
                           <PlusCircle size={14} />
-                          <span>Sell</span>
+                          <span>{t('sales.addSale', 'Sell')}</span>
                         </Button>
                       )}
                     </div>

@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Search, RotateCcw } from 'lucide-react';
 import { Button } from '../common';
 import { cropTypes } from '../../data/cropData';
+import { translateCrop, formatFieldName } from '../../utils/displayLabels';
 
 /**
  * CalendarFilters component
@@ -21,18 +23,20 @@ export default function CalendarFilters({
   onClearFilters,
   isFiltered = false,
 }) {
+  const { t } = useTranslation();
+
   return (
-    <div className="agri-cal-toolbar" role="search" aria-label="Filter calendar milestones">
+    <div className="agri-cal-toolbar" role="search" aria-label={t('common.filter', 'Filter calendar milestones')}>
       {/* Search Input */}
       <div className="agri-cal-search-box">
         <Search size={16} className="agri-cal-search-icon" aria-hidden="true" />
         <input
           type="text"
           className="agri-cal-search-input"
-          placeholder="Search milestone, crop, or field..."
+          placeholder={t('common.search', 'Search milestone, crop, or field...')}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          aria-label="Search milestone title"
+          aria-label={t('common.search', 'Search milestone title')}
         />
       </div>
 
@@ -40,17 +44,17 @@ export default function CalendarFilters({
       <div className="agri-cal-filters-group">
         {/* Crop Filter */}
         <div className="agri-cal-filter-item">
-          <label htmlFor="cal-crop-filter" className="sr-only">Crop</label>
+          <label htmlFor="cal-crop-filter" className="sr-only">{t('crops.cropName', 'Crop')}</label>
           <select
             id="cal-crop-filter"
             className="agri-cal-filter-select"
             value={selectedCrop}
             onChange={(e) => onCropChange(e.target.value)}
           >
-            <option value="">All Crops</option>
+            <option value="">{t('common.all', 'All Crops')}</option>
             {cropTypes.map((crop) => (
               <option key={crop} value={crop}>
-                {crop}
+                {translateCrop(crop, t)}
               </option>
             ))}
           </select>
@@ -58,17 +62,17 @@ export default function CalendarFilters({
 
         {/* Field Filter */}
         <div className="agri-cal-filter-item">
-          <label htmlFor="cal-field-filter" className="sr-only">Field</label>
+          <label htmlFor="cal-field-filter" className="sr-only">{t('fields.fieldName', 'Field')}</label>
           <select
             id="cal-field-filter"
             className="agri-cal-filter-select"
             value={selectedFieldId}
             onChange={(e) => onFieldChange(e.target.value)}
           >
-            <option value="">All Fields</option>
+            <option value="">{t('fields.title', 'All Fields')}</option>
             {fields.map((field) => (
               <option key={field.id} value={field.id}>
-                {field.name}
+                {formatFieldName(field.name, t)}
               </option>
             ))}
           </select>
@@ -76,36 +80,36 @@ export default function CalendarFilters({
 
         {/* Event Type Filter */}
         <div className="agri-cal-filter-item">
-          <label htmlFor="cal-type-filter" className="sr-only">Event Type</label>
+          <label htmlFor="cal-type-filter" className="sr-only">{t('activities.type', 'Event Type')}</label>
           <select
             id="cal-type-filter"
             className="agri-cal-filter-select"
             value={selectedEventType}
             onChange={(e) => onEventTypeChange(e.target.value)}
           >
-            <option value="">All Event Types</option>
-            <option value="lifecycle">Crop Lifecycle Stage</option>
-            <option value="fertilizer">Fertilizer & Nutrition</option>
-            <option value="irrigation">Irrigation Pulse</option>
-            <option value="crop_protection">Crop Protection & Weeding</option>
-            <option value="harvest">Harvest Window</option>
+            <option value="">{t('common.all', 'All Event Types')}</option>
+            <option value="lifecycle">{t('crops.lifecycleProgress', 'Crop Lifecycle Stage')}</option>
+            <option value="fertilizer">{t('activityTypes.fertilization', 'Fertilizer & Nutrition')}</option>
+            <option value="irrigation">{t('irrigation.title', 'Irrigation Pulse')}</option>
+            <option value="crop_protection">{t('activityTypes.spraying', 'Crop Protection & Weeding')}</option>
+            <option value="harvest">{t('stages.harvestReadiness', 'Harvest Window')}</option>
           </select>
         </div>
 
         {/* Status Filter */}
         <div className="agri-cal-filter-item">
-          <label htmlFor="cal-status-filter" className="sr-only">Status</label>
+          <label htmlFor="cal-status-filter" className="sr-only">{t('common.status', 'Status')}</label>
           <select
             id="cal-status-filter"
             className="agri-cal-filter-select"
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value)}
           >
-            <option value="">All Statuses</option>
-            <option value="Scheduled">Scheduled</option>
-            <option value="Upcoming">Upcoming</option>
-            <option value="Ready">Ready</option>
-            <option value="Completed">Completed</option>
+            <option value="">{t('common.status', 'All Statuses')}</option>
+            <option value="Scheduled">{t('status.scheduled', 'Scheduled')}</option>
+            <option value="Upcoming">{t('status.planned', 'Upcoming')}</option>
+            <option value="Ready">{t('status.optimal', 'Ready')}</option>
+            <option value="Completed">{t('status.completed', 'Completed')}</option>
           </select>
         </div>
 
@@ -116,9 +120,9 @@ export default function CalendarFilters({
             size="sm"
             icon={<RotateCcw size={14} aria-hidden="true" />}
             onClick={onClearFilters}
-            aria-label="Clear all calendar filters"
+            aria-label={t('common.clear', 'Clear all calendar filters')}
           >
-            Reset
+            {t('common.clear', 'Reset')}
           </Button>
         )}
       </div>

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { X, Grid3X3 } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
@@ -8,6 +9,7 @@ import { formatAcres } from '../../utils/formatters';
  * Modal showing comprehensive breakdown of a farm holding.
  */
 export default function FarmDetailsModal({ farm, onClose }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!farm) return null;
@@ -38,13 +40,13 @@ export default function FarmDetailsModal({ farm, onClose }) {
             <h3 id="farm-modal-title" className="agri-modal-title">
               {farm.name}
             </h3>
-            <p className="agri-modal-subtitle">Operational Holding Specifications</p>
+            <p className="agri-modal-subtitle">{t('farms.farmDetails', 'Operational Holding Specifications')}</p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -54,30 +56,30 @@ export default function FarmDetailsModal({ farm, onClose }) {
         <div className="agri-modal-body">
           {/* General Specs */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Property Information</h4>
+            <h4 className="agri-detail-section-title">{t('common.details', 'Property Information')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Location</span>
+                <span className="agri-detail-label">{t('farms.location', 'Location')}</span>
                 <span className="agri-detail-value">{farm.location}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">District & State</span>
+                <span className="agri-detail-label">{t('marketPrices.state', 'District & State')}</span>
                 <span className="agri-detail-value">{farm.district}, {farm.state}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Total Area</span>
-                <span className="agri-detail-value">{formatAcres(farm.areaAcres)}</span>
+                <span className="agri-detail-label">{t('farms.totalArea', 'Total Area')}</span>
+                <span className="agri-detail-value">{formatAcres(farm.areaAcres, t)}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Total Fields</span>
-                <span className="agri-detail-value">{farm.fieldsCount} Mapped Plots</span>
+                <span className="agri-detail-label">{t('farms.fieldsCount', 'Total Fields')}</span>
+                <span className="agri-detail-value">{farm.fieldsCount} {t('navigation.fields', 'Mapped Plots')}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Established Year</span>
-                <span className="agri-detail-value">{farm.establishedYear || '2019'}</span>
+                <span className="agri-detail-label">{t('common.status', 'Status')}</span>
+                <span className="agri-detail-value">{farm.status}</span>
               </div>
               <div className="agri-detail-item">
-                <span className="agri-detail-label">Registered Farmer / Owner</span>
+                <span className="agri-detail-label">{t('topbar.role', 'Owner')}</span>
                 <span className="agri-detail-value">{farm.owner || 'XYZ (Farmer)'}</span>
               </div>
             </div>
@@ -85,18 +87,18 @@ export default function FarmDetailsModal({ farm, onClose }) {
 
           {/* Agronomy & Water */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Agronomy & Infrastructure</h4>
+            <h4 className="agri-detail-section-title">{t('soil.title', 'Agronomy & Infrastructure')}</h4>
             <div className="agri-detail-grid">
               <div className="agri-detail-item" style={{ gridColumn: 'span 2' }}>
-                <span className="agri-detail-label">Soil Profile</span>
+                <span className="agri-detail-label">{t('farms.soilType', 'Soil Profile')}</span>
                 <span className="agri-detail-value">{farm.soilSummary}</span>
               </div>
               <div className="agri-detail-item" style={{ gridColumn: 'span 2' }}>
-                <span className="agri-detail-label">Irrigation Network</span>
+                <span className="agri-detail-label">{t('irrigation.title', 'Irrigation Network')}</span>
                 <span className="agri-detail-value">{farm.irrigationSummary}</span>
               </div>
               <div className="agri-detail-item" style={{ gridColumn: 'span 2' }}>
-                <span className="agri-detail-label">Primary Water Source</span>
+                <span className="agri-detail-label">{t('farms.irrigationSource', 'Primary Water Source')}</span>
                 <span className="agri-detail-value">{farm.waterSource}</span>
               </div>
             </div>
@@ -104,7 +106,7 @@ export default function FarmDetailsModal({ farm, onClose }) {
 
           {/* Primary Crops */}
           <div className="agri-detail-section">
-            <h4 className="agri-detail-section-title">Cultivated Crops</h4>
+            <h4 className="agri-detail-section-title">{t('dashboard.activeCrops', 'Cultivated Crops')}</h4>
             <div className="agri-farm-card__crops-pills">
               {farm.primaryCrops.map((crop, idx) => (
                 <span key={idx} className="agri-farm-card__crop-pill">
@@ -117,7 +119,7 @@ export default function FarmDetailsModal({ farm, onClose }) {
           {/* Operational Notes */}
           {farm.notes && (
             <div className="agri-detail-section">
-              <h4 className="agri-detail-section-title">Operational Notes</h4>
+              <h4 className="agri-detail-section-title">{t('common.notes', 'Operational Notes')}</h4>
               <p style={{ fontSize: '0.85rem', color: 'var(--slate-600)', lineHeight: '1.5' }}>
                 {farm.notes}
               </p>
@@ -128,14 +130,14 @@ export default function FarmDetailsModal({ farm, onClose }) {
         {/* Footer */}
         <div className="agri-modal-footer">
           <Button variant="secondary" onClick={onClose}>
-            Close
+            {t('common.close', 'Close')}
           </Button>
           <Button
             variant="primary"
             icon={<Grid3X3 size={15} aria-hidden="true" />}
             onClick={handleGoToFields}
           >
-            View {farm.fieldsCount} Fields
+            {t('farms.viewFields', 'View Fields')}
           </Button>
         </div>
       </div>

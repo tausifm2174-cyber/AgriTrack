@@ -1,15 +1,13 @@
+import { useTranslation } from 'react-i18next';
 import { Check, X, AlertTriangle, HelpCircle } from 'lucide-react';
 
 /**
  * RuleEvaluation component
  * Displays transparent, explainable rule verification checklist for a single crop recommendation.
- *
- * @param {Object} props
- * @param {Array} props.checks - Array of evaluated parameter checks
- * @param {Array} props.warnings - Array of potential warnings or limitations
- * @param {Object} props.crop - The crop object with target ranges
  */
 export default function RuleEvaluation({ checks = [], warnings = [], crop = {} }) {
+  const { t } = useTranslation();
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pass':
@@ -26,7 +24,7 @@ export default function RuleEvaluation({ checks = [], warnings = [], crop = {} }
   return (
     <div className="agri-rule-eval">
       <h4 className="agri-rule-eval__title">
-        Why this recommendation? (Rule Evaluation Details)
+        {t('recommendations.whyRecommendation', 'Why this recommendation? (Rule Evaluation Details)')}
       </h4>
 
       {/* Transparent Evaluation Checklist */}
@@ -47,19 +45,19 @@ export default function RuleEvaluation({ checks = [], warnings = [], crop = {} }
       {/* Target Benchmarks Reference */}
       <div className="agri-rule-eval__benchmarks">
         <div className="agri-rule-eval__bench-item">
-          <span className="text-muted">Target Soil:</span>
+          <span className="text-muted">{t('recommendations.targetSoil', 'Target Soil')}:</span>
           <strong>{crop.soilTypesPreferred}</strong>
         </div>
         <div className="agri-rule-eval__bench-item">
-          <span className="text-muted">Target pH:</span>
+          <span className="text-muted">{t('recommendations.targetPh', 'Target pH')}:</span>
           <strong>{crop.phRange}</strong>
         </div>
         <div className="agri-rule-eval__bench-item">
-          <span className="text-muted">Thermal Range:</span>
+          <span className="text-muted">{t('recommendations.thermalRange', 'Thermal Range')}:</span>
           <strong>{crop.tempRange}</strong>
         </div>
         <div className="agri-rule-eval__bench-item">
-          <span className="text-muted">Required Season:</span>
+          <span className="text-muted">{t('recommendations.requiredSeason', 'Required Season')}:</span>
           <strong>{crop.seasonRequired}</strong>
         </div>
       </div>
@@ -69,7 +67,7 @@ export default function RuleEvaluation({ checks = [], warnings = [], crop = {} }
         <div className="agri-rule-eval__warnings">
           <div className="agri-rule-eval__warning-header">
             <AlertTriangle size={14} className="text-warning" aria-hidden="true" />
-            <span>Agronomic Advisory & Amendments Needed:</span>
+            <span>{t('recommendations.advisoryAmendments', 'Agronomic Advisory & Amendments Needed')}:</span>
           </div>
           <ul className="agri-rule-eval__warning-list">
             {warnings.map((warn, i) => (

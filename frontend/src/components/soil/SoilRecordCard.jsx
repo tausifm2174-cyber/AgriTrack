@@ -1,12 +1,21 @@
+import { useTranslation } from 'react-i18next';
 import { Warehouse, Calendar, Eye, Droplet } from 'lucide-react';
 import SoilStatus from './SoilStatus';
 import { Button } from '../common';
+import {
+  formatFieldName,
+  translateSoilType,
+  translateStatus,
+  translateTime,
+} from '../../utils/displayLabels';
 
 /**
  * SoilRecordCard component
  * Card presentation for an individual soil test report.
  */
 export default function SoilRecordCard({ record, onViewDetails }) {
+  const { t } = useTranslation();
+
   const getPhBadgeClass = (ph) => {
     if (ph < 6.0) return 'agri-soil-ph-badge--acidic';
     if (ph > 7.5) return 'agri-soil-ph-badge--alkaline';
@@ -19,11 +28,11 @@ export default function SoilRecordCard({ record, onViewDetails }) {
       <div className="agri-soil-card__header">
         <div className="agri-soil-field-cell">
           <h2 id={`soil-title-${record.id}`} className="agri-soil-field-name">
-            {record.fieldName}
+            {formatFieldName(record.fieldName, t)}
           </h2>
           <span className="agri-soil-farm-name">
             <Warehouse size={12} style={{ display: 'inline', marginRight: '4px' }} aria-hidden="true" />
-            {record.farmName}
+            {t(`farms.demoNames.${record.farmId}`, record.farmName)}
           </span>
         </div>
         <SoilStatus status={record.status} variant={record.statusVariant} />
@@ -35,27 +44,27 @@ export default function SoilRecordCard({ record, onViewDetails }) {
         <div className="agri-soil-card__ph-row">
           <div>
             <div style={{ fontSize: '0.7rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-              Soil Type
+              {t('fields.soilType', 'Soil Type')}
             </div>
             <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--slate-800)' }}>
-              {record.soilType}
+              {translateSoilType(record.soilType, t)}
             </div>
           </div>
           <span className={`agri-soil-ph-badge ${getPhBadgeClass(record.ph)}`}>
-            {record.ph} pH • {record.phRating}
+            {record.ph} pH • {translateStatus(record.phRating, t)}
           </span>
         </div>
 
         {/* N-P-K Nutrient Breakdown */}
         <div className="agri-soil-card__nutrients-box">
           <div style={{ fontSize: '0.725rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-            Primary Nutrients (kg/ha)
+            {t('soil.nutrientBalance', 'Primary Nutrients (kg/ha)')}
           </div>
 
           <div className="agri-soil-card__nutrient-bar-group">
             <div className="agri-soil-card__nutrient-label-row">
-              <span>Nitrogen (N)</span>
-              <strong>{record.nitrogen} kg/ha ({record.nitrogenRating})</strong>
+              <span>{t('soil.nitrogen', 'Nitrogen (N)')}</span>
+              <strong>{record.nitrogen} kg/ha ({translateStatus(record.nitrogenRating, t)})</strong>
             </div>
             <div className="agri-field-card__progress-bar">
               <div
@@ -67,8 +76,8 @@ export default function SoilRecordCard({ record, onViewDetails }) {
 
           <div className="agri-soil-card__nutrient-bar-group">
             <div className="agri-soil-card__nutrient-label-row">
-              <span>Phosphorus (P)</span>
-              <strong>{record.phosphorus} kg/ha ({record.phosphorusRating})</strong>
+              <span>{t('soil.phosphorus', 'Phosphorus (P)')}</span>
+              <strong>{record.phosphorus} kg/ha ({translateStatus(record.phosphorusRating, t)})</strong>
             </div>
             <div className="agri-field-card__progress-bar">
               <div
@@ -80,8 +89,8 @@ export default function SoilRecordCard({ record, onViewDetails }) {
 
           <div className="agri-soil-card__nutrient-bar-group">
             <div className="agri-soil-card__nutrient-label-row">
-              <span>Potassium (K)</span>
-              <strong>{record.potassium} kg/ha ({record.potassiumRating})</strong>
+              <span>{t('soil.potassium', 'Potassium (K)')}</span>
+              <strong>{record.potassium} kg/ha ({translateStatus(record.potassiumRating, t)})</strong>
             </div>
             <div className="agri-field-card__progress-bar">
               <div
@@ -95,15 +104,15 @@ export default function SoilRecordCard({ record, onViewDetails }) {
         {/* Carbon & Moisture Metrics */}
         <div className="agri-field-card__specs" style={{ marginTop: '0.25rem' }}>
           <div className="agri-field-card__spec-item">
-            <span className="agri-field-card__spec-label">Organic Carbon</span>
-            <span className="agri-field-card__spec-value">{record.organicCarbon}% ({record.organicCarbonRating})</span>
+            <span className="agri-field-card__spec-label">{t('soil.organicCarbon', 'Organic Carbon')}</span>
+            <span className="agri-field-card__spec-value">{record.organicCarbon}% ({translateStatus(record.organicCarbonRating, t)})</span>
           </div>
 
           <div className="agri-field-card__spec-item">
-            <span className="agri-field-card__spec-label">Soil Moisture</span>
+            <span className="agri-field-card__spec-label">{t('soil.moisture', 'Soil Moisture')}</span>
             <span className="agri-field-card__spec-value">
               <Droplet size={13} style={{ color: 'var(--info-text)' }} aria-hidden="true" />
-              <span>{record.moisturePercent}% ({record.moistureRating})</span>
+              <span>{record.moisturePercent}% ({translateStatus(record.moistureRating, t)})</span>
             </span>
           </div>
         </div>
@@ -113,7 +122,7 @@ export default function SoilRecordCard({ record, onViewDetails }) {
       <div className="agri-soil-card__footer">
         <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', display: 'flex', alignItems: 'center', gap: '4px' }}>
           <Calendar size={13} aria-hidden="true" />
-          <span>{record.testedDaysAgo}</span>
+          <span>{translateTime(record.testedDaysAgo, t)}</span>
         </span>
 
         <Button
@@ -122,7 +131,7 @@ export default function SoilRecordCard({ record, onViewDetails }) {
           icon={<Eye size={14} aria-hidden="true" />}
           onClick={() => onViewDetails(record)}
         >
-          View Full Report
+          {t('soil.soilReport', 'View Full Report')}
         </Button>
       </div>
     </article>

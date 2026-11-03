@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Menu, ChevronDown, User, Bell, LogOut, CheckCircle } from 'lucide-react';
 import Breadcrumbs from './Breadcrumbs';
 import NotificationBell from './NotificationBell';
+import LanguageSelector from './LanguageSelector';
 
 /**
  * TopNavbar component
@@ -10,6 +12,7 @@ import NotificationBell from './NotificationBell';
  * @param {Function} props.onOpenMobileSidebar
  */
 export default function TopNavbar({ onOpenMobileSidebar }) {
+  const { t } = useTranslation();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState(false);
   const dropdownRef = useRef(null);
@@ -51,7 +54,7 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
           type="button"
           className="agri-topbar__mobile-toggle"
           onClick={onOpenMobileSidebar}
-          aria-label="Open navigation menu"
+          aria-label={t('common.navigationMenu', 'Open navigation menu')}
         >
           <Menu size={20} />
         </button>
@@ -61,8 +64,10 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
         </div>
       </div>
 
-      {/* Right: Actions, Notifications & User Profile */}
+      {/* Right: Language Selector, Notifications & User Profile */}
       <div className="agri-topbar__right">
+        <LanguageSelector />
+
         <NotificationBell />
 
         <div className="agri-topbar__divider" aria-hidden="true" />
@@ -75,14 +80,14 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
             onClick={() => setUserDropdownOpen((prev) => !prev)}
             aria-expanded={userDropdownOpen}
             aria-haspopup="true"
-            aria-label="User profile options"
+            aria-label={t('topbar.profileSettings', 'User profile options')}
           >
             <div className="agri-user-avatar">
               <span>XYZ</span>
             </div>
             <div className="agri-user-info">
               <span className="agri-user-name">XYZ</span>
-              <span className="agri-user-role">Farmer</span>
+              <span className="agri-user-role">{t('topbar.role', 'Farmer')}</span>
             </div>
             <ChevronDown size={15} className="agri-user-chevron" aria-hidden="true" />
           </button>
@@ -98,7 +103,7 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
                   <p className="agri-user-dropdown-name">XYZ</p>
                   <p className="agri-user-dropdown-email">xyz.farmer@agritrack.in</p>
                   <span className="agri-badge agri-badge--success" style={{ marginTop: '0.25rem' }}>
-                    Farmer
+                    {t('topbar.role', 'Farmer')}
                   </span>
                 </div>
               </div>
@@ -111,7 +116,7 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
                   role="menuitem"
                 >
                   <User size={16} className="agri-dropdown-item__icon" />
-                  <span>Farmer Profile & Settings</span>
+                  <span>{t('topbar.profileSettings', 'Farmer Profile & Settings')}</span>
                 </button>
 
                 <button
@@ -121,7 +126,7 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
                   role="menuitem"
                 >
                   <Bell size={16} className="agri-dropdown-item__icon" />
-                  <span>Notification Center</span>
+                  <span>{t('topbar.notificationCenter', 'Notification Center')}</span>
                 </button>
               </div>
 
@@ -129,7 +134,7 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
                 {logoutMessage ? (
                   <div className="agri-demo-logout-alert">
                     <CheckCircle size={14} className="text-success" />
-                    <span>Demo session. Auth backend planned in next phase.</span>
+                    <span>{t('topbar.logoutNotice', 'Demo session. Auth backend planned in next phase.')}</span>
                   </div>
                 ) : (
                   <button
@@ -139,7 +144,7 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
                     role="menuitem"
                   >
                     <LogOut size={16} className="agri-dropdown-item__icon" />
-                    <span>Logout (Demo)</span>
+                    <span>{t('topbar.logout', 'Logout (Demo)')}</span>
                   </button>
                 )}
               </div>

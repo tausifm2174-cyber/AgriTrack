@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CheckCircle, Info } from 'lucide-react';
 import { Button } from '../common';
 
@@ -7,6 +8,7 @@ import { Button } from '../common';
  * Polished modal dialog for demo "Add Farm" registration.
  */
 export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -75,17 +77,17 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
         <div className="agri-modal-header">
           <div>
             <h3 id="add-farm-title" className="agri-modal-title">
-              Register New Farm Holding
+              {t('farms.addFarm', 'Register New Farm Holding')}
             </h3>
             <p className="agri-modal-subtitle">
-              Add a new property or land parcel to your operational portfolio
+              {t('farms.subtitle', 'Add a new property or land parcel to your operational portfolio')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
             disabled={submitted}
           >
             <X size={20} aria-hidden="true" />
@@ -97,7 +99,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
             <div className="agri-demo-badge-banner">
               <Info size={16} aria-hidden="true" />
               <span>
-                <strong>Demo Mode:</strong> New farms are stored in memory for this session without backend persistence.
+                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'New farms are stored in memory for this session without backend persistence.')}
               </span>
             </div>
 
@@ -105,17 +107,17 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                 <CheckCircle size={48} className="text-success" style={{ margin: '0 auto 1rem auto' }} aria-hidden="true" />
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-900)' }}>
-                  Farm Holding Registered Successfully!
+                  {t('messages.farmAdded', 'Farm Holding Registered Successfully!')}
                 </h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--slate-500)', marginTop: '0.25rem' }}>
-                  Adding &ldquo;{formData.name}&rdquo; to your farm portfolio...
+                  {t('common.loading', 'Adding')} &ldquo;{formData.name}&rdquo;...
                 </p>
               </div>
             ) : (
               <div className="agri-form-grid">
                 <div className="agri-form-group">
                   <label htmlFor="farm-name" className="agri-form-label agri-form-label--required">
-                    Farm / Holding Name
+                    {t('farms.farmName', 'Farm / Holding Name')}
                   </label>
                   <input
                     id="farm-name"
@@ -132,7 +134,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="farm-location" className="agri-form-label agri-form-label--required">
-                      Location / Village
+                      {t('farms.location', 'Location / Village')}
                     </label>
                     <input
                       id="farm-location"
@@ -148,7 +150,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
 
                   <div className="agri-form-group">
                     <label htmlFor="farm-area" className="agri-form-label agri-form-label--required">
-                      Total Area (Acres)
+                      {t('farms.totalArea', 'Total Area')} ({t('units.acres', 'Acres')})
                     </label>
                     <input
                       id="farm-area"
@@ -168,7 +170,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="farm-soil" className="agri-form-label">
-                      Dominant Soil Type
+                      {t('farms.soilType', 'Dominant Soil Type')}
                     </label>
                     <select
                       id="farm-soil"
@@ -177,18 +179,18 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       value={formData.soilType}
                       onChange={handleChange}
                     >
-                      <option value="Alluvial Loam">Alluvial Loam</option>
-                      <option value="Deep Black Soil">Deep Black Soil</option>
-                      <option value="Medium Black Soil">Medium Black Soil</option>
-                      <option value="Sandy Loam">Sandy Loam</option>
-                      <option value="Clay Loam">Clay Loam</option>
-                      <option value="Red Sandy Loam">Red Sandy Loam</option>
+                      <option value="Alluvial Loam">{t('soil.types.alluvialLoam', 'Alluvial Loam')}</option>
+                      <option value="Deep Black Soil">{t('soil.types.deepBlackSoil', 'Deep Black Soil')}</option>
+                      <option value="Medium Black Soil">{t('soil.types.mediumBlackSoil', 'Medium Black Soil')}</option>
+                      <option value="Sandy Loam">{t('soil.types.sandyLoam', 'Sandy Loam')}</option>
+                      <option value="Clay Loam">{t('soil.types.clayLoam', 'Clay Loam')}</option>
+                      <option value="Red Sandy Loam">{t('soil.types.redSandyLoam', 'Red Sandy Loam')}</option>
                     </select>
                   </div>
 
                   <div className="agri-form-group">
                     <label htmlFor="farm-water" className="agri-form-label">
-                      Primary Water Source
+                      {t('farms.irrigationSource', 'Primary Water Source')}
                     </label>
                     <select
                       id="farm-water"
@@ -197,18 +199,19 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       value={formData.waterSource}
                       onChange={handleChange}
                     >
-                      <option value="Borewell / Tube Well">Borewell / Tube Well</option>
-                      <option value="Drip Irrigation Network">Drip Irrigation Network</option>
-                      <option value="Canal Lift + Pump">Canal Lift + Pump</option>
-                      <option value="Farm Pond & Solar Pump">Farm Pond & Solar Pump</option>
-                      <option value="Rainfed Catchment">Rainfed Catchment</option>
+                      <option value="Borewell / Tube Well">{t('farms.waterSources.borewell', 'Borewell / Tube Well')}</option>
+                      <option value="Drip Irrigation Network">{t('farms.waterSources.drip', 'Drip Irrigation Network')}</option>
+                      <option value="Canal Lift + Pump">{t('farms.waterSources.canal', 'Canal Lift + Pump')}</option>
+                      <option value="Farm Pond & Solar Pump">{t('farms.waterSources.pond', 'Farm Pond & Solar Pump')}</option>
+                      <option value="Rainfed Catchment">{t('farms.waterSources.rainfed', 'Rainfed Catchment')}</option>
                     </select>
                   </div>
+
                 </div>
 
                 <div className="agri-form-group">
                   <label htmlFor="farm-crop" className="agri-form-label">
-                    Primary Crop (Initial Planting)
+                    {t('fields.currentCrop', 'Primary Crop')}
                   </label>
                   <input
                     id="farm-crop"
@@ -223,7 +226,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
 
                 <div className="agri-form-group">
                   <label htmlFor="farm-notes" className="agri-form-label">
-                    Operational Notes (Optional)
+                    {t('common.notes', 'Operational Notes')} ({t('common.optional', 'Optional')})
                   </label>
                   <textarea
                     id="farm-notes"
@@ -242,10 +245,10 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
           {!submitted && (
             <div className="agri-modal-footer">
               <Button variant="secondary" onClick={onClose} type="button">
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button variant="primary" type="submit">
-                Register Farm (Demo)
+                {t('farms.addFarm', 'Register Farm')}
               </Button>
             </div>
           )}

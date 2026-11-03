@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 
 export default function ProfitLossFilters({
@@ -11,6 +12,7 @@ export default function ProfitLossFilters({
   farmList = [],
   cropList = [],
 }) {
+  const { t } = useTranslation();
   const isFiltered =
     selectedPeriod !== 'ALL' || selectedFarm !== 'ALL' || selectedCrop !== 'ALL';
 
@@ -20,7 +22,7 @@ export default function ProfitLossFilters({
         {/* Period Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-            Period:
+            {t('common.date', 'Period')}:
           </span>
           <select
             className="agri-pl-filters__select"
@@ -28,16 +30,16 @@ export default function ProfitLossFilters({
             onChange={(e) => onPeriodChange(e.target.value)}
             aria-label="Filter by financial period"
           >
-            <option value="ALL">All Time (Full Cycle)</option>
-            <option value="THIS_MONTH">This Month (Oct 2026)</option>
-            <option value="PREVIOUS_MONTH">Previous Month (Sep 2026)</option>
+            <option value="ALL">{t('profitLoss.allTime', 'All Time (Full Cycle)')}</option>
+            <option value="THIS_MONTH">{t('profitLoss.thisMonth', 'This Month (Oct 2026)')}</option>
+            <option value="PREVIOUS_MONTH">{t('profitLoss.prevMonth', 'Previous Month (Sep 2026)')}</option>
           </select>
         </div>
 
         {/* Farm Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-            Holding:
+            {t('farms.farm', 'Holding')}:
           </span>
           <select
             className="agri-pl-filters__select"
@@ -45,7 +47,7 @@ export default function ProfitLossFilters({
             onChange={(e) => onFarmChange(e.target.value)}
             aria-label="Filter by farm holding"
           >
-            <option value="ALL">All Holdings</option>
+            <option value="ALL">{t('farms.allFarms', 'All Holdings')}</option>
             {farmList.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name}
@@ -57,7 +59,7 @@ export default function ProfitLossFilters({
         {/* Crop Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-            Crop:
+            {t('crops.crop', 'Crop')}:
           </span>
           <select
             className="agri-pl-filters__select"
@@ -65,7 +67,7 @@ export default function ProfitLossFilters({
             onChange={(e) => onCropChange(e.target.value)}
             aria-label="Filter by agronomic crop"
           >
-            <option value="ALL">All Crops</option>
+            <option value="ALL">{t('common.allCrops', 'All Crops')}</option>
             {cropList.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -80,13 +82,14 @@ export default function ProfitLossFilters({
             type="button"
             className="agri-btn agri-btn--outline agri-btn--sm"
             onClick={onResetFilters}
-            aria-label="Reset all financial filters"
+            aria-label={t('common.clearFilters', 'Reset Filters')}
           >
             <X size={14} />
-            <span>Reset Filters</span>
+            <span>{t('common.clearFilters', 'Reset Filters')}</span>
           </button>
         )}
       </div>
     </div>
   );
 }
+

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CheckCircle, Info } from 'lucide-react';
 import { Button } from '../common';
 
@@ -13,6 +14,7 @@ export default function AddFieldModal({
   farms = [],
   defaultFarmId = '',
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     farmId: defaultFarmId || (farms[0]?.id || 'farm-1'),
@@ -91,17 +93,17 @@ export default function AddFieldModal({
         <div className="agri-modal-header">
           <div>
             <h3 id="add-field-title" className="agri-modal-title">
-              Map New Field Plot
+              {t('fields.addField', 'Map New Field Plot')}
             </h3>
             <p className="agri-modal-subtitle">
-              Register a cultivation parcel and associate it with a farm holding
+              {t('fields.subtitle', 'Register a cultivation parcel and associate it with a farm holding')}
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('common.close', 'Close dialog')}
             disabled={submitted}
           >
             <X size={20} aria-hidden="true" />
@@ -113,7 +115,7 @@ export default function AddFieldModal({
             <div className="agri-demo-badge-banner">
               <Info size={16} aria-hidden="true" />
               <span>
-                <strong>Demo Mode:</strong> New fields are mapped in session memory for immediate testing.
+                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'New fields are mapped in session memory for immediate testing.')}
               </span>
             </div>
 
@@ -121,10 +123,10 @@ export default function AddFieldModal({
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                 <CheckCircle size={48} className="text-success" style={{ margin: '0 auto 1rem auto' }} aria-hidden="true" />
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-900)' }}>
-                  Field Plot Mapped Successfully!
+                  {t('messages.fieldAdded', 'Field Plot Mapped Successfully!')}
                 </h4>
                 <p style={{ fontSize: '0.875rem', color: 'var(--slate-500)', marginTop: '0.25rem' }}>
-                  Adding &ldquo;{formData.name}&rdquo; to your operational acreage...
+                  {t('common.loading', 'Adding')} &ldquo;{formData.name}&rdquo;...
                 </p>
               </div>
             ) : (
@@ -132,7 +134,7 @@ export default function AddFieldModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="field-name" className="agri-form-label agri-form-label--required">
-                      Field Identifier / Name
+                      {t('fields.fieldName', 'Field Identifier / Name')}
                     </label>
                     <input
                       id="field-name"
@@ -148,7 +150,7 @@ export default function AddFieldModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="field-farm" className="agri-form-label agri-form-label--required">
-                      Farm / Holding
+                      {t('fields.farm', 'Farm / Holding')}
                     </label>
                     <select
                       id="field-farm"
@@ -169,7 +171,7 @@ export default function AddFieldModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="field-area" className="agri-form-label agri-form-label--required">
-                      Area (Acres)
+                      {t('fields.area', 'Area')} ({t('units.acres', 'Acres')})
                     </label>
                     <input
                       id="field-area"
@@ -187,7 +189,7 @@ export default function AddFieldModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="field-soil" className="agri-form-label">
-                      Soil Type
+                      {t('fields.soilType', 'Soil Type')}
                     </label>
                     <select
                       id="field-soil"
@@ -196,13 +198,13 @@ export default function AddFieldModal({
                       value={formData.soilType}
                       onChange={handleChange}
                     >
-                      <option value="Alluvial Loam">Alluvial Loam</option>
-                      <option value="Loamy Soil">Loamy Soil</option>
-                      <option value="Deep Black Soil">Deep Black Soil</option>
-                      <option value="Medium Black Soil">Medium Black Soil</option>
-                      <option value="Sandy Loam">Sandy Loam</option>
-                      <option value="Clay Loam">Clay Loam</option>
-                      <option value="Red Sandy Loam">Red Sandy Loam</option>
+                      <option value="Alluvial Loam">{t('soil.types.alluvialLoam', 'Alluvial Loam')}</option>
+                      <option value="Loamy Soil">{t('soil.types.loamySoil', 'Loamy Soil')}</option>
+                      <option value="Deep Black Soil">{t('soil.types.deepBlackSoil', 'Deep Black Soil')}</option>
+                      <option value="Medium Black Soil">{t('soil.types.mediumBlackSoil', 'Medium Black Soil')}</option>
+                      <option value="Sandy Loam">{t('soil.types.sandyLoam', 'Sandy Loam')}</option>
+                      <option value="Clay Loam">{t('soil.types.clayLoam', 'Clay Loam')}</option>
+                      <option value="Red Sandy Loam">{t('soil.types.redSandyLoam', 'Red Sandy Loam')}</option>
                     </select>
                   </div>
                 </div>
@@ -210,7 +212,7 @@ export default function AddFieldModal({
                 <div className="agri-form-grid--2 agri-form-grid">
                   <div className="agri-form-group">
                     <label htmlFor="field-crop" className="agri-form-label">
-                      Current Standing Crop
+                      {t('fields.currentCrop', 'Current Standing Crop')}
                     </label>
                     <input
                       id="field-crop"
@@ -225,7 +227,7 @@ export default function AddFieldModal({
 
                   <div className="agri-form-group">
                     <label htmlFor="field-irrigation" className="agri-form-label">
-                      Irrigation Method
+                      {t('fields.irrigationSystem', 'Irrigation Method')}
                     </label>
                     <select
                       id="field-irrigation"
@@ -234,17 +236,18 @@ export default function AddFieldModal({
                       value={formData.irrigationMethod}
                       onChange={handleChange}
                     >
-                      <option value="Drip Irrigation">Drip Irrigation</option>
-                      <option value="Sprinkler Irrigation">Sprinkler Irrigation</option>
-                      <option value="Furrow Irrigation">Furrow Irrigation</option>
-                      <option value="Canal Flow / Rainfed">Canal Flow / Rainfed</option>
+                      <option value="Drip Irrigation">{t('irrigation.methods.drip', 'Drip Irrigation')}</option>
+                      <option value="Sprinkler Irrigation">{t('irrigation.methods.sprinkler', 'Sprinkler Irrigation')}</option>
+                      <option value="Furrow Irrigation">{t('irrigation.methods.furrow', 'Furrow Irrigation')}</option>
+                      <option value="Canal Flow / Rainfed">{t('irrigation.methods.flood', 'Canal Flow / Rainfed')}</option>
                     </select>
                   </div>
                 </div>
 
+
                 <div className="agri-form-group">
                   <label htmlFor="field-notes" className="agri-form-label">
-                    Plot Boundary Notes
+                    {t('common.notes', 'Plot Boundary Notes')}
                   </label>
                   <textarea
                     id="field-notes"
@@ -263,10 +266,10 @@ export default function AddFieldModal({
           {!submitted && (
             <div className="agri-modal-footer">
               <Button variant="secondary" onClick={onClose} type="button">
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button variant="primary" type="submit">
-                Save Field Plot (Demo)
+                {t('fields.addField', 'Save Field Plot')}
               </Button>
             </div>
           )}

@@ -245,16 +245,16 @@ export const dashboardData = {
 
   // Quick action shortcuts
   quickActions: [
-    { id: 'qa-farm', label: 'Add Farm', path: '/farms', icon: 'Warehouse', description: 'Register farm holding' },
-    { id: 'qa-field', label: 'Add Field', path: '/fields', icon: 'Grid3X3', description: 'Plot new boundary' },
-    { id: 'qa-soil', label: 'Record Soil Test', path: '/soil', icon: 'FlaskConical', description: 'Log N-P-K & pH values' },
-    { id: 'qa-crop', label: 'Add Crop', path: '/crops', icon: 'Sprout', description: 'Start crop cycle' },
-    { id: 'qa-harvest', label: 'Record Harvest', path: '/harvests', icon: 'PackageCheck', description: 'Log produce yield' },
-    { id: 'qa-sale', label: 'Record Sale', path: '/sales', icon: 'Receipt', description: 'Execute crop sale' },
-    { id: 'qa-market', label: 'Market Prices', path: '/market-prices', icon: 'TrendingUp', description: 'View mandi rates' },
-    { id: 'qa-irrigation', label: 'Schedule Irrigation', path: '/irrigation', icon: 'Droplets', description: 'Trigger drip zone' },
-    { id: 'qa-expense', label: 'Record Expense', path: '/expenses', icon: 'CreditCard', description: 'Log input purchase' },
-    { id: 'qa-revenue', label: 'View Revenue', path: '/revenue', icon: 'Wallet', description: 'Track sales revenue' },
-    { id: 'qa-profit-loss', label: 'Profit & Loss', path: '/profit-loss', icon: 'PieChart', description: 'Financial analysis' },
+    { id: 'qa-farm', titleKey: 'dashboard.quickActions.addFarm.title', descriptionKey: 'dashboard.quickActions.addFarm.description', label: 'Add Farm', path: '/farms', icon: 'Warehouse', description: 'Register farm holding' },
+    { id: 'qa-field', titleKey: 'dashboard.quickActions.addField.title', descriptionKey: 'dashboard.quickActions.addField.description', label: 'Add Field', path: '/fields', icon: 'Grid3X3', description: 'Plot new boundary' },
+    { id: 'qa-soil', titleKey: 'dashboard.quickActions.recordSoilTest.title', descriptionKey: 'dashboard.quickActions.recordSoilTest.description', label: 'Record Soil Test', path: '/soil', icon: 'FlaskConical', description: 'Log N-P-K & pH values' },
+    { id: 'qa-crop', titleKey: 'dashboard.quickActions.addCrop.title', descriptionKey: 'dashboard.quickActions.addCrop.description', label: 'Add Crop', path: '/crops', icon: 'Sprout', description: 'Start crop cycle' },
+    { id: 'qa-harvest', titleKey: 'dashboard.quickActions.recordHarvest.title', descriptionKey: 'dashboard.quickActions.recordHarvest.description', label: 'Record Harvest', path: '/harvests', icon: 'PackageCheck', description: 'Log produce yield' },
+    { id: 'qa-sale', titleKey: 'dashboard.quickActions.recordSale.title', descriptionKey: 'dashboard.quickActions.recordSale.description', label: 'Record Sale', path: '/sales', icon: 'Receipt', description: 'Execute crop sale' },
+    { id: 'qa-market', titleKey: 'dashboard.quickActions.marketPrices.title', descriptionKey: 'dashboard.quickActions.marketPrices.description', label: 'Market Prices', path: '/market-prices', icon: 'TrendingUp', description: 'View mandi rates' },
+    { id: 'qa-irrigation', titleKey: 'dashboard.quickActions.scheduleIrrigation.title', descriptionKey: 'dashboard.quickActions.scheduleIrrigation.description', label: 'Schedule Irrigation', path: '/irrigation', icon: 'Droplets', description: 'Trigger drip zone' },
+    { id: 'qa-expense', titleKey: 'dashboard.quickActions.recordExpense.title', descriptionKey: 'dashboard.quickActions.recordExpense.description', label: 'Record Expense', path: '/expenses', icon: 'CreditCard', description: 'Log input purchase' },
+    { id: 'qa-revenue', titleKey: 'dashboard.quickActions.viewRevenue.title', descriptionKey: 'dashboard.quickActions.viewRevenue.description', label: 'View Revenue', path: '/revenue', icon: 'Wallet', description: 'Track sales revenue' },
+    { id: 'qa-profit-loss', titleKey: 'dashboard.quickActions.profitLoss.title', descriptionKey: 'dashboard.quickActions.profitLoss.description', label: 'Profit & Loss', path: '/profit-loss', icon: 'PieChart', description: 'Financial analysis' },
   ],
 };

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Search, RotateCcw, Filter } from 'lucide-react';
 import Button from '../common/Button';
 
@@ -30,6 +31,7 @@ export default function NotificationFilters({
   filteredCount,
   totalCount,
 }) {
+  const { t } = useTranslation();
   const isFiltered =
     Boolean(searchQuery) ||
     typeFilter !== 'all' ||
@@ -45,10 +47,10 @@ export default function NotificationFilters({
           <input
             type="search"
             className="agri-notif-search-input"
-            placeholder="Search by title, farm, field, crop or message..."
+            placeholder={t('notifications.searchPlaceholder', 'Search by title, farm, field, crop or message...')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            aria-label="Search notifications"
+            aria-label={t('common.searchPlaceholder', 'Search notifications')}
           />
         </div>
 
@@ -61,15 +63,15 @@ export default function NotificationFilters({
             onChange={(e) => onTypeChange(e.target.value)}
             aria-label="Filter by notification type"
           >
-            <option value="all">All Types</option>
-            <option value="WEATHER">Weather</option>
-            <option value="IRRIGATION">Irrigation</option>
-            <option value="CROP">Crop</option>
-            <option value="HARVEST">Harvest</option>
-            <option value="SALES">Sales</option>
-            <option value="PAYMENT">Payment</option>
-            <option value="ADVISORY">Advisory</option>
-            <option value="SYSTEM">System</option>
+            <option value="all">{t('common.all', 'All Types')}</option>
+            <option value="WEATHER">{t('notifications.types.weather', 'Weather')}</option>
+            <option value="IRRIGATION">{t('navigation.irrigation', 'Irrigation')}</option>
+            <option value="CROP">{t('crops.crop', 'Crop')}</option>
+            <option value="HARVEST">{t('navigation.harvests', 'Harvest')}</option>
+            <option value="SALES">{t('navigation.sales', 'Sales')}</option>
+            <option value="PAYMENT">{t('sales.paymentMethod', 'Payment')}</option>
+            <option value="ADVISORY">{t('notifications.types.advisory', 'Advisory')}</option>
+            <option value="SYSTEM">{t('navigation.groups.system', 'System')}</option>
           </select>
 
           {/* Status Filter */}
@@ -79,9 +81,9 @@ export default function NotificationFilters({
             onChange={(e) => onStatusChange(e.target.value)}
             aria-label="Filter by read status"
           >
-            <option value="all">All Status</option>
-            <option value="unread">Unread Only</option>
-            <option value="read">Read Only</option>
+            <option value="all">{t('common.allStatuses', 'All Status')}</option>
+            <option value="unread">{t('notifications.unread', 'Unread Only')}</option>
+            <option value="read">{t('notifications.readOnly', 'Read Only')}</option>
           </select>
 
           {/* Severity Filter */}
@@ -91,11 +93,11 @@ export default function NotificationFilters({
             onChange={(e) => onSeverityChange(e.target.value)}
             aria-label="Filter by severity level"
           >
-            <option value="all">All Severities</option>
-            <option value="INFO">Info</option>
-            <option value="SUCCESS">Success</option>
-            <option value="WARNING">Warning</option>
-            <option value="CRITICAL">Critical</option>
+            <option value="all">{t('notifications.allSeverities', 'All Severities')}</option>
+            <option value="INFO">{t('notifications.severities.info', 'Info')}</option>
+            <option value="SUCCESS">{t('notifications.severities.success', 'Success')}</option>
+            <option value="WARNING">{t('notifications.severities.warning', 'Warning')}</option>
+            <option value="CRITICAL">{t('notifications.severities.critical', 'Critical')}</option>
           </select>
 
           {/* Reset Filters button */}
@@ -105,9 +107,9 @@ export default function NotificationFilters({
               size="sm"
               icon={<RotateCcw size={14} />}
               onClick={onClearFilters}
-              title="Reset all filters"
+              title={t('common.clearFilters', 'Reset all filters')}
             >
-              Reset
+              {t('common.clear', 'Reset')}
             </Button>
           )}
         </div>
@@ -117,13 +119,13 @@ export default function NotificationFilters({
       <div className="agri-notif-filter-status-row">
         <div>
           <span>
-            Showing <strong>{filteredCount}</strong> of <strong>{totalCount}</strong> notifications
+            {t('common.showing', 'Showing')} <strong>{filteredCount}</strong> {t('common.of', 'of')} <strong>{totalCount}</strong> {t('notifications.title', 'notifications')}
           </span>
           {isFiltered && (
             <span style={{ marginLeft: '0.5rem' }}>
               <span className="agri-notif-active-filter-badge">
                 <Filter size={11} aria-hidden="true" />
-                Filters Active
+                {t('common.filter', 'Filters Active')}
               </span>
             </span>
           )}
@@ -136,10 +138,11 @@ export default function NotificationFilters({
             onClick={onClearFilters}
             style={{ fontSize: '0.8rem', color: 'var(--primary-600)' }}
           >
-            Clear all filters
+            {t('common.clearFilters', 'Clear all filters')}
           </button>
         )}
       </div>
     </div>
   );
 }
+

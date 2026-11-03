@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   FlaskConical,
   Droplets,
@@ -8,6 +9,7 @@ import {
   Clock,
 } from 'lucide-react';
 import Card from '../common/Card';
+import { translateTime, formatFieldName } from '../../utils/displayLabels';
 
 /**
  * RecentActivities Component
@@ -16,6 +18,8 @@ import Card from '../common/Card';
  * @param {Array} props.activities
  */
 export default function RecentActivities({ activities = [] }) {
+  const { t } = useTranslation();
+
   const getTimelineIcon = (type) => {
     switch (type) {
       case 'soil':
@@ -33,11 +37,11 @@ export default function RecentActivities({ activities = [] }) {
 
   return (
     <Card
-      title="Recent Farm Activities"
-      subtitle="Latest log entries across your holdings"
+      title={t('dashboard.recentActivities', 'Recent Farm Activities')}
+      subtitle={t('activities.subtitle', 'Latest log entries across your holdings')}
       action={
         <Link to="/activities" className="agri-card-action-link">
-          <span>Full activity log</span>
+          <span>{t('dashboard.viewAllActivities', 'Full activity log')}</span>
           <ArrowRight size={14} aria-hidden="true" />
         </Link>
       }
@@ -54,11 +58,13 @@ export default function RecentActivities({ activities = [] }) {
             </div>
 
             <div className="agri-timeline-body">
-              <span className="agri-timeline-title">{item.title}</span>
+              <span className="agri-timeline-title">
+                {t(`dashboard.recentActivitiesData.${item.id}.title`, item.title)}
+              </span>
               <div className="agri-timeline-meta">
-                <strong>{item.field}</strong>
+                <strong>{formatFieldName(item.field, t)}</strong>
                 <span> • </span>
-                <span>{item.timestamp || item.time}</span>
+                <span>{translateTime(item.timestamp || item.time, t)}</span>
               </div>
             </div>
           </div>

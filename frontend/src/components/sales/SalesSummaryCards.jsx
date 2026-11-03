@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Receipt, Scale, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
 import { formatCurrency, formatWeight } from '../../utils/formatters';
 
 export default function SalesSummaryCards({ sales = [] }) {
+  const { t } = useTranslation();
   const totalSales = sales.length;
 
   const totalQuantityKg = sales.reduce(
@@ -31,9 +33,9 @@ export default function SalesSummaryCards({ sales = [] }) {
           <Receipt size={22} />
         </div>
         <div className="agri-sales-summary-card__content">
-          <span className="agri-sales-summary-card__label">Total Invoices</span>
+          <span className="agri-sales-summary-card__label">{t('sales.totalInvoices', 'Total Invoices')}</span>
           <span className="agri-sales-summary-card__value">{totalSales}</span>
-          <span className="agri-sales-summary-card__subtext">Active trade records</span>
+          <span className="agri-sales-summary-card__subtext">{t('sales.activeRecords', 'Active trade records')}</span>
         </div>
       </div>
 
@@ -43,12 +45,12 @@ export default function SalesSummaryCards({ sales = [] }) {
           <Scale size={22} />
         </div>
         <div className="agri-sales-summary-card__content">
-          <span className="agri-sales-summary-card__label">Quantity Sold</span>
+          <span className="agri-sales-summary-card__label">{t('sales.quantitySold', 'Quantity Sold')}</span>
           <span className="agri-sales-summary-card__value">
             {formatWeight(totalQuantityKg, 'kg')}
           </span>
           <span className="agri-sales-summary-card__subtext">
-            {(totalQuantityKg / 100).toFixed(1)} quintals traded
+            {(totalQuantityKg / 100).toFixed(1)} {t('units.quintals', 'quintals')} {t('harvests.traded', 'traded')}
           </span>
         </div>
       </div>
@@ -59,12 +61,12 @@ export default function SalesSummaryCards({ sales = [] }) {
           <Wallet size={22} />
         </div>
         <div className="agri-sales-summary-card__content">
-          <span className="agri-sales-summary-card__label">Total Revenue</span>
+          <span className="agri-sales-summary-card__label">{t('sales.totalRevenue', 'Total Revenue')}</span>
           <span className="agri-sales-summary-card__value">
             {formatCurrency(totalRevenue)}
           </span>
           <span className="agri-sales-summary-card__subtext">
-            Gross invoiced value
+            {t('sales.grossValue', 'Gross invoiced value')}
           </span>
         </div>
       </div>
@@ -75,12 +77,12 @@ export default function SalesSummaryCards({ sales = [] }) {
           <TrendingUp size={22} />
         </div>
         <div className="agri-sales-summary-card__content">
-          <span className="agri-sales-summary-card__label">Avg Realized Price</span>
+          <span className="agri-sales-summary-card__label">{t('sales.avgRealizedPrice', 'Avg Realized Price')}</span>
           <span className="agri-sales-summary-card__value">
             {formatCurrency(avgPricePerQuintal)}/q
           </span>
           <span className="agri-sales-summary-card__subtext">
-            ₹{(avgPricePerQuintal / 100).toFixed(2)}/kg blended
+            ₹{(avgPricePerQuintal / 100).toFixed(2)}/kg
           </span>
         </div>
       </div>
@@ -91,7 +93,7 @@ export default function SalesSummaryCards({ sales = [] }) {
           <AlertCircle size={22} />
         </div>
         <div className="agri-sales-summary-card__content">
-          <span className="agri-sales-summary-card__label">Pending Balance</span>
+          <span className="agri-sales-summary-card__label">{t('sales.pendingBalance', 'Pending Balance')}</span>
           <span
             className="agri-sales-summary-card__value"
             style={{ color: pendingPayments > 0 ? '#b45309' : 'var(--slate-900)' }}
@@ -99,7 +101,7 @@ export default function SalesSummaryCards({ sales = [] }) {
             {formatCurrency(pendingPayments)}
           </span>
           <span className="agri-sales-summary-card__subtext">
-            {pendingPayments > 0 ? 'Awaiting buyer settlement' : 'All accounts settled'}
+            {pendingPayments > 0 ? t('sales.awaitingSettlement', 'Awaiting buyer settlement') : t('sales.allSettled', 'All settled')}
           </span>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Edit3,
@@ -16,6 +17,7 @@ import {
 import { Button } from '../common';
 import ActivityStatusBadge from './ActivityStatusBadge';
 import ActivityTypePill from './ActivityTypePill';
+import { translateCrop, formatFieldName, translateStatus } from '../../utils/displayLabels';
 
 /**
  * ActivityDetailsModal Component
@@ -29,6 +31,7 @@ export default function ActivityDetailsModal({
   farmsMap = {},
   fieldsMap = {},
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Close on Escape key
@@ -46,8 +49,8 @@ export default function ActivityDetailsModal({
 
   const farm = farmsMap[activity.farmId];
   const field = fieldsMap[activity.fieldId];
-  const farmName = farm?.name || activity.farmId;
-  const fieldName = field?.name || activity.fieldId;
+  const farmName = farm?.name ? t(`farms.demoNames.${activity.farmId}`, farm.name) : activity.farmId;
+  const fieldName = field?.name ? formatFieldName(field.name, t) : activity.fieldId;
 
   const handleNavigateToField = () => {
     onClose();
@@ -97,7 +100,7 @@ export default function ActivityDetailsModal({
                         : 'var(--slate-700)',
                   }}
                 >
-                  {activity.priority} Priority
+                  {translateStatus(activity.priority, t)}
                 </span>
               )}
             </div>
@@ -105,14 +108,14 @@ export default function ActivityDetailsModal({
               {activity.title}
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)', fontFamily: 'var(--font-mono)' }}>
-              Activity ID: {activity.id}
+              ID: {activity.id}
             </span>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close activity details modal"
+            aria-label={t('common.close')}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -133,7 +136,7 @@ export default function ActivityDetailsModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                 <Info size={14} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-700)', textTransform: 'uppercase' }}>
-                  Description
+                  {t('common.description')}
                 </span>
               </div>
               <p style={{ fontSize: '0.875rem', color: 'var(--slate-700)', lineHeight: 1.5, margin: 0 }}>
@@ -157,7 +160,7 @@ export default function ActivityDetailsModal({
             {/* Farm */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Farm
+                {t('navigation.farms')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                 <MapPin size={14} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
@@ -168,7 +171,7 @@ export default function ActivityDetailsModal({
             {/* Field with deep link */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Field / Parcel
+                {t('navigation.fields')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
                 <span style={{ fontWeight: 600, color: 'var(--slate-800)' }}>{fieldName}</span>
@@ -187,9 +190,9 @@ export default function ActivityDetailsModal({
                     gap: '0.2rem',
                     padding: 0,
                   }}
-                  title="Navigate to Field page"
+                  title={t('common.viewDetails')}
                 >
-                  <span>View</span>
+                  <span>{t('common.viewDetails')}</span>
                   <ExternalLink size={12} aria-hidden="true" />
                 </button>
               </div>
@@ -198,12 +201,12 @@ export default function ActivityDetailsModal({
             {/* Crop with deep link */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Associated Crop
+                {t('navigation.crops')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                   <Sprout size={14} style={{ color: 'var(--primary-600)' }} aria-hidden="true" />
-                  <span>{activity.cropName || 'N/A'}</span>
+                  <span>{activity.cropName ? translateCrop(activity.cropName, t) : '—'}</span>
                 </div>
                 {activity.fieldId && (
                   <button
@@ -221,9 +224,9 @@ export default function ActivityDetailsModal({
                       gap: '0.2rem',
                       padding: 0,
                     }}
-                    title="Navigate to Crop page"
+                    title={t('common.viewDetails')}
                   >
-                    <span>View</span>
+                    <span>{t('common.viewDetails')}</span>
                     <ExternalLink size={12} aria-hidden="true" />
                   </button>
                 )}
@@ -233,18 +236,18 @@ export default function ActivityDetailsModal({
             {/* Operator */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Operator / Agronomist
+                {t('activities.operator')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 500, color: 'var(--slate-800)' }}>
                 <User size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
-                <span>{activity.operator || 'Assigned Farm Staff'}</span>
+                <span>{activity.operator || '—'}</span>
               </div>
             </div>
 
             {/* Scheduled Date */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Activity Date
+                {t('activities.activityDate')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 500, color: 'var(--slate-800)' }}>
                 <Calendar size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
@@ -255,12 +258,12 @@ export default function ActivityDetailsModal({
             {/* Time & Duration */}
             <div>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Time & Duration
+                {t('common.time')} & {t('irrigation.duration')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 500, color: 'var(--slate-800)' }}>
                 <Clock size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
                 <span>
-                  {activity.time || 'Flexible'} {activity.duration ? `(${activity.duration} hrs)` : ''}
+                  {activity.time || '—'} {activity.duration ? `(${activity.duration} ${t('units.hours')})` : ''}
                 </span>
               </div>
             </div>
@@ -269,7 +272,7 @@ export default function ActivityDetailsModal({
             {activity.quantity && (
               <div style={{ gridColumn: '1 / -1' }}>
                 <span style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textTransform: 'uppercase', fontWeight: 600 }}>
-                  Input Quantity Applied
+                  {t('irrigation.waterQuantity')}
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem', fontWeight: 600, color: 'var(--slate-800)' }}>
                   <Layers size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
@@ -285,7 +288,7 @@ export default function ActivityDetailsModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                 <FileText size={14} style={{ color: 'var(--slate-500)' }} aria-hidden="true" />
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--slate-700)', textTransform: 'uppercase' }}>
-                  Field Notes & Observations
+                  {t('activities.notes')}
                 </span>
               </div>
               <p
@@ -304,13 +307,6 @@ export default function ActivityDetailsModal({
               </p>
             </div>
           )}
-
-          {/* Creation Timestamp */}
-          {activity.createdAt && (
-            <div style={{ fontSize: '0.725rem', color: 'var(--slate-400)', textAlign: 'right' }}>
-              Created: {new Date(activity.createdAt).toLocaleDateString()} {new Date(activity.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </div>
-          )}
         </div>
 
         {/* Footer */}
@@ -322,14 +318,14 @@ export default function ActivityDetailsModal({
               onClose();
               onEdit(activity);
             }}
-            aria-label="Edit this activity"
+            aria-label={t('activities.editActivity')}
           >
             <Edit3 size={14} aria-hidden="true" />
-            <span>Edit Activity</span>
+            <span>{t('activities.editActivity')}</span>
           </Button>
 
           <Button variant="primary" size="sm" onClick={onClose}>
-            Close
+            {t('common.close')}
           </Button>
         </div>
       </div>

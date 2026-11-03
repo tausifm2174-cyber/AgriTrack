@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { PackageCheck, Scale, ShoppingBag, Award, CheckCircle2 } from 'lucide-react';
 import { formatWeight } from '../../utils/formatters';
 
 export default function HarvestSummaryCards({ harvests = [] }) {
+  const { t } = useTranslation();
   const totalHarvests = harvests.length;
 
   const totalHarvestedKg = harvests.reduce(
@@ -36,9 +38,9 @@ export default function HarvestSummaryCards({ harvests = [] }) {
           <PackageCheck size={22} />
         </div>
         <div className="agri-harvest-summary-card__content">
-          <span className="agri-harvest-summary-card__label">Total Harvests</span>
+          <span className="agri-harvest-summary-card__label">{t('harvests.totalHarvests', 'Total Harvests')}</span>
           <span className="agri-harvest-summary-card__value">{totalHarvests}</span>
-          <span className="agri-harvest-summary-card__subtext">Across 3 active farms</span>
+          <span className="agri-harvest-summary-card__subtext">{t('harvests.acrossFarms', 'Across active farms')}</span>
         </div>
       </div>
 
@@ -48,12 +50,12 @@ export default function HarvestSummaryCards({ harvests = [] }) {
           <Scale size={22} />
         </div>
         <div className="agri-harvest-summary-card__content">
-          <span className="agri-harvest-summary-card__label">Total Harvested</span>
+          <span className="agri-harvest-summary-card__label">{t('harvests.harvestQuantity', 'Total Harvested')}</span>
           <span className="agri-harvest-summary-card__value">
             {formatWeight(totalHarvestedKg, 'kg')}
           </span>
           <span className="agri-harvest-summary-card__subtext">
-            {(totalHarvestedKg / 100).toFixed(1)} quintals produced
+            {(totalHarvestedKg / 100).toFixed(1)} {t('units.quintals', 'quintals')}
           </span>
         </div>
       </div>
@@ -64,7 +66,7 @@ export default function HarvestSummaryCards({ harvests = [] }) {
           <ShoppingBag size={22} />
         </div>
         <div className="agri-harvest-summary-card__content">
-          <span className="agri-harvest-summary-card__label">Available For Sale</span>
+          <span className="agri-harvest-summary-card__label">{t('harvests.availableForSale', 'Available For Sale')}</span>
           <span className="agri-harvest-summary-card__value">
             {formatWeight(availableQuantityKg, 'kg')}
           </span>
@@ -82,12 +84,12 @@ export default function HarvestSummaryCards({ harvests = [] }) {
           <CheckCircle2 size={22} />
         </div>
         <div className="agri-harvest-summary-card__content">
-          <span className="agri-harvest-summary-card__label">Sold Quantity</span>
+          <span className="agri-harvest-summary-card__label">{t('harvests.soldQuantity', 'Sold Quantity')}</span>
           <span className="agri-harvest-summary-card__value">
             {formatWeight(soldQuantityKg, 'kg')}
           </span>
           <span className="agri-harvest-summary-card__subtext">
-            {(soldQuantityKg / 100).toFixed(1)} quintals offloaded
+            {(soldQuantityKg / 100).toFixed(1)} {t('units.quintals', 'quintals')}
           </span>
         </div>
       </div>
@@ -98,9 +100,9 @@ export default function HarvestSummaryCards({ harvests = [] }) {
           <Award size={22} />
         </div>
         <div className="agri-harvest-summary-card__content">
-          <span className="agri-harvest-summary-card__label">Average Quality</span>
+          <span className="agri-harvest-summary-card__label">{t('harvests.avgQuality', 'Average Quality')}</span>
           <span className="agri-harvest-summary-card__value">{avgQualityScore} / 100</span>
-          <span className="agri-harvest-summary-card__subtext">Grade A benchmark quality</span>
+          <span className="agri-harvest-summary-card__subtext">{t('harvests.gradeBenchmark', 'Grade A benchmark quality')}</span>
         </div>
       </div>
     </div>

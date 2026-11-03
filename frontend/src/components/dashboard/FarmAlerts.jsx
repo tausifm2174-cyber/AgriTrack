@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Droplets, CloudRain, TrendingUp, Bell, ArrowRight } from 'lucide-react';
 import Card from '../common/Card';
 import StatusBadge from '../common/StatusBadge';
+import { translateTime, formatFieldName } from '../../utils/displayLabels';
 
 /**
  * FarmAlerts Component
@@ -10,6 +12,8 @@ import StatusBadge from '../common/StatusBadge';
  * @param {Array} props.alerts
  */
 export default function FarmAlerts({ alerts = [] }) {
+  const { t } = useTranslation();
+
   const getAlertIcon = (type) => {
     switch (type) {
       case 'irrigation':
@@ -25,11 +29,11 @@ export default function FarmAlerts({ alerts = [] }) {
 
   return (
     <Card
-      title="Farm Alerts & Advisories"
-      subtitle="Critical operational signals & weather advisories"
+      title={t('dashboard.farmAlerts', 'Farm Alerts & Advisories')}
+      subtitle={t('dashboard.activeAlerts', 'Active Alerts')}
       action={
         <Link to="/recommendations" className="agri-card-action-link">
-          <span>View advisories</span>
+          <span>{t('navigation.recommendations', 'Recommendations')}</span>
           <ArrowRight size={14} aria-hidden="true" />
         </Link>
       }
@@ -39,7 +43,7 @@ export default function FarmAlerts({ alerts = [] }) {
           className="agri-card-action-link"
           style={{ justifyContent: 'center', width: '100%', padding: '0.25rem 0', fontWeight: 600 }}
         >
-          <span>Open Notification Center</span>
+          <span>{t('topbar.notificationCenter', 'Open Notification Center')}</span>
           <ArrowRight size={14} aria-hidden="true" />
         </Link>
       }
@@ -53,22 +57,26 @@ export default function FarmAlerts({ alerts = [] }) {
 
             <div className="agri-alert-item__content">
               <div className="agri-alert-item__header">
-                <span className="agri-alert-item__title">{alert.title}</span>
+                <span className="agri-alert-item__title">
+                  {t(`dashboard.alertsData.${alert.id}.title`, alert.title)}
+                </span>
                 <StatusBadge variant={alert.badgeVariant || 'neutral'}>
-                  {alert.time}
+                  {translateTime(alert.time, t)}
                 </StatusBadge>
               </div>
-              <p className="agri-alert-item__msg">{alert.message}</p>
+              <p className="agri-alert-item__msg">
+                {t(`dashboard.alertsData.${alert.id}.message`, alert.message)}
+              </p>
               <p className="agri-alert-item__meta">
                 {alert.type === 'irrigation' ? (
                   <Link
                     to="/irrigation?fieldId=field-2b"
                     style={{ color: 'var(--primary-700)', textDecoration: 'none', fontWeight: 600 }}
                   >
-                    {alert.field} • Open Schedule →
+                    {formatFieldName(alert.field, t)} • {t('dashboard.openSchedule', 'Open Schedule')} →
                   </Link>
                 ) : (
-                  alert.field
+                  formatFieldName(alert.field, t)
                 )}
               </p>
             </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Grid3X3, RotateCcw } from 'lucide-react';
 import FieldCard from './FieldCard';
 import { EmptyState, Button } from '../common';
@@ -12,15 +13,17 @@ export default function FieldGrid({
   onResetFilters,
   isFiltered = false,
 }) {
+  const { t } = useTranslation();
+
   if (fields.length === 0) {
     return (
       <EmptyState
         icon={<Grid3X3 size={32} aria-hidden="true" />}
-        title="No fields found"
+        title={t('fields.noFields', 'No fields found')}
         description={
           isFiltered
-            ? "No agricultural plots match your current search and filter criteria."
-            : "No fields are registered under this holding yet."
+            ? t('common.noData', 'No agricultural plots match your current search and filter criteria.')
+            : t('fields.noFields', 'No fields are registered under this holding yet.')
         }
         action={
           isFiltered && (
@@ -29,7 +32,7 @@ export default function FieldGrid({
               icon={<RotateCcw size={15} aria-hidden="true" />}
               onClick={onResetFilters}
             >
-              Reset Filters
+              {t('common.clear', 'Reset Filters')}
             </Button>
           )
         }
@@ -38,7 +41,7 @@ export default function FieldGrid({
   }
 
   return (
-    <section className="agri-field-grid" aria-label="Field Plots Directory">
+    <section className="agri-field-grid" aria-label={t('fields.title', 'Field Plots Directory')}>
       {fields.map((field) => (
         <FieldCard
           key={field.id}

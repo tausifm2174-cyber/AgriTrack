@@ -1,10 +1,18 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { X, Sprout, Grid3X3, Receipt, PlusCircle, Warehouse, Calendar, CheckCircle2 } from 'lucide-react';
 import { Button } from '../common';
 import HarvestStatusBadge from './HarvestStatusBadge';
 import { formatWeight } from '../../utils/formatters';
+import {
+  translateCrop,
+  translateVariety,
+  translateSeason,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!harvest) return null;
@@ -56,21 +64,21 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
               </span>
               <HarvestStatusBadge status={harvest.status} />
               <span className={`agri-quality-pill ${gradeClass}`}>
-                Grade {harvest.qualityGrade} ({harvest.qualityScore}/100)
+                {t('harvests.grade', 'Grade')} {harvest.qualityGrade} ({harvest.qualityScore}/100)
               </span>
             </div>
             <h3 id="harvest-modal-title" className="agri-modal-title">
-              {harvest.cropName} — {harvest.variety}
+              {translateCrop(harvest.cropName, t)} — {translateVariety(harvest.variety, t)}
             </h3>
             <p className="agri-modal-subtitle">
-              {harvest.farmName} • {harvest.fieldName} ({harvest.season} Season)
+              {t(`farms.demoNames.${harvest.farmId}`, harvest.farmName)} • {formatFieldName(harvest.fieldName, t)} ({translateSeason(harvest.season, t)} {t('crops.season', 'Season')})
             </p>
           </div>
           <button
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
@@ -81,17 +89,17 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
           {/* Quantity Metrics */}
           <div className="agri-harvest-detail-metrics">
             <div className="agri-harvest-detail-metric-card">
-              <span className="agri-harvest-detail-metric-card__label">Harvested Qty</span>
+              <span className="agri-harvest-detail-metric-card__label">{t('harvests.harvestQuantity', 'Harvested Qty')}</span>
               <span className="agri-harvest-detail-metric-card__value">
                 {formatWeight(harvest.harvestedQuantityKg, 'kg')}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {(harvest.harvestedQuantityKg / 100).toFixed(1)} quintals
+                {(harvest.harvestedQuantityKg / 100).toFixed(1)} {t('units.quintals', 'quintals')}
               </span>
             </div>
 
             <div className="agri-harvest-detail-metric-card">
-              <span className="agri-harvest-detail-metric-card__label">Available Qty</span>
+              <span className="agri-harvest-detail-metric-card__label">{t('harvests.availableQuantity', 'Available Qty')}</span>
               <span
                 className="agri-harvest-detail-metric-card__value"
                 style={{ color: harvest.availableQuantityKg > 0 ? 'var(--primary-700)' : 'var(--slate-400)' }}
@@ -99,22 +107,22 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
                 {formatWeight(harvest.availableQuantityKg, 'kg')}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {(harvest.availableQuantityKg / 100).toFixed(1)} quintals in stock
+                {(harvest.availableQuantityKg / 100).toFixed(1)} {t('units.quintals', 'quintals')} {t('harvests.inStock', 'in stock')}
               </span>
             </div>
 
             <div className="agri-harvest-detail-metric-card">
-              <span className="agri-harvest-detail-metric-card__label">Sold Qty</span>
+              <span className="agri-harvest-detail-metric-card__label">{t('harvests.soldQuantity', 'Sold Qty')}</span>
               <span className="agri-harvest-detail-metric-card__value">
                 {formatWeight(harvest.soldQuantityKg, 'kg')}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {(harvest.soldQuantityKg / 100).toFixed(1)} quintals traded
+                {(harvest.soldQuantityKg / 100).toFixed(1)} {t('units.quintals', 'quintals')} {t('harvests.traded', 'traded')}
               </span>
             </div>
 
             <div className="agri-harvest-detail-metric-card">
-              <span className="agri-harvest-detail-metric-card__label">Expected Yield</span>
+              <span className="agri-harvest-detail-metric-card__label">{t('crops.expectedYield', 'Expected Yield')}</span>
               <span className="agri-harvest-detail-metric-card__value">
                 {formatWeight(harvest.expectedYieldKg, 'kg')}
               </span>
@@ -129,8 +137,8 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
           {/* Sales Offload Progress */}
           <div style={{ backgroundColor: '#ffffff', border: '1px solid var(--slate-200)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--slate-700)' }}>
-              <span>Sales Offload & Inventory Depletion</span>
-              <span>{soldPercent}% Offloaded</span>
+              <span>{t('harvests.salesOffload', 'Sales Offload & Inventory Depletion')}</span>
+              <span>{soldPercent}% {t('sales.soldOut', 'Offloaded')}</span>
             </div>
             <div style={{ height: '8px', backgroundColor: 'var(--slate-100)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
               <div
@@ -144,8 +152,8 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
               />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem', fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-              <span>{harvest.soldQuantityKg} kg sold to registered buyers</span>
-              <span>{harvest.availableQuantityKg} kg remaining in storage</span>
+              <span>{harvest.soldQuantityKg} kg {t('harvests.sold', 'sold to registered buyers')}</span>
+              <span>{harvest.availableQuantityKg} kg {t('harvests.remaining', 'remaining in storage')}</span>
             </div>
           </div>
 
@@ -153,28 +161,28 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
           <div className="agri-form-grid agri-form-grid--2">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: 'var(--slate-50)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-                Harvest & Timing
+                {t('harvests.harvestAndTiming', 'Harvest & Timing')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--slate-800)' }}>
                 <Calendar size={16} className="text-primary-600" />
-                <span>Date: <strong>{harvest.harvestDate}</strong></span>
+                <span>{t('common.date', 'Date')}: <strong>{harvest.harvestDate}</strong></span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--slate-800)' }}>
                 <CheckCircle2 size={16} className="text-primary-600" />
-                <span>Moisture Level: <strong>{harvest.moisturePercent}%</strong></span>
+                <span>{t('harvests.moistureLevel', 'Moisture Level')}: <strong>{harvest.moisturePercent}%</strong></span>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: 'var(--slate-50)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--slate-200)' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase' }}>
-                Storage Location
+                {t('harvests.storageLocation', 'Storage Location')}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--slate-800)' }}>
                 <Warehouse size={16} className="text-primary-600" />
-                <span>{harvest.storageLocation || 'On-farm storage yard'}</span>
+                <span>{harvest.storageLocation || t('harvests.onFarmStorage', 'On-farm storage yard')}</span>
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                Batch inspected and certified under post-harvest quality standard.
+                {t('harvests.batchCertified', 'Batch inspected and certified under post-harvest quality standard.')}
               </div>
             </div>
           </div>
@@ -183,7 +191,7 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
           {harvest.notes && (
             <div style={{ backgroundColor: 'var(--slate-50)', border: '1px solid var(--slate-200)', borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--slate-500)', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
-                Field & Quality Observations
+                {t('harvests.observations', 'Field & Quality Observations')}
               </span>
               <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--slate-700)', lineHeight: 1.5 }}>
                 {harvest.notes}
@@ -195,17 +203,17 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
         {/* Footer Navigation Actions */}
         <div className="agri-modal-footer">
           <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto', flexWrap: 'wrap' }}>
-            <Button variant="outline" size="sm" onClick={handleViewCrop} aria-label="View Crop">
+            <Button variant="outline" size="sm" onClick={handleViewCrop} aria-label={t('harvests.viewCrops', 'View Crop')}>
               <Sprout size={14} />
-              <span>View Crop</span>
+              <span>{t('harvests.viewCrops', 'View Crop')}</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleViewField} aria-label="View Field">
+            <Button variant="outline" size="sm" onClick={handleViewField} aria-label={t('navigation.fields', 'View Field')}>
               <Grid3X3 size={14} />
-              <span>View Field</span>
+              <span>{t('navigation.fields', 'View Field')}</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleViewSales} aria-label="View Linked Sales">
+            <Button variant="outline" size="sm" onClick={handleViewSales} aria-label={t('harvests.viewSales', 'View Linked Sales')}>
               <Receipt size={14} />
-              <span>View Sales</span>
+              <span>{t('harvests.viewSales', 'View Sales')}</span>
             </Button>
           </div>
 
@@ -217,14 +225,14 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
                 onClose();
                 onRecordSale(harvest);
               }}
-              aria-label="Record Sale for this Harvest"
+              aria-label={t('sales.addSale', 'Record Sale for this Harvest')}
             >
               <PlusCircle size={15} />
-              <span>Sell Produce</span>
+              <span>{t('harvests.sellProduce', 'Sell Produce')}</span>
             </Button>
           )}
-          <Button variant="secondary" size="sm" onClick={onClose} aria-label="Close modal">
-            Close
+          <Button variant="secondary" size="sm" onClick={onClose} aria-label={t('common.close', 'Close modal')}>
+            {t('common.close', 'Close')}
           </Button>
         </div>
       </div>

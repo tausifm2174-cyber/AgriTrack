@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Warehouse, MapPin } from 'lucide-react';
 import Card from '../common/Card';
 import StatusBadge from '../common/StatusBadge';
@@ -10,15 +11,16 @@ import { formatAcres } from '../../utils/formatters';
  * Displays registered land holdings under the farmer profile.
  */
 export default function FarmSummary() {
+  const { t } = useTranslation();
   const { farms = [] } = farmData;
 
   return (
     <Card
-      title="Registered Land Holdings"
-      subtitle="Operational farms currently assigned to this profile"
+      title={t('profile.landHoldings', 'Registered Land Holdings')}
+      subtitle={t('profile.landHoldingsSub', 'Operational farms currently assigned to this profile')}
       action={
         <Link to="/farms" className="agri-card-action-link">
-          <span>Manage holdings</span>
+          <span>{t('profile.manageHoldings', 'Manage holdings')}</span>
           <ArrowRight size={14} aria-hidden="true" />
         </Link>
       }
@@ -51,20 +53,20 @@ export default function FarmSummary() {
                 </div>
                 <div className="agri-profile-farm-meta">
                   <MapPin size={11} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
-                  {farm.location} • {formatAcres(farm.areaAcres)} • {farm.fieldsCount} Fields
+                  {farm.location} • {formatAcres(farm.areaAcres)} • {farm.fieldsCount} {t('fields.title', 'Fields')}
                 </div>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <StatusBadge variant="success">Active</StatusBadge>
+              <StatusBadge variant="success">{t('status.active', 'Active')}</StatusBadge>
               <Link
                 to={`/fields?farmId=${farm.id}`}
                 className="agri-btn agri-btn--ghost agri-btn--sm"
                 style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
-                title={`View ${farm.name} fields`}
+                title={`${t('common.viewDetails', 'View')} ${farm.name} ${t('fields.title', 'fields')}`}
               >
-                Fields
+                {t('fields.title', 'Fields')}
               </Link>
             </div>
           </div>
@@ -73,3 +75,4 @@ export default function FarmSummary() {
     </Card>
   );
 }
+

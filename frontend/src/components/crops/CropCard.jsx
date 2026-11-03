@@ -1,7 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import { Sprout, Warehouse, Grid3X3, Layers, Eye, Edit3 } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
 import CropLifecycleProgress from './CropLifecycleProgress';
+import {
+  translateCrop,
+  translateVariety,
+  translateSeason,
+  translateSoilType,
+  translateStatus,
+  formatFieldName,
+} from '../../utils/displayLabels';
 
 /**
  * CropCard component
@@ -19,6 +28,8 @@ export default function CropCard({
   onViewLifecycle,
   onEdit,
 }) {
+  const { t } = useTranslation();
+
   return (
     <article className="agri-crop-card" aria-labelledby={`crop-title-${crop.id}`}>
       {/* Card Header */}
@@ -27,27 +38,27 @@ export default function CropCard({
           <div className="agri-crop-card__name-row">
             <Sprout size={18} className="text-primary" aria-hidden="true" />
             <h2 id={`crop-title-${crop.id}`} className="agri-crop-card__name">
-              {crop.cropName} {crop.variety ? `– ${crop.variety}` : ''}
+              {translateCrop(crop.cropName, t)} {crop.variety ? `– ${translateVariety(crop.variety, t)}` : ''}
             </h2>
           </div>
           <div className="agri-crop-card__location-sub">
             <span className="agri-crop-card__farm-pill">
               <Warehouse size={12} aria-hidden="true" />
-              <span>{crop.farmName}</span>
+              <span>{t(`farms.demoNames.${crop.farmId}`, crop.farmName)}</span>
             </span>
             <span className="agri-crop-card__dot-sep">•</span>
             <span className="agri-crop-card__field-pill">
               <Grid3X3 size={12} aria-hidden="true" />
-              <span>{crop.fieldName}</span>
+              <span>{formatFieldName(crop.fieldName, t)}</span>
             </span>
           </div>
         </div>
 
         <div className="agri-crop-card__badge-stack">
           <StatusBadge variant={crop.statusVariant || 'success'}>
-            {crop.status}
+            {translateStatus(crop.status, t)}
           </StatusBadge>
-          <span className="agri-crop-card__season-badge">{crop.season}</span>
+          <span className="agri-crop-card__season-badge">{translateSeason(crop.season, t)}</span>
         </div>
       </div>
 
@@ -56,22 +67,22 @@ export default function CropCard({
         {/* Specs Grid */}
         <div className="agri-crop-card__specs">
           <div className="agri-crop-card__spec-item">
-            <span className="agri-crop-card__spec-label">Cultivated Area</span>
+            <span className="agri-crop-card__spec-label">{t('fields.area', 'Cultivated Area')}</span>
             <span className="agri-crop-card__spec-value">{formatAcres(crop.areaAcres)}</span>
           </div>
 
           <div className="agri-crop-card__spec-item">
-            <span className="agri-crop-card__spec-label">Soil Medium</span>
-            <span className="agri-crop-card__spec-value">{crop.soilType || 'Loam'}</span>
+            <span className="agri-crop-card__spec-label">{t('fields.soilType', 'Soil Medium')}</span>
+            <span className="agri-crop-card__spec-value">{translateSoilType(crop.soilType, t)}</span>
           </div>
 
           <div className="agri-crop-card__spec-item">
-            <span className="agri-crop-card__spec-label">Sowing Date</span>
+            <span className="agri-crop-card__spec-label">{t('crops.sowingDate', 'Sowing Date')}</span>
             <span className="agri-crop-card__spec-value">{crop.sowingDate}</span>
           </div>
 
           <div className="agri-crop-card__spec-item">
-            <span className="agri-crop-card__spec-label">Expected Harvest</span>
+            <span className="agri-crop-card__spec-label">{t('crops.expectedHarvest', 'Expected Harvest')}</span>
             <span className="agri-crop-card__spec-value">{crop.expectedHarvestDate}</span>
           </div>
         </div>
@@ -90,7 +101,7 @@ export default function CropCard({
         {/* Upcoming Milestone preview */}
         {crop.upcomingMilestone && (
           <div className="agri-crop-card__milestone">
-            <span className="agri-crop-card__milestone-label">Upcoming Milestone:</span>
+            <span className="agri-crop-card__milestone-label">{t('cropCalendar.milestoneName', 'Upcoming Milestone')}:</span>
             <span className="agri-crop-card__milestone-val">
               {crop.upcomingMilestone} {crop.upcomingMilestoneDate ? `(${crop.upcomingMilestoneDate})` : ''}
             </span>
@@ -107,7 +118,7 @@ export default function CropCard({
             icon={<Eye size={14} aria-hidden="true" />}
             onClick={() => onViewDetails(crop)}
           >
-            Details
+            {t('common.details', 'Details')}
           </Button>
           <Button
             variant="ghost"
@@ -115,7 +126,7 @@ export default function CropCard({
             icon={<Layers size={14} aria-hidden="true" />}
             onClick={() => onViewLifecycle(crop)}
           >
-            Lifecycle
+            {t('crops.lifecycleProgress', 'Lifecycle')}
           </Button>
         </div>
 
@@ -125,7 +136,7 @@ export default function CropCard({
           icon={<Edit3 size={14} aria-hidden="true" />}
           onClick={() => onEdit(crop)}
         >
-          Edit
+          {t('common.edit', 'Edit')}
         </Button>
       </div>
     </article>

@@ -1,15 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { CloudRain, AlertTriangle, CheckCircle, Droplets, Info } from 'lucide-react';
 import { StatusBadge } from '../common';
 
 /**
  * AdvisoryCard component
  * Displays "Current Farm Advisories" section evaluated against local weather demo rules.
- *
- * @param {Object} props
- * @param {Array} props.advisories - List of active advisories
- * @param {string} [props.farmName] - Target farm holding
  */
 export default function AdvisoryCard({ advisories = [], farmName = 'Green Valley Farm' }) {
+  const { t } = useTranslation();
+
   const getIcon = (type) => {
     switch (type) {
       case 'irrigation':
@@ -26,12 +25,12 @@ export default function AdvisoryCard({ advisories = [], farmName = 'Green Valley
   };
 
   return (
-    <section className="agri-advisory-section" aria-label="Current Farm Advisories">
+    <section className="agri-advisory-section" aria-label={t('recommendations.currentFarmAdvisories', 'Current Farm Advisories')}>
       <div className="agri-advisory-section__header">
         <div>
-          <h2 className="agri-advisory-section__title">Current Farm Advisories</h2>
+          <h2 className="agri-advisory-section__title">{t('recommendations.currentFarmAdvisories', 'Current Farm Advisories')}</h2>
           <p className="agri-advisory-section__subtitle">
-            Rule-based operational directives generated from current micro-climate conditions at {farmName}
+            {t('recommendations.directivesGenerated', 'Rule-based operational directives generated from current micro-climate conditions at')} {farmName}
           </p>
         </div>
       </div>
@@ -57,12 +56,12 @@ export default function AdvisoryCard({ advisories = [], farmName = 'Green Valley
 
             <div className="agri-advisory-card__body">
               <div className="agri-advisory-card__row">
-                <span className="agri-advisory-card__label">Trigger Condition:</span>
+                <span className="agri-advisory-card__label">{t('recommendations.triggerCondition', 'Trigger Condition')}:</span>
                 <span className="agri-advisory-card__val">{adv.triggerCondition}</span>
               </div>
 
               <div className="agri-advisory-card__action-box">
-                <span className="agri-advisory-card__action-label">Recommended Action:</span>
+                <span className="agri-advisory-card__action-label">{t('weather.recommendedAction', 'Recommended Action')}:</span>
                 <span className="agri-advisory-card__action-val">{adv.recommendedAction}</span>
               </div>
             </div>

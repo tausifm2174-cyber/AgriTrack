@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, X, Filter } from 'lucide-react';
 import { ACTIVITY_TYPES, ACTIVITY_STATUSES } from '../../data/activityData';
+import { formatFieldName, translateCrop, translateStatus } from '../../utils/displayLabels';
 
 /**
  * ActivityFilters Component
@@ -16,6 +18,8 @@ export default function ActivityFilters({
   crops = [],
   totalResultsCount = 0,
 }) {
+  const { t } = useTranslation();
+
   // Farm-dependent fields list
   const availableFields = useMemo(() => {
     if (!filters.farmId) return fields;
@@ -74,7 +78,7 @@ export default function ActivityFilters({
   ].filter(Boolean).length;
 
   return (
-    <div className="agri-activity-filter-toolbar" role="search" aria-label="Filter Activities">
+    <div className="agri-activity-filter-toolbar" role="search" aria-label={t('common.filter')}>
       {/* Top Row: Search and primary selects */}
       <div className="agri-activity-filter-row-top">
         {/* Search Input */}
@@ -83,10 +87,10 @@ export default function ActivityFilters({
           <input
             type="text"
             className="agri-activity-search-input"
-            placeholder="Search activities, crops, fields, notes..."
+            placeholder={`${t('common.search')} ${t('navigation.activities').toLowerCase()}...`}
             value={filters.search || ''}
             onChange={(e) => onFilterChange({ search: e.target.value })}
-            aria-label="Search activities"
+            aria-label={t('common.search')}
           />
         </div>
 
@@ -97,12 +101,12 @@ export default function ActivityFilters({
             className="agri-activity-select"
             value={filters.farmId || ''}
             onChange={handleFarmChange}
-            aria-label="Filter by Farm"
+            aria-label={t('navigation.farms')}
           >
-            <option value="">All Farms</option>
+            <option value="">{t('common.all')} {t('navigation.farms')}</option>
             {farms.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name}
+                {t(`farms.demoNames.${f.id}`, f.name)}
               </option>
             ))}
           </select>
@@ -112,12 +116,12 @@ export default function ActivityFilters({
             className="agri-activity-select"
             value={filters.fieldId || ''}
             onChange={(e) => onFilterChange({ fieldId: e.target.value })}
-            aria-label="Filter by Field"
+            aria-label={t('navigation.fields')}
           >
-            <option value="">{filters.farmId ? 'All Farm Fields' : 'All Fields'}</option>
+            <option value="">{t('common.all')} {t('navigation.fields')}</option>
             {availableFields.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} ({f.currentCrop || 'No Crop'})
+                {formatFieldName(f.name, t)} ({f.currentCrop ? translateCrop(f.currentCrop, t) : '—'})
               </option>
             ))}
           </select>
@@ -127,12 +131,12 @@ export default function ActivityFilters({
             className="agri-activity-select"
             value={filters.cropName || ''}
             onChange={(e) => onFilterChange({ cropName: e.target.value })}
-            aria-label="Filter by Crop"
+            aria-label={t('navigation.crops')}
           >
-            <option value="">All Crops</option>
+            <option value="">{t('common.all')} {t('navigation.crops')}</option>
             {availableCrops.map((cropName) => (
               <option key={cropName} value={cropName}>
-                {cropName}
+                {translateCrop(cropName, t)}
               </option>
             ))}
           </select>
@@ -142,12 +146,12 @@ export default function ActivityFilters({
             className="agri-activity-select"
             value={filters.activityType || ''}
             onChange={(e) => onFilterChange({ activityType: e.target.value })}
-            aria-label="Filter by Activity Type"
+            aria-label={t('activities.activityType')}
           >
-            <option value="">All Types</option>
+            <option value="">{t('common.all')} {t('activities.activityType')}</option>
             {ACTIVITY_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {t(`activityTypes.${type.toLowerCase().replace(/\s+/g, '')}`, type)}
               </option>
             ))}
           </select>
@@ -157,12 +161,12 @@ export default function ActivityFilters({
             className="agri-activity-select"
             value={filters.status || ''}
             onChange={(e) => onFilterChange({ status: e.target.value })}
-            aria-label="Filter by Status"
+            aria-label={t('common.status')}
           >
-            <option value="">All Statuses</option>
+            <option value="">{t('common.all')} {t('common.status')}</option>
             {ACTIVITY_STATUSES.map((status) => (
               <option key={status} value={status}>
-                {status}
+                {translateStatus(status, t)}
               </option>
             ))}
           </select>
@@ -174,8 +178,8 @@ export default function ActivityFilters({
             style={{ paddingRight: '0.75rem', backgroundImage: 'none' }}
             value={filters.date || ''}
             onChange={(e) => onFilterChange({ date: e.target.value })}
-            aria-label="Filter by Date"
-            title="Filter by Activity Date"
+            aria-label={t('common.date')}
+            title={t('common.date')}
           />
         </div>
       </div>
@@ -184,25 +188,25 @@ export default function ActivityFilters({
       <div className="agri-activity-filter-status-row">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
           <span style={{ fontWeight: 500, color: 'var(--slate-600)' }}>
-            Showing <strong>{totalResultsCount}</strong> {totalResultsCount === 1 ? 'activity' : 'activities'}
+            <strong>{totalResultsCount}</strong> {t('navigation.activities').toLowerCase()}
           </span>
 
           {hasActiveFilters && (
             <span className="agri-activity-active-filter-badge">
               <Filter size={12} aria-hidden="true" />
-              {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active
+              {activeFilterCount} {t('common.filter').toLowerCase()}
             </span>
           )}
 
           {filters.fieldId && (
             <span className="agri-activity-active-filter-badge" style={{ backgroundColor: 'var(--slate-100)', color: 'var(--slate-700)' }}>
-              Field: {fields.find((f) => f.id === filters.fieldId)?.name || filters.fieldId}
+              {t('activities.field')}: {fields.find((f) => f.id === filters.fieldId)?.name || filters.fieldId}
             </span>
           )}
 
           {filters.farmId && (
             <span className="agri-activity-active-filter-badge" style={{ backgroundColor: 'var(--slate-100)', color: 'var(--slate-700)' }}>
-              Farm: {farms.find((f) => f.id === filters.farmId)?.name || filters.farmId}
+              {t('navigation.farms')}: {farms.find((f) => f.id === filters.farmId)?.name || filters.farmId}
             </span>
           )}
         </div>
@@ -215,7 +219,7 @@ export default function ActivityFilters({
             onClick={onResetFilters}
           >
             <X size={13} aria-hidden="true" />
-            Clear Filters
+            {t('common.clear')}
           </button>
         )}
       </div>

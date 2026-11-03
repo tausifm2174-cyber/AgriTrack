@@ -1,4 +1,5 @@
 import { useState, useEffect, useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Check, CalendarPlus, Edit3, AlertCircle } from 'lucide-react';
 import { Button } from '../common';
 import { ACTIVITY_TYPES, ACTIVITY_STATUSES } from '../../data/activityData';
@@ -15,6 +16,7 @@ function ActivityFormContent({
   onSave,
   onClose,
 }) {
+  const { t } = useTranslation();
   const isEditMode = Boolean(activityToEdit);
 
   // Form field unique IDs for accessibility
@@ -130,33 +132,33 @@ function ActivityFormContent({
     const newErrors = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Activity title is required';
+      newErrors.title = t('validation.required');
     }
     if (!formData.activityType) {
-      newErrors.activityType = 'Activity type is required';
+      newErrors.activityType = t('validation.required');
     }
     if (!formData.farmId) {
-      newErrors.farmId = 'Farm selection is required';
+      newErrors.farmId = t('validation.selectFarm');
     }
     if (!formData.fieldId) {
-      newErrors.fieldId = 'Field selection is required';
+      newErrors.fieldId = t('validation.selectField');
     }
     if (!formData.cropName.trim()) {
-      newErrors.cropName = 'Crop name is required';
+      newErrors.cropName = t('validation.selectCrop');
     }
     if (!formData.date) {
-      newErrors.date = 'Activity date is required';
+      newErrors.date = t('validation.enterValidDate');
     }
     if (!formData.status) {
-      newErrors.status = 'Activity status is required';
+      newErrors.status = t('validation.required');
     }
 
     if (formData.duration && (isNaN(Number(formData.duration)) || Number(formData.duration) <= 0)) {
-      newErrors.duration = 'Duration must be a positive number';
+      newErrors.duration = t('validation.enterValidNumber');
     }
 
     if (formData.quantity && (isNaN(Number(formData.quantity)) || Number(formData.quantity) < 0)) {
-      newErrors.quantity = 'Quantity must be zero or a positive number';
+      newErrors.quantity = t('validation.enterValidQuantity');
     }
 
     setErrors(newErrors);
@@ -203,7 +205,7 @@ function ActivityFormContent({
           {/* Activity Type */}
           <div className="agri-form-group">
             <label htmlFor={typeId} className="agri-form-label agri-form-label--required">
-              Activity Type
+              {t('activities.activityType')}
             </label>
             <select
               id={typeId}
@@ -229,7 +231,7 @@ function ActivityFormContent({
           {/* Status */}
           <div className="agri-form-group">
             <label htmlFor={statusId} className="agri-form-label agri-form-label--required">
-              Activity Status
+              {t('common.status')}
             </label>
             <select
               id={statusId}
@@ -255,7 +257,7 @@ function ActivityFormContent({
           {/* Title (Full Width) */}
           <div className="agri-form-group agri-form-grid--full">
             <label htmlFor={titleId} className="agri-form-label agri-form-label--required">
-              Activity Title
+              {t('common.name')}
             </label>
             <input
               id={titleId}
@@ -277,7 +279,7 @@ function ActivityFormContent({
           {/* Farm Selection (Dependent parent) */}
           <div className="agri-form-group">
             <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
-              Select Farm
+              {t('navigation.farms')}
             </label>
             <select
               id={farmSelectId}
@@ -286,7 +288,7 @@ function ActivityFormContent({
               value={formData.farmId}
               onChange={handleFarmChange}
             >
-              <option value="">-- Choose Farm --</option>
+              <option value="">-- {t('navigation.farms')} --</option>
               {farms.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name}
@@ -304,7 +306,7 @@ function ActivityFormContent({
           {/* Field Selection (Dependent child) */}
           <div className="agri-form-group">
             <label htmlFor={fieldSelectId} className="agri-form-label agri-form-label--required">
-              Select Field
+              {t('navigation.fields')}
             </label>
             <select
               id={fieldSelectId}
@@ -314,10 +316,10 @@ function ActivityFormContent({
               onChange={handleFieldChange}
               disabled={availableFields.length === 0}
             >
-              <option value="">-- Choose Field --</option>
+              <option value="">-- {t('navigation.fields')} --</option>
               {availableFields.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name} ({f.currentCrop || 'No standing crop'})
+                  {f.name} ({f.currentCrop || '—'})
                 </option>
               ))}
             </select>
@@ -332,7 +334,7 @@ function ActivityFormContent({
           {/* Crop Name */}
           <div className="agri-form-group">
             <label htmlFor={cropInputId} className="agri-form-label agri-form-label--required">
-              Associated Crop
+              {t('navigation.crops')}
             </label>
             <input
               id={cropInputId}
@@ -363,16 +365,17 @@ function ActivityFormContent({
               value={formData.priority}
               onChange={handleChange}
             >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
+              <option value="Low">{t('activities.priorityLevels.low', 'Low')}</option>
+              <option value="Medium">{t('activities.priorityLevels.medium', 'Medium')}</option>
+              <option value="High">{t('activities.priorityLevels.high', 'High')}</option>
             </select>
           </div>
+
 
           {/* Date */}
           <div className="agri-form-group">
             <label htmlFor={dateId} className="agri-form-label agri-form-label--required">
-              Activity Date
+              {t('activities.activityDate')}
             </label>
             <input
               id={dateId}
@@ -393,7 +396,7 @@ function ActivityFormContent({
           {/* Time */}
           <div className="agri-form-group">
             <label htmlFor={timeId} className="agri-form-label">
-              Scheduled Time
+              {t('common.time')}
             </label>
             <input
               id={timeId}
@@ -409,7 +412,7 @@ function ActivityFormContent({
           {/* Duration */}
           <div className="agri-form-group">
             <label htmlFor={durationId} className="agri-form-label">
-              Duration (hours)
+              {t('irrigation.duration')} ({t('units.hours')})
             </label>
             <input
               id={durationId}
@@ -433,7 +436,7 @@ function ActivityFormContent({
           {/* Operator */}
           <div className="agri-form-group">
             <label htmlFor={operatorId} className="agri-form-label">
-              Assigned Operator
+              {t('activities.operator')}
             </label>
             <input
               id={operatorId}
@@ -449,7 +452,7 @@ function ActivityFormContent({
           {/* Quantity & Unit */}
           <div className="agri-form-group">
             <label htmlFor={quantityId} className="agri-form-label">
-              Input Quantity (Optional)
+              {t('irrigation.waterQuantity')}
             </label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input
@@ -474,10 +477,11 @@ function ActivityFormContent({
               >
                 <option value="kg">kg</option>
                 <option value="L">L</option>
-                <option value="bags">bags</option>
-                <option value="hours">hours</option>
-                <option value="units">units</option>
+                <option value="bags">{t('units.bags', 'bags')}</option>
+                <option value="hours">{t('units.hours', 'hours')}</option>
+                <option value="units">{t('units.units', 'units')}</option>
               </select>
+
             </div>
             {errors.quantity && (
               <span className="agri-form-error">
@@ -490,7 +494,7 @@ function ActivityFormContent({
           {/* Description */}
           <div className="agri-form-group agri-form-grid--full">
             <label htmlFor={descriptionId} className="agri-form-label">
-              Description / Objective
+              {t('common.description')}
             </label>
             <textarea
               id={descriptionId}
@@ -506,7 +510,7 @@ function ActivityFormContent({
           {/* Notes */}
           <div className="agri-form-group agri-form-grid--full">
             <label htmlFor={notesId} className="agri-form-label">
-              Field Observations & Agronomic Notes
+              {t('activities.notes')}
             </label>
             <textarea
               id={notesId}
@@ -524,11 +528,11 @@ function ActivityFormContent({
       {/* Footer Actions */}
       <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
         <Button variant="ghost" size="sm" type="button" onClick={onClose}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button variant="primary" size="sm" type="submit">
           <Check size={14} aria-hidden="true" />
-          <span>{isEditMode ? 'Update Activity' : 'Save Activity'}</span>
+          <span>{isEditMode ? t('common.save') : t('activities.addActivity')}</span>
         </Button>
       </div>
     </form>
@@ -547,6 +551,7 @@ export default function AddActivityModal({
   farms = [],
   fields = [],
 }) {
+  const { t } = useTranslation();
   const isEditMode = Boolean(activityToEdit);
 
   // Close on Escape key
@@ -597,12 +602,12 @@ export default function AddActivityModal({
             </div>
             <div>
               <h3 id="activity-modal-heading" className="agri-modal-title">
-                {isEditMode ? 'Edit Activity' : 'Schedule New Activity'}
+                {isEditMode ? t('activities.editActivity') : t('activities.addActivity')}
               </h3>
               <p style={{ fontSize: '0.75rem', color: 'var(--slate-500)', margin: 0 }}>
                 {isEditMode
-                  ? `Updating record ${activityToEdit?.id}`
-                  : 'Assign tasks, operations, and agronomic events'}
+                  ? `${activityToEdit?.id}`
+                  : t('activities.subtitle')}
               </p>
             </div>
           </div>
@@ -610,7 +615,7 @@ export default function AddActivityModal({
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
-            aria-label="Close activity modal"
+            aria-label={t('common.close')}
           >
             <X size={20} aria-hidden="true" />
           </button>

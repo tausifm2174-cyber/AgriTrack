@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Eye, Edit3, Trash2, Calendar, Clock, MapPin, Ban } from 'lucide-react';
 import { Button } from '../common';
 import IrrigationStatusBadge from './IrrigationStatusBadge';
@@ -25,21 +26,23 @@ export default function IrrigationTable({
   farmsMap = {},
   fieldsMap = {},
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="agri-irrigation-table-container">
       <div className="agri-irrigation-table-scroll">
-        <table className="agri-irrigation-table" aria-label="Irrigation Schedules">
+        <table className="agri-irrigation-table" aria-label={t('navigation.irrigation')}>
           <thead>
             <tr>
-              <th>Schedule</th>
-              <th>Farm / Field</th>
-              <th>Crop</th>
-              <th>Date & Time</th>
-              <th>Method</th>
-              <th>Duration</th>
-              <th>Water Volume</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>{t('navigation.irrigation')}</th>
+              <th>{t('navigation.farms')} / {t('navigation.fields')}</th>
+              <th>{t('navigation.crops')}</th>
+              <th>{t('common.date')} & {t('common.time')}</th>
+              <th>{t('irrigation.method')}</th>
+              <th>{t('irrigation.duration')}</th>
+              <th>{t('irrigation.waterQuantity')}</th>
+              <th>{t('common.status')}</th>
+              <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -165,21 +168,21 @@ export default function IrrigationTable({
                         variant="outline"
                         size="sm"
                         onClick={() => onViewSchedule(schedule)}
-                        aria-label={`View details for ${schedule.title}`}
-                        title="View details"
+                        aria-label={`${t('common.viewDetails')}: ${schedule.title}`}
+                        title={t('common.viewDetails')}
                       >
                         <Eye size={13} aria-hidden="true" />
-                        <span>View</span>
+                        <span>{t('common.viewDetails')}</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => onEditSchedule(schedule)}
-                        aria-label={`Edit ${schedule.title}`}
-                        title="Edit schedule"
+                        aria-label={`${t('common.edit')}: ${schedule.title}`}
+                        title={t('common.edit')}
                       >
                         <Edit3 size={13} aria-hidden="true" />
-                        <span>Edit</span>
+                        <span>{t('common.edit')}</span>
                       </Button>
 
                       {isScheduled && onCancelSchedule && (
@@ -199,8 +202,8 @@ export default function IrrigationTable({
                             cursor: 'pointer',
                           }}
                           onClick={() => onCancelSchedule(schedule)}
-                          aria-label={`Cancel schedule for ${schedule.title}`}
-                          title="Cancel scheduled run"
+                          aria-label={`${t('common.cancel')}: ${schedule.title}`}
+                          title={t('common.cancel')}
                         >
                           <Ban size={13} aria-hidden="true" />
                         </button>
@@ -223,8 +226,8 @@ export default function IrrigationTable({
                             cursor: 'pointer',
                           }}
                           onClick={() => onDeleteSchedule(schedule)}
-                          aria-label={`Delete ${schedule.title}`}
-                          title="Delete schedule"
+                          aria-label={`${t('common.delete')}: ${schedule.title}`}
+                          title={t('common.delete')}
                         >
                           <Trash2 size={13} aria-hidden="true" />
                         </button>

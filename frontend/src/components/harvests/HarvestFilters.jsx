@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { Search, LayoutGrid, Table, X } from 'lucide-react';
+import { translateCrop } from '../../utils/displayLabels';
 
 export default function HarvestFilters({
   searchQuery,
@@ -19,6 +21,7 @@ export default function HarvestFilters({
   cropList = [],
   farmList = [],
 }) {
+  const { t } = useTranslation();
   const isFiltered =
     Boolean(searchQuery) ||
     selectedFarm !== 'ALL' ||
@@ -36,10 +39,10 @@ export default function HarvestFilters({
           <input
             type="text"
             className="agri-harvest-filters__search-input"
-            placeholder="Search by crop, farm, field..."
+            placeholder={t('harvests.searchPlaceholder', 'Search by crop, farm, field...')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            aria-label="Search harvests"
+            aria-label={t('harvests.searchAria', 'Search harvests')}
           />
         </div>
 
@@ -48,12 +51,12 @@ export default function HarvestFilters({
           className="agri-harvest-filters__select"
           value={selectedFarm}
           onChange={(e) => onFarmChange(e.target.value)}
-          aria-label="Filter by farm"
+          aria-label={t('fields.filterByFarm', 'Filter by farm')}
         >
-          <option value="ALL">All Farms</option>
+          <option value="ALL">{t('common.allFarms', 'All Farms')}</option>
           {farmList.map((farm) => (
             <option key={farm.id} value={farm.id}>
-              {farm.name}
+              {t(`farms.demoNames.${farm.id}`, farm.name)}
             </option>
           ))}
         </select>
@@ -63,12 +66,12 @@ export default function HarvestFilters({
           className="agri-harvest-filters__select"
           value={selectedCrop}
           onChange={(e) => onCropChange(e.target.value)}
-          aria-label="Filter by crop"
+          aria-label={t('common.filterBy', 'Filter by crop')}
         >
-          <option value="ALL">All Crops</option>
+          <option value="ALL">{t('common.allCrops', 'All Crops')}</option>
           {cropList.map((crop) => (
             <option key={crop} value={crop}>
-              {crop}
+              {translateCrop(crop, t)}
             </option>
           ))}
         </select>
@@ -78,13 +81,13 @@ export default function HarvestFilters({
           className="agri-harvest-filters__select"
           value={selectedStatus}
           onChange={(e) => onStatusChange(e.target.value)}
-          aria-label="Filter by status"
+          aria-label={t('common.status', 'Filter by status')}
         >
-          <option value="ALL">All Statuses</option>
-          <option value="PLANNED">Planned</option>
-          <option value="HARVESTED">Harvested</option>
-          <option value="PARTIALLY_SOLD">Partially Sold</option>
-          <option value="SOLD_OUT">Sold Out</option>
+          <option value="ALL">{t('common.allStatuses', 'All Statuses')}</option>
+          <option value="PLANNED">{t('status.planned', 'Planned')}</option>
+          <option value="HARVESTED">{t('harvests.harvested', 'Harvested')}</option>
+          <option value="PARTIALLY_SOLD">{t('sales.partiallySold', 'Partially Sold')}</option>
+          <option value="SOLD_OUT">{t('sales.soldOut', 'Sold Out')}</option>
         </select>
 
         {/* Grade Select */}
@@ -92,12 +95,12 @@ export default function HarvestFilters({
           className="agri-harvest-filters__select"
           value={selectedGrade}
           onChange={(e) => onGradeChange(e.target.value)}
-          aria-label="Filter by quality grade"
+          aria-label={t('harvests.quality', 'Filter by quality grade')}
         >
-          <option value="ALL">All Grades</option>
-          <option value="A">Grade A (Premium)</option>
-          <option value="B">Grade B (Standard)</option>
-          <option value="C">Grade C (Commercial)</option>
+          <option value="ALL">{t('harvests.allGrades', 'All Grades')}</option>
+          <option value="A">{t('harvests.gradeA', 'Grade A (Premium)')}</option>
+          <option value="B">{t('harvests.gradeB', 'Grade B (Standard)')}</option>
+          <option value="C">{t('harvests.gradeC', 'Grade C (Commercial)')}</option>
         </select>
 
         {/* Date Range Select */}
@@ -105,12 +108,12 @@ export default function HarvestFilters({
           className="agri-harvest-filters__select"
           value={selectedDateRange}
           onChange={(e) => onDateRangeChange(e.target.value)}
-          aria-label="Filter by date range"
+          aria-label={t('common.date', 'Filter by date range')}
         >
-          <option value="ALL">All Dates</option>
-          <option value="RECENT">Recent (Last 7 Days)</option>
-          <option value="THIS_MONTH">This Month (Oct 2026)</option>
-          <option value="OLDER">Past Months (Sep 2026)</option>
+          <option value="ALL">{t('harvests.allDates', 'All Dates')}</option>
+          <option value="RECENT">{t('harvests.recentDays', 'Recent (Last 7 Days)')}</option>
+          <option value="THIS_MONTH">{t('harvests.thisMonth', 'This Month (Oct 2026)')}</option>
+          <option value="OLDER">{t('harvests.pastMonths', 'Past Months (Sep 2026)')}</option>
         </select>
 
         {/* Clear Filters */}
@@ -119,23 +122,23 @@ export default function HarvestFilters({
             type="button"
             className="agri-btn agri-btn--outline agri-btn--sm"
             onClick={onResetFilters}
-            aria-label="Reset all filters"
+            aria-label={t('common.clearFilters', 'Reset all filters')}
           >
             <X size={14} />
-            <span>Reset</span>
+            <span>{t('common.clear', 'Reset')}</span>
           </button>
         )}
 
         {/* View Mode Toggle */}
-        <div className="agri-harvest-filters__view-toggles" role="group" aria-label="View toggle">
+        <div className="agri-harvest-filters__view-toggles" role="group" aria-label={t('crops.viewMode', 'View toggle')}>
           <button
             type="button"
             className={`agri-harvest-filters__view-btn ${
               viewMode === 'table' ? 'agri-harvest-filters__view-btn--active' : ''
             }`}
             onClick={() => onViewModeChange('table')}
-            title="Table View"
-            aria-label="Table View"
+            title={t('common.tableView', 'Table View')}
+            aria-label={t('common.tableView', 'Table View')}
           >
             <Table size={16} />
           </button>
@@ -145,8 +148,8 @@ export default function HarvestFilters({
               viewMode === 'cards' ? 'agri-harvest-filters__view-btn--active' : ''
             }`}
             onClick={() => onViewModeChange('cards')}
-            title="Card View"
-            aria-label="Card View"
+            title={t('common.cardView', 'Card View')}
+            aria-label={t('common.cardView', 'Card View')}
           >
             <LayoutGrid size={16} />
           </button>

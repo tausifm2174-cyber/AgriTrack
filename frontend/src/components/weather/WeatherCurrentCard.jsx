@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   CloudSun,
   Sun,
@@ -11,21 +12,18 @@ import {
   ShieldCheck,
   MapPin,
 } from 'lucide-react';
+import { translateWeatherCondition } from '../../utils/displayLabels';
 
 /**
  * WeatherCurrentCard component
  * Displays prominent live-style current meteorological reading for the selected farm holding.
- *
- * @param {Object} props
- * @param {Object} props.weather - Current weather data
- * @param {string} props.farmName - Name of active farm
- * @param {string} props.location - Location string
  */
 export default function WeatherCurrentCard({
   weather = {},
   farmName = 'Green Valley Farm',
   location = 'Karnal, Haryana',
 }) {
+  const { t } = useTranslation();
   const {
     temperature = 28,
     unit = '°C',
@@ -59,7 +57,7 @@ export default function WeatherCurrentCard({
   };
 
   return (
-    <article className="agri-cur-weather-card" aria-label="Current Weather Conditions">
+    <article className="agri-cur-weather-card" aria-label={t('weather.currentWeather', 'Current Weather Conditions')}>
       {/* Top Banner with Farm Location */}
       <div className="agri-cur-weather-card__header">
         <div className="agri-cur-weather-card__loc-group">
@@ -70,7 +68,7 @@ export default function WeatherCurrentCard({
           <span className="agri-cur-weather-card__loc-sub">{location}</span>
         </div>
         <span className="agri-cur-weather-card__condition-tag">
-          {condition}
+          {translateWeatherCondition(conditionCode || condition, t)}
         </span>
       </div>
 
@@ -90,11 +88,11 @@ export default function WeatherCurrentCard({
 
       {/* Secondary Subtext */}
       <div className="agri-cur-weather-card__feels-row">
-        <span>Feels like <strong>{feelsLike}°C</strong></span>
+        <span>{t('weather.feelsLike', 'Feels like')} <strong>{feelsLike}°C</strong></span>
         <span className="agri-cur-weather-card__dot">•</span>
-        <span>Dew Point: {dewPoint}</span>
+        <span>{t('weather.dewPoint', 'Dew Point')}: {dewPoint}</span>
         <span className="agri-cur-weather-card__dot">•</span>
-        <span>UV Index: {uvIndex}</span>
+        <span>{t('weather.uvIndex', 'UV Index')}: {uvIndex}</span>
       </div>
 
       {/* Metrics Grid */}
@@ -102,7 +100,7 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__metric-item">
           <span className="agri-cur-weather-card__metric-label">
             <Droplets size={14} className="text-info" aria-hidden="true" />
-            Humidity
+            {t('weather.humidity', 'Humidity')}
           </span>
           <span className="agri-cur-weather-card__metric-val">{humidity}%</span>
         </div>
@@ -110,7 +108,7 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__metric-item">
           <span className="agri-cur-weather-card__metric-label">
             <Wind size={14} className="text-primary" aria-hidden="true" />
-            Wind
+            {t('weather.wind', 'Wind')}
           </span>
           <span className="agri-cur-weather-card__metric-val">{windSpeed} {windDirection}</span>
         </div>
@@ -118,7 +116,7 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__metric-item">
           <span className="agri-cur-weather-card__metric-label">
             <Umbrella size={14} className="text-warning" aria-hidden="true" />
-            Rain Probability
+            {t('weather.rainChance', 'Rain Probability')}
           </span>
           <span className="agri-cur-weather-card__metric-val">{rainChance}</span>
         </div>
@@ -126,7 +124,7 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__metric-item">
           <span className="agri-cur-weather-card__metric-label">
             <Eye size={14} aria-hidden="true" />
-            Visibility
+            {t('weather.visibility', 'Visibility')}
           </span>
           <span className="agri-cur-weather-card__metric-val">{visibility}</span>
         </div>
@@ -134,7 +132,7 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__metric-item">
           <span className="agri-cur-weather-card__metric-label">
             <Gauge size={14} aria-hidden="true" />
-            Pressure
+            {t('weather.pressure', 'Pressure')}
           </span>
           <span className="agri-cur-weather-card__metric-val">{pressure}</span>
         </div>
@@ -142,7 +140,7 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__metric-item">
           <span className="agri-cur-weather-card__metric-label">
             <ShieldCheck size={14} className="text-success" aria-hidden="true" />
-            Air Quality
+            {t('weather.airQuality', 'Air Quality')}
           </span>
           <span className="agri-cur-weather-card__metric-val">{airQuality}</span>
         </div>

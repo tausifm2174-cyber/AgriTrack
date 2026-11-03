@@ -1,17 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Warehouse, FlaskConical, Thermometer, SlidersHorizontal, RefreshCw } from 'lucide-react';
 import { Button } from '../common';
 
 /**
  * RecommendationInputPanel component
  * Provides interactive agronomic parameter inputs with auto-population from field & soil records.
- *
- * @param {Object} props
- * @param {Object} props.inputs - Form inputs state
- * @param {Function} props.onInputChange - Change handler
- * @param {Function} props.onFieldSelect - Handler when field changes (auto-populates soil)
- * @param {Array} props.farms - List of farms
- * @param {Array} props.fields - List of fields
- * @param {Function} props.onReset - Reset inputs callback
  */
 export default function RecommendationInputPanel({
   inputs,
@@ -21,34 +14,35 @@ export default function RecommendationInputPanel({
   fields = [],
   onReset,
 }) {
+  const { t } = useTranslation();
   const availableFields = inputs.farmId
     ? fields.filter((f) => f.farmId === inputs.farmId)
     : fields;
 
   return (
-    <div className="agri-recom-panel-card" role="region" aria-label="Agronomic Evaluation Parameters">
+    <div className="agri-recom-panel-card" role="region" aria-label={t('recommendations.evaluationParams', 'Agronomic Evaluation Parameters')}>
       <div className="agri-recom-panel-card__header">
         <div className="agri-recom-panel-card__title-group">
           <SlidersHorizontal size={18} className="text-primary" aria-hidden="true" />
-          <h2 className="agri-recom-panel-card__title">Agronomic Evaluation Parameters</h2>
+          <h2 className="agri-recom-panel-card__title">{t('recommendations.evaluationParams', 'Agronomic Evaluation Parameters')}</h2>
         </div>
         <span className="agri-recom-panel-card__sub">
-          Auto-populated from field soil tests or customized to test planting scenarios
+          {t('recommendations.autoPopulatedDesc', 'Auto-populated from field soil tests or customized to test planting scenarios')}
         </span>
       </div>
 
       <div className="agri-recom-panel-grid">
-        {/* Section 1: Target Farm & Field */}
+        {/* Section 1: Target Location */}
         <div className="agri-recom-section">
           <h3 className="agri-recom-section__title">
             <Warehouse size={15} aria-hidden="true" />
-            <span>Target Location</span>
+            <span>{t('recommendations.targetLocation', 'Target Location')}</span>
           </h3>
 
           <div className="agri-form-grid--2 agri-form-grid">
             <div className="agri-form-group">
               <label htmlFor="recom-farm" className="agri-form-label">
-                Farm Holding
+                {t('farms.farm', 'Farm Holding')}
               </label>
               <select
                 id="recom-farm"
@@ -67,7 +61,7 @@ export default function RecommendationInputPanel({
 
             <div className="agri-form-group">
               <label htmlFor="recom-field" className="agri-form-label">
-                Field Parcel (Auto-loads Soil)
+                {t('recommendations.fieldParcel', 'Field Parcel (Auto-loads Soil)')}
               </label>
               <select
                 id="recom-field"
@@ -90,13 +84,13 @@ export default function RecommendationInputPanel({
         <div className="agri-recom-section">
           <h3 className="agri-recom-section__title">
             <FlaskConical size={15} aria-hidden="true" />
-            <span>Soil Characteristics</span>
+            <span>{t('recommendations.soilCharacteristics', 'Soil Characteristics')}</span>
           </h3>
 
           <div className="agri-form-grid--2 agri-form-grid">
             <div className="agri-form-group">
               <label htmlFor="recom-soil-type" className="agri-form-label">
-                Soil Type
+                {t('soil.soilType', 'Soil Type')}
               </label>
               <select
                 id="recom-soil-type"
@@ -105,20 +99,21 @@ export default function RecommendationInputPanel({
                 value={inputs.soilType}
                 onChange={(e) => onInputChange('soilType', e.target.value)}
               >
-                <option value="Alluvial Loam">Alluvial Loam</option>
-                <option value="Loamy Soil">Loamy Soil</option>
-                <option value="Deep Black Soil">Deep Black Soil</option>
-                <option value="Medium Black Soil">Medium Black Soil</option>
-                <option value="Sandy Loam">Sandy Loam</option>
-                <option value="Red Sandy Loam">Red Sandy Loam</option>
-                <option value="Clay Loam">Clay Loam</option>
-                <option value="Silty Clay">Silty Clay</option>
+                <option value="Alluvial Loam">{t('soil.types.alluvialLoam', 'Alluvial Loam')}</option>
+                <option value="Loamy Soil">{t('soil.types.loamySoil', 'Loamy Soil')}</option>
+                <option value="Deep Black Soil">{t('soil.types.deepBlackSoil', 'Deep Black Soil')}</option>
+                <option value="Medium Black Soil">{t('soil.types.mediumBlackSoil', 'Medium Black Soil')}</option>
+                <option value="Sandy Loam">{t('soil.types.sandyLoam', 'Sandy Loam')}</option>
+                <option value="Red Sandy Loam">{t('soil.types.redSandyLoam', 'Red Sandy Loam')}</option>
+                <option value="Clay Loam">{t('soil.types.clayLoam', 'Clay Loam')}</option>
+                <option value="Silty Clay">{t('soil.types.siltyClay', 'Silty Clay')}</option>
               </select>
             </div>
 
+
             <div className="agri-form-group">
               <label htmlFor="recom-ph" className="agri-form-label">
-                Soil pH ({inputs.soilPh})
+                {t('soil.ph', 'Soil pH')} ({inputs.soilPh})
               </label>
               <input
                 id="recom-ph"
@@ -138,7 +133,7 @@ export default function RecommendationInputPanel({
           <div className="agri-form-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem', marginTop: '0.65rem' }}>
             <div className="agri-form-group">
               <label htmlFor="recom-n" className="agri-form-label">
-                Nitrogen (N)
+                {t('soil.nitrogen', 'Nitrogen (N)')}
               </label>
               <input
                 id="recom-n"
@@ -155,7 +150,7 @@ export default function RecommendationInputPanel({
 
             <div className="agri-form-group">
               <label htmlFor="recom-p" className="agri-form-label">
-                Phosphorus (P)
+                {t('soil.phosphorus', 'Phosphorus (P)')}
               </label>
               <input
                 id="recom-p"
@@ -172,7 +167,7 @@ export default function RecommendationInputPanel({
 
             <div className="agri-form-group">
               <label htmlFor="recom-k" className="agri-form-label">
-                Potassium (K)
+                {t('soil.potassium', 'Potassium (K)')}
               </label>
               <input
                 id="recom-k"
@@ -193,13 +188,13 @@ export default function RecommendationInputPanel({
         <div className="agri-recom-section">
           <h3 className="agri-recom-section__title">
             <Thermometer size={15} aria-hidden="true" />
-            <span>Season & Climate Context</span>
+            <span>{t('recommendations.seasonClimateContext', 'Season & Climate Context')}</span>
           </h3>
 
           <div className="agri-form-grid--3 agri-form-grid">
             <div className="agri-form-group">
               <label htmlFor="recom-season" className="agri-form-label">
-                Target Season
+                {t('recommendations.targetSeason', 'Target Season')}
               </label>
               <select
                 id="recom-season"
@@ -208,15 +203,15 @@ export default function RecommendationInputPanel({
                 value={inputs.season}
                 onChange={(e) => onInputChange('season', e.target.value)}
               >
-                <option value="Rabi">Rabi (Winter/Spring)</option>
-                <option value="Kharif">Kharif (Monsoon/Autumn)</option>
-                <option value="Zaid">Zaid (Summer)</option>
+                <option value="Rabi">{t('crops.rabi', 'Rabi')} (Winter/Spring)</option>
+                <option value="Kharif">{t('crops.kharif', 'Kharif')} (Monsoon/Autumn)</option>
+                <option value="Zaid">{t('crops.zaid', 'Zaid')} (Summer)</option>
               </select>
             </div>
 
             <div className="agri-form-group">
               <label htmlFor="recom-temp" className="agri-form-label">
-                Mean Temp (°C)
+                {t('recommendations.meanTemp', 'Mean Temp (°C)')}
               </label>
               <input
                 id="recom-temp"
@@ -232,7 +227,7 @@ export default function RecommendationInputPanel({
 
             <div className="agri-form-group">
               <label htmlFor="recom-rain" className="agri-form-label">
-                Expected Rain (mm)
+                {t('recommendations.expectedRain', 'Expected Rain (mm)')}
               </label>
               <input
                 id="recom-rain"
@@ -251,7 +246,7 @@ export default function RecommendationInputPanel({
 
       <div className="agri-recom-panel-footer">
         <span className="agri-recom-panel-status">
-          Auto-evaluating 7 crops based on selected parameters
+          {t('recommendations.autoEvaluating', 'Auto-evaluating 7 crops based on selected parameters')}
         </span>
         <Button
           variant="ghost"
@@ -259,7 +254,7 @@ export default function RecommendationInputPanel({
           icon={<RefreshCw size={13} aria-hidden="true" />}
           onClick={onReset}
         >
-          Reset to Defaults
+          {t('recommendations.resetDefaults', 'Reset to Defaults')}
         </Button>
       </div>
     </div>

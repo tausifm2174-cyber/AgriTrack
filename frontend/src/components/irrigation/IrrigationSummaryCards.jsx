@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ListTodo, Clock, PlayCircle, CheckCircle2, Droplets } from 'lucide-react';
 
 /**
@@ -15,51 +16,53 @@ export default function IrrigationSummaryCards({
   activeStatusFilter,
   onStatusFilterChange,
 }) {
+  const { t } = useTranslation();
+
   const cards = [
     {
       id: 'ALL',
-      label: 'Total Schedules',
+      label: t('common.all') + ' ' + t('navigation.irrigation'),
       value: summary.total,
-      sub: 'All registered schedules',
+      sub: t('navigation.irrigation'),
       icon: ListTodo,
       iconVariant: 'total',
     },
     {
       id: 'Scheduled',
-      label: 'Scheduled',
+      label: t('status.scheduled'),
       value: summary.scheduled,
-      sub: 'Upcoming runs',
+      sub: t('status.scheduled'),
       icon: Clock,
       iconVariant: 'scheduled',
     },
     {
       id: 'In Progress',
-      label: 'In Progress',
+      label: t('status.inProgress'),
       value: summary.inProgress,
-      sub: 'Actively pumping',
+      sub: t('status.inProgress'),
       icon: PlayCircle,
       iconVariant: 'inprogress',
     },
     {
       id: 'Completed',
-      label: 'Completed',
+      label: t('status.completed'),
       value: summary.completed,
-      sub: 'Executed cycles',
+      sub: t('status.completed'),
       icon: CheckCircle2,
       iconVariant: 'completed',
     },
     {
       id: 'VOLUME',
-      label: 'Total Water Volume',
+      label: t('irrigation.waterQuantity'),
       value: `${summary.totalWaterVolumeM3} m³`,
-      sub: `${(summary.totalWaterVolumeLitres / 1000).toFixed(0)}k Litres total`,
+      sub: `${(summary.totalWaterVolumeLitres / 1000).toFixed(0)}k ${t('units.liters')}`,
       icon: Droplets,
       iconVariant: 'water',
     },
   ];
 
   return (
-    <div className="agri-irrigation-summary-grid" role="region" aria-label="Irrigation Metrics">
+    <div className="agri-irrigation-summary-grid" role="region" aria-label={t('navigation.irrigation')}>
       {cards.map((card) => {
         const IconComponent = card.icon;
         const isClickable = card.id !== 'VOLUME';

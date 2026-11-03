@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -9,6 +10,7 @@ import {
   Legend,
 } from 'recharts';
 import { TrendingUp } from 'lucide-react';
+import { translateTime } from '../../utils/displayLabels';
 
 /**
  * Custom Tooltip for Weather Trend Chart
@@ -39,28 +41,30 @@ function WeatherChartTooltip({ active, payload, label }) {
 /**
  * WeatherTrendChart component
  * Visualizes 7-day high vs low temperature curve using Recharts.
- *
- * @param {Object} props
- * @param {Array} props.forecast - List of forecast items
  */
 export default function WeatherTrendChart({ forecast = [] }) {
-  const chartData = forecast.map((f) => ({
-    name: `${f.day} (${f.date})`,
-    day: f.day,
-    'High Temp': f.highTemp,
-    'Low Temp': f.lowTemp,
-    rainMm: f.rainMm,
-  }));
+  const { t } = useTranslation();
+
+  const chartData = forecast.map((f) => {
+    const localizedDay = translateTime(f.day, t);
+    return {
+      name: `${localizedDay} (${f.date})`,
+      day: localizedDay,
+      'High Temp': f.highTemp,
+      'Low Temp': f.lowTemp,
+      rainMm: f.rainMm,
+    };
+  });
 
   return (
     <div className="agri-weather-trend-card">
       <div className="agri-weather-trend-card__header">
         <div className="agri-weather-trend-card__title-group">
           <TrendingUp size={18} className="text-primary" aria-hidden="true" />
-          <h2 className="agri-weather-trend-card__title">Temperature & Thermal Trend</h2>
+          <h2 className="agri-weather-trend-card__title">{t('weather.temperatureTrend', 'Temperature & Thermal Trend')}</h2>
         </div>
         <span className="agri-weather-trend-card__sub">
-          7-Day Daytime High vs Nighttime Low Temperature Curve
+          {t('weather.tempCurveSub', '7-Day Daytime High vs Nighttime Low Temperature Curve')}
         </span>
       </div>
 
@@ -102,6 +106,7 @@ export default function WeatherTrendChart({ forecast = [] }) {
             />
             <Area
               type="monotone"
+              name={t('weather.highTemp', 'High Temp')}
               dataKey="High Temp"
               stroke="#f59e0b"
               strokeWidth={2.5}
@@ -111,6 +116,7 @@ export default function WeatherTrendChart({ forecast = [] }) {
             />
             <Area
               type="monotone"
+              name={t('weather.lowTemp', 'Low Temp')}
               dataKey="Low Temp"
               stroke="#0284c7"
               strokeWidth={2.5}

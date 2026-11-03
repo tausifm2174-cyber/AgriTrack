@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Wallet, CreditCard, TrendingUp, TrendingDown, Percent, Scale, Tag } from 'lucide-react';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
 
@@ -10,6 +11,7 @@ export default function ProfitLossSummaryCards({
   harvestYieldKg = 15000,
   averageMandiRate = 3993,
 }) {
+  const { t } = useTranslation();
   const isProfitable = netProfit >= 0;
 
   return (
@@ -20,12 +22,12 @@ export default function ProfitLossSummaryCards({
           <Wallet size={22} />
         </div>
         <div className="agri-pl-summary-card__content">
-          <span className="agri-pl-summary-card__label">Total Revenue</span>
+          <span className="agri-pl-summary-card__label">{t('revenue.totalRevenue', 'Total Revenue')}</span>
           <span className="agri-pl-summary-card__value" style={{ color: '#059669' }}>
             {formatCurrency(totalRevenue)}
           </span>
           <span className="agri-pl-summary-card__subtext">
-            Recognized gross sales
+            {t('profitLoss.recognizedSales', 'Recognized gross sales')}
           </span>
         </div>
       </div>
@@ -36,12 +38,12 @@ export default function ProfitLossSummaryCards({
           <CreditCard size={22} />
         </div>
         <div className="agri-pl-summary-card__content">
-          <span className="agri-pl-summary-card__label">Total Expenses</span>
+          <span className="agri-pl-summary-card__label">{t('profitLoss.totalExpenses', 'Total Expenses')}</span>
           <span className="agri-pl-summary-card__value" style={{ color: '#dc2626' }}>
             {formatCurrency(totalExpenses)}
           </span>
           <span className="agri-pl-summary-card__subtext">
-            Operational input costs
+            {t('profitLoss.operationalCosts', 'Operational input costs')}
           </span>
         </div>
       </div>
@@ -56,7 +58,7 @@ export default function ProfitLossSummaryCards({
           {isProfitable ? <TrendingUp size={22} /> : <TrendingDown size={22} />}
         </div>
         <div className="agri-pl-summary-card__content">
-          <span className="agri-pl-summary-card__label">Net Profit</span>
+          <span className="agri-pl-summary-card__label">{t('profitLoss.netProfit', 'Net Profit')}</span>
           <span
             className="agri-pl-summary-card__value"
             style={{ color: isProfitable ? '#059669' : '#dc2626' }}
@@ -64,7 +66,7 @@ export default function ProfitLossSummaryCards({
             {isProfitable ? `+${formatCurrency(netProfit)}` : formatCurrency(netProfit)}
           </span>
           <span className="agri-pl-summary-card__subtext">
-            {isProfitable ? 'Profit ↑ Realized' : 'Loss ↓ Incurred'}
+            {isProfitable ? t('profitLoss.profitRealized', 'Profit ↑ Realized') : t('profitLoss.lossIncurred', 'Loss ↓ Incurred')}
           </span>
         </div>
       </div>
@@ -75,7 +77,7 @@ export default function ProfitLossSummaryCards({
           <Percent size={22} />
         </div>
         <div className="agri-pl-summary-card__content">
-          <span className="agri-pl-summary-card__label">Net Margin</span>
+          <span className="agri-pl-summary-card__label">{t('profitLoss.netMargin', 'Net Margin')}</span>
           <span
             className="agri-pl-summary-card__value"
             style={{ color: isProfitable ? '#2563eb' : '#dc2626' }}
@@ -83,7 +85,7 @@ export default function ProfitLossSummaryCards({
             {formatPercentage(netMargin)}
           </span>
           <span className="agri-pl-summary-card__subtext">
-            Profit margin on sales
+            {t('profitLoss.profitMarginSales', 'Profit margin on sales')}
           </span>
         </div>
       </div>
@@ -94,12 +96,12 @@ export default function ProfitLossSummaryCards({
           <Scale size={22} />
         </div>
         <div className="agri-pl-summary-card__content">
-          <span className="agri-pl-summary-card__label">Cost per Quintal</span>
+          <span className="agri-pl-summary-card__label">{t('profitLoss.costPerQuintal', 'Cost per Quintal')}</span>
           <span className="agri-pl-summary-card__value">
             {formatCurrency(costPerQuintal)}/q
           </span>
           <span className="agri-pl-summary-card__subtext">
-            ₹{(costPerQuintal / 100).toFixed(2)}/kg production cost
+            ₹{(costPerQuintal / 100).toFixed(2)}/kg {t('profitLoss.productionCost', 'production cost')}
           </span>
         </div>
       </div>
@@ -110,15 +112,16 @@ export default function ProfitLossSummaryCards({
           <Tag size={22} />
         </div>
         <div className="agri-pl-summary-card__content">
-          <span className="agri-pl-summary-card__label">Mandi Benchmark</span>
+          <span className="agri-pl-summary-card__label">{t('profitLoss.mandiBenchmark', 'Mandi Benchmark')}</span>
           <span className="agri-pl-summary-card__value" style={{ fontSize: '1.2rem' }}>
             {formatCurrency(averageMandiRate)}/q
           </span>
           <span className="agri-pl-summary-card__subtext">
-            {(harvestYieldKg / 100).toFixed(1)} q total harvest
+            {(harvestYieldKg / 100).toFixed(1)} q {t('profitLoss.totalHarvest', 'total harvest')}
           </span>
         </div>
       </div>
     </div>
   );
 }
+

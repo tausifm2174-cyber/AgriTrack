@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PieChart, CreditCard, Wallet, Plus, AlertCircle } from 'lucide-react';
 import { Button } from '../common';
 import { FINANCIAL_DATA_DISCLAIMER } from '../../data/profitLossData';
 
 export default function ProfitLossHeader() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -11,11 +13,11 @@ export default function ProfitLossHeader() {
       <div className="agri-pl-header__left">
         <div className="agri-pl-header__badge">
           <PieChart size={14} />
-          <span>Financial Performance • Profit & Loss Analysis</span>
+          <span>{t('profitLoss.badge', 'Financial Performance • Profit & Loss Analysis')}</span>
         </div>
-        <h1 className="agri-pl-header__title">Profit & Loss Analysis</h1>
+        <h1 className="agri-pl-header__title">{t('profitLoss.title', 'Profit & Loss Analysis')}</h1>
         <p className="agri-pl-header__desc">
-          Evaluate net operational margins, production cost per quintal, and revenue realization across farms and standing crops.
+          {t('profitLoss.subtitle', 'Evaluate net operational margins, production cost per quintal, and revenue realization across farms and standing crops.')}
         </p>
 
         {/* Demo Data Disclaimer */}
@@ -30,30 +32,31 @@ export default function ProfitLossHeader() {
           variant="outline"
           size="sm"
           onClick={() => navigate('/expenses')}
-          aria-label="View Expenses"
+          aria-label={t('navigation.expenses', 'Expenses')}
         >
           <CreditCard size={16} />
-          <span>Expenses</span>
+          <span>{t('navigation.expenses', 'Expenses')}</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
           onClick={() => navigate('/revenue')}
-          aria-label="View Revenue"
+          aria-label={t('navigation.revenue', 'Revenue')}
         >
           <Wallet size={16} />
-          <span>Revenue</span>
+          <span>{t('navigation.revenue', 'Revenue')}</span>
         </Button>
         <Button
           variant="primary"
           size="md"
           onClick={() => navigate('/sales')}
-          aria-label="Record Sale in Sales Ledger"
+          aria-label={t('sales.addSale', 'Record Sale')}
         >
           <Plus size={18} />
-          <span>Record Sale</span>
+          <span>{t('sales.addSale', 'Record Sale')}</span>
         </Button>
       </div>
     </div>
   );
 }
+
