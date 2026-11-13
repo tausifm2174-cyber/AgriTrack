@@ -1,4 +1,4 @@
-﻿package com.agritrack.entity;
+package com.agritrack.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;

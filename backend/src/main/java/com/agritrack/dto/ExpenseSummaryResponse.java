@@ -1,4 +1,4 @@
-﻿package com.agritrack.dto;
+package com.agritrack.dto;
 
 import java.math.BigDecimal;
 import java.util.List;

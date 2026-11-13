@@ -1,4 +1,4 @@
-﻿package com.agritrack.dto;
+package com.agritrack.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

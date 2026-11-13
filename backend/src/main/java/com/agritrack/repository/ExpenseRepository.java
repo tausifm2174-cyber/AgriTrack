@@ -1,4 +1,4 @@
-﻿package com.agritrack.repository;
+package com.agritrack.repository;
 
 import com.agritrack.entity.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;

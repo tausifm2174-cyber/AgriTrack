@@ -1,4 +1,4 @@
-# AgriTrack — Spring Boot Backend (Phase 18: Harvest, Sales & APMC Market Price Management Backend APIs)
+# AgriTrack — Spring Boot Backend (Phase 20: Weather Synchronization & Weather-Based Rule Advisory Backend APIs)
 
 Welcome to the backend service of **AgriTrack – Smart Farm Management System**. This backend is implemented as a clean, modular REST API using **Java 21 LTS** and **Spring Boot 4.1.x**, backed by **MySQL 8.0** with **Spring Security** and **JWT Bearer token authentication**.
 
@@ -45,7 +45,26 @@ AgriTrack employs a three-tier architecture:
   - APMC Market Price REST APIs (`/api/v1/market-prices/**`) with multi-criteria filtering and ADMIN-only write protection (`@PreAuthorize("hasRole('ADMIN')")`).
   - Transactional inventory reconciliation with row-level pessimistic locking (`@Lock(LockModeType.PESSIMISTIC_WRITE)`).
   - Authoritative backend financial calculations (total revenue, quintal pricing, balance due, payment status derivation).
-  - 166 automated unit, mock, and integration tests passing with 100% success.
+- **Phase 19 (Expense Management & Financial / Profit & Loss Analytics Backend APIs):**
+  - Relational schema table (`expenses`) with ON DELETE CASCADE to `farms` and ON DELETE SET NULL to `fields` and `crop_cycles`.
+  - Strict multi-tenant server-side ownership isolation: User -> Farm -> (optional Field) -> (optional CropCycle) -> Expense.
+  - Canonical validation for categories and payment methods.
+  - Operational Expense REST APIs (`/api/v1/expenses/**`).
+  - Financial Analytics REST APIs (`/api/v1/financials/profit-loss`, `/api/v1/financials/monthly-trend`).
+  - Authoritative Profit & Loss metrics (Total Revenue, Total Expenses, Net Profit, Net Margin %, Cost per Quintal).
+- **Phase 20 (Weather Synchronization & Weather-Based Rule Advisory Backend APIs):**
+  - Relational schema tables (`weather_snapshots`, `weather_forecasts`, `advisories`) with ON DELETE CASCADE to `farms` and ON DELETE SET NULL to `fields`/`crop_cycles`.
+  - Configurable in-memory cache TTL policy (`app.weather.cache-ttl-minutes=30`) to protect meteorological rate limits.
+  - Dual meteorological provider design: `OpenWeatherMapClient` (REST API integration) with seamless deterministic fallback to `SimulationFallbackWeatherClient`.
+  - Strict boundary weather advisory rule engine with 4 agronomic hazard rules:
+    - Rule 1: Rainfall > 25.0 mm -> `WARNING`, `WATER_MANAGEMENT`, `IRRIGATION`
+    - Rule 2: Humidity > 85% -> `WARNING`, `CROP_PROTECTION`, `DISEASE`
+    - Rule 3: Wind speed > 20.0 km/h -> `ADVISORY`, `FIELD_OPERATIONS`, `SPRAY`
+    - Rule 4: Temperature > 35.0 °C -> `ADVISORY`, `WATER_MANAGEMENT`, `HEAT`
+  - Normal condition: zero alerts generated, no spurious database records inserted.
+  - Composite deduplication key (`ruleCode_targetDate`) preventing redundant alerts.
+  - Weather REST APIs (`/api/v1/farms/{farmId}/weather/**`) and Advisory REST APIs (`/api/v1/farms/{farmId}/advisories/**`, `/api/v1/advisories/**`).
+  - 230 automated unit, mock, and integration tests passing with 100% success.
 
 ---
 
@@ -328,7 +347,47 @@ All endpoints require JWT Bearer authentication under `/api/v1`:
 
 ---
 
-## 7. Database Setup & Seed Data
+## 7. Weather Synchronization & Rule Advisory Backend APIs (Phase 20)
+
+### 7.1 Meteorological Observation & Forecast Endpoints
+| Method | Endpoint | Description | Status Code |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/farms/{farmId}/weather/current` | Retrieves current meteorological snapshot (cached if within TTL) | `200 OK` |
+| `GET` | `/farms/{farmId}/weather/forecast` | Retrieves 7-day weather forecast (cached if fresh) | `200 OK` |
+| `POST` | `/farms/{farmId}/weather/sync` | Forces fresh meteorological synchronization and auto-evaluates advisories | `200 OK` |
+
+### 7.2 Agronomic Hazard Advisory Endpoints
+| Method | Endpoint | Description | Status Code |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/farms/{farmId}/advisories` | Retrieves agronomic advisories for a specific farm (optional `?status=`) | `200 OK` |
+| `GET` | `/advisories` | Retrieves all advisories across user's farms (optional `?status=`) | `200 OK` |
+| `POST` | `/farms/{farmId}/advisories/evaluate` | Manually triggers rule evaluation on farm's latest weather observation | `200 OK` |
+| `PATCH` | `/advisories/{id}/status` | Updates advisory status (`ACKNOWLEDGED`, `DISMISSED`) | `200 OK` |
+
+### 7.3 Agronomic Weather Advisory Rules & Boundary Thresholds
+1. **Rule 1: Heavy Rainfall (`RULE_HEAVY_RAINFALL`)**
+   - **Threshold**: Rainfall > 25.0 mm (25.00 does not trigger, 25.01 triggers)
+   - **Severity / Category / Type**: `WARNING`, `WATER_MANAGEMENT`, `IRRIGATION`
+   - **Title**: Heavy Rainfall Warning
+2. **Rule 2: High Humidity (`RULE_HIGH_HUMIDITY`)**
+   - **Threshold**: Humidity > 85% (85 does not trigger, 86 triggers)
+   - **Severity / Category / Type**: `WARNING`, `CROP_PROTECTION`, `DISEASE`
+   - **Title**: Fungal Disease Risk Alert
+3. **Rule 3: High Wind (`RULE_HIGH_WIND`)**
+   - **Threshold**: Wind speed > 20.0 km/h (20.00 does not trigger, 20.01 triggers)
+   - **Severity / Category / Type**: `ADVISORY`, `FIELD_OPERATIONS`, `SPRAY`
+   - **Title**: High Wind Spraying Advisory
+4. **Rule 4: Heat Stress (`RULE_HEAT_STRESS`)**
+   - **Threshold**: Ambient temperature > 35.0 °C (35.00 does not trigger, 35.01 triggers)
+   - **Severity / Category / Type**: `ADVISORY`, `WATER_MANAGEMENT`, `HEAT`
+   - **Title**: Crop Heat Stress Advisory
+
+- **Normal Condition**: When observations are within safe agronomic boundaries, no spurious alerts are generated, and zero records are persisted.
+- **Deduplication Key**: Composite key `ruleCode + "_" + targetDate` guarantees that repeat evaluations on the same day update existing active records without duplicate insertions.
+
+---
+
+## 8. Database Setup & Seed Data
 
 ### 1. Database Creation & Migrations
 Execute the migrations in order:
@@ -340,6 +399,7 @@ mysql -u root -p < database/04_create_crop_cycles_table.sql
 mysql -u root -p < database/05_create_activities_and_irrigation_tables.sql
 mysql -u root -p < database/06_create_harvest_sales_market_tables.sql
 mysql -u root -p < database/08_create_expenses_table.sql
+mysql -u root -p < database/09_create_weather_and_advisory_tables.sql
 ```
 
 ### 2. Market Price Seed Data
@@ -350,9 +410,9 @@ mysql -u root -p < database/07_seed_market_prices.sql
 
 ---
 
-## 8. Running Tests
+## 9. Running Tests
 
-Execute all 204 automated unit and MockMvc tests:
+Execute all 230 automated unit and MockMvc tests:
 ```powershell
 cd backend
 .\mvnw.cmd test
@@ -361,7 +421,7 @@ cd backend
 Execute tests including live MySQL database connectivity:
 ```powershell
 cd backend
-$env:DB_PASSWORD="your_password"
+$env:DB_PASSWORD="<your_password>"
 .\mvnw.cmd test -DrunDbTests=true
 ```
 

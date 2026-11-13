@@ -1,4 +1,4 @@
-﻿package com.agritrack.controller;
+package com.agritrack.controller;
 
 import com.agritrack.dto.ApiResponse;
 import com.agritrack.dto.MonthlyFinancialSummary;
