@@ -1,4 +1,4 @@
-# AgriTrack — Spring Boot Backend (Phase 17: Activity & Irrigation Management Backend APIs)
+# AgriTrack — Spring Boot Backend (Phase 18: Harvest, Sales & APMC Market Price Management Backend APIs)
 
 Welcome to the backend service of **AgriTrack – Smart Farm Management System**. This backend is implemented as a clean, modular REST API using **Java 21 LTS** and **Spring Boot 4.1.x**, backed by **MySQL 8.0** with **Spring Security** and **JWT Bearer token authentication**.
 
@@ -36,7 +36,16 @@ AgriTrack employs a three-tier architecture:
   - Cross-field and cross-user validation for optional crop cycle association.
   - Activity REST APIs (`/api/v1/fields/{fieldId}/activities`, `/api/v1/activities/**`).
   - Irrigation REST APIs (`/api/v1/fields/{fieldId}/irrigation`, `/api/v1/irrigation/**`).
-  - 113 automated unit, mock, and integration tests passing with 100% success.
+- **Phase 18 (Harvest, Sales & APMC Market Price Management Backend APIs):**
+  - Relational schema tables (`harvests`, `sales`, `market_prices`).
+  - Strict server-side ownership isolation: User -> Farm -> Field -> CropCycle -> Harvest -> Sale.
+  - Referential integrity strategy: `ON DELETE RESTRICT` for `CropCycle -> Harvest` and `Harvest -> Sale` to safeguard historical financial transactions and audit history.
+  - Harvest REST APIs (`/api/v1/crop-cycles/{cropCycleId}/harvests`, `/api/v1/harvests/**`, `/api/v1/fields/{fieldId}/harvests`, `/api/v1/farms/{farmId}/harvests`).
+  - Sales REST APIs (`/api/v1/harvests/{harvestId}/sales`, `/api/v1/sales/**`).
+  - APMC Market Price REST APIs (`/api/v1/market-prices/**`) with multi-criteria filtering and ADMIN-only write protection (`@PreAuthorize("hasRole('ADMIN')")`).
+  - Transactional inventory reconciliation with row-level pessimistic locking (`@Lock(LockModeType.PESSIMISTIC_WRITE)`).
+  - Authoritative backend financial calculations (total revenue, quintal pricing, balance due, payment status derivation).
+  - 166 automated unit, mock, and integration tests passing with 100% success.
 
 ---
 
@@ -76,8 +85,11 @@ backend/
 │   │   │   │   ├── CropCycleController.java       # /crop-cycles and /fields/{fieldId}/crop-cycles CRUD
 │   │   │   │   ├── FarmController.java            # /farms CRUD endpoints
 │   │   │   │   ├── FieldController.java           # /farms/{farmId}/fields, /fields/{id} CRUD
+│   │   │   │   ├── HarvestController.java         # /harvests and /crop-cycles/{cropCycleId}/harvests CRUD
 │   │   │   │   ├── HealthController.java          # GET /health probe
 │   │   │   │   ├── IrrigationController.java      # /irrigation and /fields/{fieldId}/irrigation CRUD
+│   │   │   │   ├── MarketPriceController.java     # /market-prices (Read: All; Write: ADMIN)
+│   │   │   │   ├── SaleController.java            # /sales and /harvests/{harvestId}/sales CRUD
 │   │   │   │   ├── SoilRecordController.java      # /fields/{fieldId}/soil-records, /soil-records/{id} CRUD
 │   │   │   │   └── UserController.java            # GET /users/me (protected)
 │   │   │   ├── dto/
@@ -92,10 +104,16 @@ backend/
 │   │   │   │   ├── FarmResponse.java              # Farm response payload DTO
 │   │   │   │   ├── FieldRequest.java              # Field creation & update payload DTO
 │   │   │   │   ├── FieldResponse.java             # Field response payload DTO
+│   │   │   │   ├── HarvestRequest.java            # Harvest payload DTO
+│   │   │   │   ├── HarvestResponse.java           # Harvest response DTO
 │   │   │   │   ├── IrrigationRequest.java         # Irrigation schedule payload DTO
 │   │   │   │   ├── IrrigationResponse.java        # Irrigation schedule response DTO
 │   │   │   │   ├── LoginRequest.java              # User login payload DTO
+│   │   │   │   ├── MarketPriceRequest.java        # Market price benchmark payload DTO
+│   │   │   │   ├── MarketPriceResponse.java       # Market price response DTO
 │   │   │   │   ├── RegisterRequest.java           # User registration payload DTO
+│   │   │   │   ├── SaleRequest.java               # Sales transaction payload DTO
+│   │   │   │   ├── SaleResponse.java              # Sales transaction response DTO
 │   │   │   │   ├── SoilRecordRequest.java         # Soil record payload DTO
 │   │   │   │   ├── SoilRecordResponse.java        # Soil record response DTO
 │   │   │   │   └── UserResponse.java              # Safe user profile DTO
@@ -104,8 +122,11 @@ backend/
 │   │   │   │   ├── CropCycle.java                 # JPA entity mapping to 'crop_cycles' table
 │   │   │   │   ├── Farm.java                      # JPA entity mapping to 'farms' table
 │   │   │   │   ├── Field.java                     # JPA entity mapping to 'fields' table
+│   │   │   │   ├── Harvest.java                   # JPA entity mapping to 'harvests' table
 │   │   │   │   ├── IrrigationSchedule.java        # JPA entity mapping to 'irrigation_schedules' table
+│   │   │   │   ├── MarketPrice.java               # JPA entity mapping to 'market_prices' table
 │   │   │   │   ├── Role.java                      # User roles enum (FARMER, ADMIN)
+│   │   │   │   ├── Sale.java                      # JPA entity mapping to 'sales' table
 │   │   │   │   ├── SoilRecord.java                # JPA entity mapping to 'soil_records' table
 │   │   │   │   └── User.java                      # JPA entity mapping to 'users' table
 │   │   │   ├── exception/
@@ -120,7 +141,10 @@ backend/
 │   │   │   │   ├── CropCycleRepository.java       # Spring Data JPA repository for CropCycle
 │   │   │   │   ├── FarmRepository.java            # Spring Data JPA repository for Farm
 │   │   │   │   ├── FieldRepository.java           # Spring Data JPA repository for Field
+│   │   │   │   ├── HarvestRepository.java         # Spring Data JPA repository for Harvest
 │   │   │   │   ├── IrrigationScheduleRepository.java # Spring Data JPA repository for IrrigationSchedule
+│   │   │   │   ├── MarketPriceRepository.java     # Spring Data JPA repository for MarketPrice
+│   │   │   │   ├── SaleRepository.java            # Spring Data JPA repository for Sale
 │   │   │   │   ├── SoilRecordRepository.java      # Spring Data JPA repository for SoilRecord
 │   │   │   │   └── UserRepository.java            # Spring Data JPA repository for User
 │   │   │   ├── service/
@@ -129,7 +153,10 @@ backend/
 │   │   │   │   ├── CropCycleService.java          # Crop cycle business logic with user isolation
 │   │   │   │   ├── FarmService.java               # Farm business logic with user isolation
 │   │   │   │   ├── FieldService.java              # Field business logic with user isolation
+│   │   │   │   ├── HarvestService.java            # Harvest business logic with inventory invariants
 │   │   │   │   ├── IrrigationService.java         # Irrigation business logic with user isolation
+│   │   │   │   ├── MarketPriceService.java        # Market price reference data logic
+│   │   │   │   ├── SaleService.java               # Sales business logic with inventory reconciliation
 │   │   │   │   ├── SoilRecordService.java         # Soil record business logic with user isolation
 │   │   │   │   └── UserService.java               # Profile retrieval workflows
 │   │   │   └── util/
@@ -151,10 +178,16 @@ backend/
 │           ├── FieldControllerTest.java           # Field endpoint tests with Bearer tokens
 │           ├── FieldServiceTest.java              # Field business logic & ownership isolation tests
 │           ├── GlobalExceptionHandlerTest.java    # Exception handling unit tests
+│           ├── HarvestControllerTest.java         # Harvest endpoint tests with Bearer tokens
+│           ├── HarvestServiceTest.java            # Harvest business logic & inventory invariant tests
 │           ├── HealthControllerTest.java          # MockMvc GET /api/v1/health test
 │           ├── IrrigationControllerTest.java      # Irrigation endpoint tests with Bearer tokens
 │           ├── IrrigationServiceTest.java         # Irrigation business logic & ownership isolation tests
 │           ├── JwtUtilTest.java                   # JWT generation, expiration & validation tests
+│           ├── MarketPriceControllerTest.java     # Market price endpoint & ADMIN authorization tests
+│           ├── MarketPriceServiceTest.java        # Market price business logic & calculation tests
+│           ├── SaleControllerTest.java            # Sale endpoint tests with Bearer tokens
+│           ├── SaleServiceTest.java               # Sale financial calculations & inventory reconciliation tests
 │           ├── SoilRecordControllerTest.java      # Soil record endpoint tests with Bearer tokens
 │           ├── SoilRecordServiceTest.java         # Soil record business logic tests
 │           └── UserControllerTest.java            # Protected GET /api/v1/users/me tests
@@ -167,49 +200,111 @@ backend/
 
 ---
 
-## 4. REST API Reference (Phase 17 Endpoints)
+## 4. REST API Reference (Phase 18 Endpoints)
 
 All endpoints require standard Bearer token authentication:
 `Authorization: Bearer <access_token>`
 
-### Activity Endpoints
+### 4.1 Harvest Endpoints
 | Method | Endpoint | Description | Status Code |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/fields/{fieldId}/activities` | Log a new field activity | `201 Created` |
-| `GET` | `/api/v1/fields/{fieldId}/activities` | List all activities for a specific field | `200 OK` |
-| `GET` | `/api/v1/activities` | List all activities belonging to the authenticated user | `200 OK` |
-| `GET` | `/api/v1/activities/{id}` | Get activity by ID (returns 404 if owned by another user) | `200 OK` / `404 Not Found` |
-| `PUT` | `/api/v1/activities/{id}` | Update activity details | `200 OK` / `404 Not Found` |
-| `DELETE` | `/api/v1/activities/{id}` | Delete activity | `200 OK` / `404 Not Found` |
+| `POST` | `/api/v1/crop-cycles/{cropCycleId}/harvests` | Log a new harvest for an owned crop cycle | `201 Created` |
+| `GET` | `/api/v1/crop-cycles/{cropCycleId}/harvests` | List all harvests for a specific crop cycle | `200 OK` |
+| `GET` | `/api/v1/harvests` | List all harvests belonging to the authenticated user | `200 OK` |
+| `GET` | `/api/v1/harvests/{id}` | Get harvest by ID (returns 404 if owned by another user) | `200 OK` / `404 Not Found` |
+| `PUT` | `/api/v1/harvests/{id}` | Update harvest details and inventory figures | `200 OK` / `404 Not Found` |
+| `DELETE` | `/api/v1/harvests/{id}` | Delete harvest (blocked if sales exist) | `204 No Content` / `400 Bad Request` |
+| `GET` | `/api/v1/fields/{fieldId}/harvests` | List all harvests within a field | `200 OK` |
+| `GET` | `/api/v1/farms/{farmId}/harvests` | List all harvests within a farm | `200 OK` |
 
-### Irrigation Endpoints
+### 4.2 Sales Endpoints
 | Method | Endpoint | Description | Status Code |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/fields/{fieldId}/irrigation` | Schedule a precision irrigation run | `201 Created` |
-| `GET` | `/api/v1/fields/{fieldId}/irrigation` | List all irrigation schedules for a specific field | `200 OK` |
-| `GET` | `/api/v1/irrigation` | List all irrigation schedules belonging to the authenticated user | `200 OK` |
-| `GET` | `/api/v1/irrigation/{id}` | Get irrigation schedule by ID (returns 404 if owned by another user) | `200 OK` / `404 Not Found` |
-| `PUT` | `/api/v1/irrigation/{id}` | Update irrigation schedule details | `200 OK` / `404 Not Found` |
-| `DELETE` | `/api/v1/irrigation/{id}` | Delete irrigation schedule | `200 OK` / `404 Not Found` |
+| `POST` | `/api/v1/harvests/{harvestId}/sales` | Log a sale transaction with automatic stock decrement | `201 Created` |
+| `GET` | `/api/v1/harvests/{harvestId}/sales` | List all sales recorded against a harvest | `200 OK` |
+| `GET` | `/api/v1/sales` | List all sales belonging to the authenticated user | `200 OK` |
+| `GET` | `/api/v1/sales/{id}` | Get sale by ID (returns 404 if owned by another user) | `200 OK` / `404 Not Found` |
+| `PUT` | `/api/v1/sales/{id}` | Update sale record with inventory delta adjustments | `200 OK` / `404 Not Found` |
+| `DELETE` | `/api/v1/sales/{id}` | Delete sale and refund sold stock back to available inventory | `204 No Content` / `404 Not Found` |
+
+### 4.3 APMC / Market Prices Endpoints
+| Method | Endpoint | Required Role | Description | Status Code |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/market-prices` | `FARMER`, `ADMIN` | Query market prices with filters (`crop`, `market`, `trend`, `date`, `dateFrom`, `dateTo`) | `200 OK` |
+| `GET` | `/api/v1/market-prices/{id}` | `FARMER`, `ADMIN` | Get market price detail by ID | `200 OK` / `404 Not Found` |
+| `POST` | `/api/v1/market-prices` | `ADMIN` | Create a new benchmark market price record | `201 Created` / `403 Forbidden` |
+| `PUT` | `/api/v1/market-prices/{id}` | `ADMIN` | Update benchmark market price record | `200 OK` / `403 Forbidden` |
+| `DELETE` | `/api/v1/market-prices/{id}` | `ADMIN` | Delete benchmark market price record | `204 No Content` / `403 Forbidden` |
 
 ---
 
-## 5. Security & Multi-Tenant Data Isolation
+## 5. Domain Rules & Architectural Decisions
 
-AgriTrack enforces strict multi-tenant ownership resolution:
-1. **Farms**: Queried by `userId` resolved directly from the authenticated JWT token subject (`user.id`).
-2. **Fields**: Queried by `farm.userId == currentUser.id`.
-3. **Soil Records**: Queried by `field.farm.userId == currentUser.id`.
-4. **Crop Cycles**: Queried by `field.farm.userId == currentUser.id`.
-5. **Activities**: Queried by `field.farm.userId == currentUser.id`.
-6. **Irrigation Schedules**: Queried by `field.farm.userId == currentUser.id`.
-7. **Cross-Field Validation**: If an activity or irrigation schedule request supplies a `cropCycleId`, the service confirms that `cropCycle.getField().getId().equals(field.getId())` and belongs to the current user; mismatches are rejected immediately with 400 Bad Request or 404 Not Found.
+### 5.1 Ownership Hierarchy & Multi-Tenant Security
+```text
+User (id)
+  └── Farm (user_id FK)
+        └── Field (farm_id FK)
+              └── CropCycle (field_id FK)
+                    └── Harvest (crop_cycle_id FK)
+                          └── Sale (harvest_id FK)
+
+Global Commodity Benchmark:
+MarketPrice (Independent reference data — readable by all authenticated users)
+```
+- **Harvest Ownership**: Derived via `harvest.cropCycle.field.farm.user.id == currentUser.id`.
+- **Sale Ownership**: Derived via `sale.harvest.cropCycle.field.farm.user.id == currentUser.id`.
+- **Anti-Enumeration Protection**: Attempting to access or modify a harvest or sale owned by another farmer returns `404 Not Found` with generic resource masking to eliminate resource ID scanning.
+- **Market Prices**: Global reference benchmark data. All authenticated users have read access. Write operations are strictly secured with `@PreAuthorize("hasRole('ADMIN')")`.
+
+### 5.2 Referential Integrity & Deletion Strategy (Financial Protection)
+To protect financial and accounting records against accidental destruction:
+- `fk_harvests_crop_cycle`: Uses `ON DELETE RESTRICT`. A `CropCycle` cannot be deleted if associated `Harvest` records exist.
+- `fk_sales_harvest`: Uses `ON DELETE RESTRICT`. A `Harvest` cannot be deleted if associated `Sale` records exist. Attempting to delete a harvest with sales raises an `IllegalArgumentException` explaining that sales must be handled first.
+
+### 5.3 Authoritative Financial Calculations
+The backend is the sole authority for financial calculations and will not trust client-supplied totals:
+- `pricePerQuintal = pricePerKg * 100`
+- `totalAmount = quantityKg * pricePerKg`
+- `balanceDue = max(0, totalAmount - paidAmount)`
+- `paymentStatus`:
+  - `paidAmount == 0` → `PENDING`
+  - `paidAmount > 0 and paidAmount < totalAmount` → `PARTIAL`
+  - `paidAmount >= totalAmount` → `PAID`
+
+### 5.4 Transactional Inventory Reconciliation
+- **Concurrency Safety**: `HarvestRepository.findByIdAndCropCycleFieldFarmUserIdWithLock` employs row-level pessimistic write locking (`@Lock(LockModeType.PESSIMISTIC_WRITE)`) to ensure concurrent sales cannot oversell the same harvest.
+- **Creation**: Decrements `availableQuantityKg` and increments `soldQuantityKg`. Rejects with `400 Bad Request` if `quantityKg > availableQuantityKg`.
+- **Deletion**: Refunds `quantityKg` back into `availableQuantityKg` and decrements `soldQuantityKg`.
+- **Update**: Computes delta (`newQuantity - oldQuantity`) and adjusts available and sold quantities accordingly.
+- **Lifecycle Status**: Automatically updates harvest status to `SOLD_OUT` when `availableQuantityKg == 0 && soldQuantityKg > 0`, `PARTIALLY_SOLD` when `soldQuantityKg > 0`, and `HARVESTED` when `soldQuantityKg == 0`.
 
 ---
 
-## 6. Running Tests
+## 6. Database Setup & Seed Data
 
-Execute all unit and MockMvc tests:
+### 1. Database Creation & Migrations
+Execute the migrations in order:
+```powershell
+mysql -u root -p < database/01_create_database.sql
+mysql -u root -p < database/02_create_users_table.sql
+mysql -u root -p < database/03_create_farms_fields_soil_tables.sql
+mysql -u root -p < database/04_create_crop_cycles_table.sql
+mysql -u root -p < database/05_create_activities_and_irrigation_tables.sql
+mysql -u root -p < database/06_create_harvest_sales_market_tables.sql
+```
+
+### 2. Market Price Seed Data
+Load the initial APMC commodity market benchmark prices:
+```powershell
+mysql -u root -p < database/07_seed_market_prices.sql
+```
+
+---
+
+## 7. Running Tests
+
+Execute all 166 automated unit and MockMvc tests:
 ```powershell
 cd backend
 .\mvnw.cmd test
@@ -218,6 +313,7 @@ cd backend
 Execute tests including live MySQL database connectivity:
 ```powershell
 cd backend
+$env:DB_PASSWORD="your_password"
 .\mvnw.cmd test -DrunDbTests=true
 ```
 
