@@ -37,6 +37,56 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles duplicate email conflict during registration (HTTP 409).
+     */
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        logger.warn("Registration conflict: {}", ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
+     * Handles invalid authentication credentials (HTTP 401).
+     */
+    @ExceptionHandler({InvalidCredentialsException.class, org.springframework.security.authentication.BadCredentialsException.class})
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(Exception ex) {
+        logger.warn("Authentication failed: {}", ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error("Invalid email or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    /**
+     * Handles login attempts on deactivated user accounts (HTTP 403).
+     */
+    @ExceptionHandler(UserInactiveException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUserInactive(UserInactiveException ex) {
+        logger.warn("User inactive: {}", ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    /**
+     * Handles invalid, expired, or malformed JWT tokens (HTTP 401).
+     */
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleJwtAuthenticationException(JwtAuthenticationException ex) {
+        logger.warn("JWT authentication error: {}", ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    /**
+     * Handles access denied / authorization failures (HTTP 403).
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        logger.warn("Access denied: {}", ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error("Access denied: You do not have permission to access this resource");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    /**
      * Handles missing routes or unmapped endpoints in Spring MVC 6+ (HTTP 404).
      */
     @ExceptionHandler(NoResourceFoundException.class)

@@ -1,6 +1,6 @@
-# AgriTrack — Spring Boot Backend (Phase 13 Foundation)
+# AgriTrack — Spring Boot Backend (Phase 14: Authentication & User Management)
 
-Welcome to the backend service of **AgriTrack – Smart Farm Management System**. This backend is implemented as a clean, modular REST API using **Java 21 LTS** and **Spring Boot 4.1.x**, backed by **MySQL 8.0**.
+Welcome to the backend service of **AgriTrack – Smart Farm Management System**. This backend is implemented as a clean, modular REST API using **Java 21 LTS** and **Spring Boot 4.1.x**, backed by **MySQL 8.0** with **Spring Security** and **JWT Bearer token authentication**.
 
 ---
 
@@ -11,27 +11,32 @@ AgriTrack employs a three-tier architecture:
 2. **Application Layer**: Java Spring Boot REST API (`/backend`), serving endpoints at `/api/v1/*`.
 3. **Data Layer**: MySQL 8.0 relational database (`/database`), accessed via Spring Data JPA and Hibernate.
 
-Phase 13 establishes the foundational backend infrastructure:
-- Structured package hierarchy ready for future business domains.
-- Standardized, consistent API response envelope (`ApiResponse<T>`).
-- Centralized exception handling (`@RestControllerAdvice`).
-- CORS policies allowing local Vite frontend origin access (`http://localhost:5173`).
-- MySQL datasource configuration with environment variable abstraction and dedicated least-privilege user security.
-- Verification probe via `GET /api/v1/health`.
-- Test suite with opt-in live database verification.
+### Completed Milestones:
+- **Phase 13 (Foundation):** Clean layered architecture, standardized `ApiResponse<T>` envelope, `@RestControllerAdvice` error handling, CORS policies, MySQL connectivity, and health probe `/api/v1/health`.
+- **Phase 14 (Authentication & User Management):**
+  - Secure user database model (`users` table).
+  - User registration (`POST /api/v1/auth/register`) with default `FARMER` role.
+  - User authentication (`POST /api/v1/auth/login`) with BCrypt password verification.
+  - Stateless HMAC-SHA256 JWT access-token generation and validation.
+  - Spring Security stateless filter chain with `JwtAuthenticationFilter` and `JwtAuthenticationEntryPoint`.
+  - Protected endpoints requiring Bearer tokens (`GET /api/v1/users/me`).
+  - Robust exception handling for auth errors (401, 403, 409).
+  - 27 automated unit and integration tests passing with 100% success.
 
 ---
 
 ## 2. Technology Stack
 
-- **Language**: Java 21 LTS (Oracle JDK / OpenJDK)
+- **Language**: Java 21 LTS (Amazon Corretto / OpenJDK)
 - **Framework**: Spring Boot 4.1.2 (Current Stable GA Release)
 - **Framework Core**: Spring Framework 7.0.x
+- **Security**: Spring Security 7.0.x & BCrypt Password Hashing
+- **Authentication**: JJWT (Java JWT) 0.12.6 (HMAC-SHA256)
 - **Build Tool**: Apache Maven 3.9.16 (bundled with Maven Wrapper `mvnw`)
 - **Persistence**: Spring Data JPA & Hibernate 7.4 / 6.6
 - **Database Driver**: MySQL Connector/J 8.3+
 - **Validation**: Jakarta Validation / Hibernate Validator (Spring Boot Starter Validation)
-- **Testing**: JUnit 5 Jupiter, MockMvc, Spring Boot Test
+- **Testing**: JUnit 5 Jupiter, Mockito, MockMvc, Spring Boot Test, Spring Security Test
 
 ---
 
@@ -40,38 +45,56 @@ Phase 13 establishes the foundational backend infrastructure:
 ```
 backend/
 ├── .mvn/wrapper/                                  # Maven Wrapper runtime binaries & properties
-│   ├── maven-wrapper.jar
 │   └── maven-wrapper.properties
 ├── src/
 │   ├── main/
 │   │   ├── java/com/agritrack/
 │   │   │   ├── AgriTrackApplication.java          # Spring Boot main entrypoint
 │   │   │   ├── config/
-│   │   │   │   └── CorsConfig.java                # CORS registry (WebMvcConfigurer)
+│   │   │   │   ├── CorsConfig.java                # CORS registry (WebMvcConfigurer)
+│   │   │   │   ├── JwtAuthenticationEntryPoint.java # 401 Unauthorized JSON entry point
+│   │   │   │   ├── JwtAuthenticationFilter.java   # Bearer token interceptor filter
+│   │   │   │   └── SecurityConfig.java            # Spring Security configuration
 │   │   │   ├── controller/
-│   │   │   │   └── HealthController.java          # GET /api/v1/health probe
+│   │   │   │   ├── AuthController.java            # POST /auth/register, POST /auth/login
+│   │   │   │   ├── HealthController.java          # GET /health probe
+│   │   │   │   └── UserController.java            # GET /users/me (protected)
 │   │   │   ├── dto/
+│   │   │   │   ├── ApiError.java                  # Field-level validation error DTO
 │   │   │   │   ├── ApiResponse.java               # Standard API response JSON envelope
-│   │   │   │   └── ApiError.java                  # Field-level validation error DTO
+│   │   │   │   ├── AuthResponse.java              # JWT authentication response DTO
+│   │   │   │   ├── LoginRequest.java              # User login payload DTO
+│   │   │   │   ├── RegisterRequest.java           # User registration payload DTO
+│   │   │   │   └── UserResponse.java              # Safe user profile DTO
 │   │   │   ├── entity/
-│   │   │   │   └── package-info.java              # [Phase 14+] Future JPA domain entities
+│   │   │   │   ├── Role.java                      # User roles enum (FARMER, ADMIN)
+│   │   │   │   └── User.java                      # JPA entity mapping to 'users' table
 │   │   │   ├── exception/
+│   │   │   │   ├── EmailAlreadyExistsException.java # HTTP 409 Conflict
 │   │   │   │   ├── GlobalExceptionHandler.java    # Centralized @RestControllerAdvice
-│   │   │   │   └── ResourceNotFoundException.java # Reusable HTTP 404 domain exception
+│   │   │   │   ├── InvalidCredentialsException.java # HTTP 401 Unauthorized
+│   │   │   │   ├── JwtAuthenticationException.java # HTTP 401 Unauthorized
+│   │   │   │   ├── ResourceNotFoundException.java # HTTP 404 Not Found
+│   │   │   │   └── UserInactiveException.java     # HTTP 403 Forbidden
 │   │   │   ├── repository/
-│   │   │   │   └── package-info.java              # [Phase 14+] Future Spring Data JPA repos
+│   │   │   │   └── UserRepository.java            # Spring Data JPA repository for User
 │   │   │   ├── service/
-│   │   │   │   └── package-info.java              # [Phase 14+] Future business services
+│   │   │   │   ├── AuthService.java               # Registration & login workflows
+│   │   │   │   └── UserService.java               # Profile retrieval workflows
 │   │   │   └── util/
-│   │   │       └── package-info.java              # Future utility & formatting helpers
+│   │   │       └── JwtUtil.java                   # HMAC-SHA256 JWT utility
 │   │   └── resources/
-│   │       └── application.properties             # Context-path, datasource, and JPA config
+│   │       └── application.properties             # Context-path, datasource, and JWT config
 │   └── test/
 │       └── java/com/agritrack/
 │           ├── AgriTrackApplicationTests.java     # Spring context bootstrap verification
+│           ├── AuthControllerTest.java            # Registration & login endpoint tests
+│           ├── AuthServiceTest.java               # Authentication business logic tests
 │           ├── DatabaseConnectionTest.java        # Live MySQL connectivity (opt-in)
+│           ├── GlobalExceptionHandlerTest.java    # Exception handling unit tests
 │           ├── HealthControllerTest.java          # MockMvc GET /api/v1/health test
-│           └── GlobalExceptionHandlerTest.java    # Exception handling unit tests
+│           ├── JwtUtilTest.java                   # JWT generation, expiration & validation tests
+│           └── UserControllerTest.java            # Protected GET /api/v1/users/me tests
 ├── .env.example                                   # Environment variable reference template
 ├── mvnw                                           # Linux/macOS Maven wrapper script
 ├── mvnw.cmd                                       # Windows PowerShell/CMD Maven wrapper
@@ -79,74 +102,11 @@ backend/
 └── README.md                                      # Comprehensive backend documentation
 ```
 
-### Intended Future Package Responsibilities
-
-| Package | Responsibility |
-| :--- | :--- |
-| `config` | Spring configuration beans (Security, CORS, WebMvc, Auditing). |
-| `controller` | REST API controllers exposing HTTP endpoints under `/api/v1/*`. |
-| `dto` | Request and response Data Transfer Objects (Payloads, Projections). |
-| `entity` | Relational database entity models annotated with JPA `@Entity`. |
-| `exception` | Custom application exceptions and global exception interceptors. |
-| `repository` | Data access layer using Spring Data `JpaRepository<T, ID>`. |
-| `service` | Business logic, transaction boundaries, validations, and calculations. |
-| `util` | Reusable utilities (date calculators, math helpers, text formatters). |
-
 ---
 
-## 4. Prerequisites
+## 4. Environment Variables Configuration
 
-Before running the backend, ensure you have:
-1. **Java 21 LTS** installed (`java -version`).
-2. **MySQL Server 8.0** installed and running on port 3306 (`Get-Service MySQL80`).
-3. Apache Maven 3.9+ or the included `.\mvnw.cmd` wrapper.
-
----
-
-## 5. MySQL Database & Dedicated Runtime User Setup
-
-To follow security best practices, **do not use the MySQL `root` superuser** for regular application operation. The runtime application user should possess only data manipulation privileges (DML) and **no administrative or schema modification rights**.
-
-### Step 1: Initialize Database (PowerShell Compatible)
-In Windows PowerShell from the project root:
-```powershell
-Get-Content .\database\01_create_database.sql | mysql -u root -p
-```
-*(Enter your MySQL root password when prompted)*
-
-### Step 2: Create the Dedicated Application Runtime User
-Open MySQL CLI as `root`:
-```powershell
-mysql -u root -p
-```
-Run the following SQL commands (replace `YourSecurePasswordHere` with your chosen password):
-```sql
-CREATE USER IF NOT EXISTS 'agritrack_user'@'localhost' IDENTIFIED BY 'YourSecurePasswordHere';
--- Grant ONLY runtime data manipulation privileges (Least Privilege Principle)
-GRANT SELECT, INSERT, UPDATE, DELETE ON `agritrack_db`.* TO 'agritrack_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-Verify that the dedicated user can connect:
-```powershell
-mysql -u agritrack_user -p -e "USE agritrack_db; SELECT DATABASE();"
-```
-
-### Future Schema Migrations (Migration-User Approach)
-If automated schema migrations (e.g. Flyway / Liquibase) or structural DDL updates are introduced in future phases, a separate administrative migration user (e.g., `agritrack_migrator`) with DDL privileges (`CREATE`, `ALTER`, `DROP`, `INDEX`, `REFERENCES`) should be used strictly during deployment/migration runs, keeping `agritrack_user` restricted to DML operations.
-
----
-
-## 6. Environment Variable Setup on Windows PowerShell
-
-### Critical Distinction: Environment Variables vs. `.env` Files
-> [!IMPORTANT]
-> **Spring Boot does NOT automatically load `.env` files.**
-> The included `backend/.env.example` file is provided solely as a reference template and documentation aid. 
-> To configure Spring Boot locally, configure PowerShell environment variables (`$env:VARIABLE_NAME = "value"`).
-
-In Windows PowerShell, set the following configuration variables prior to starting the application:
+Set these variables in Windows PowerShell prior to starting the backend:
 
 ```powershell
 # 1. Database Connection URL
@@ -156,182 +116,176 @@ $env:DB_URL="jdbc:mysql://localhost:3306/agritrack_db?useSSL=false&allowPublicKe
 $env:DB_USERNAME="agritrack_user"
 
 # 3. Database Password (the password you created for agritrack_user)
-$env:DB_PASSWORD="YourSecurePasswordHere"
+$env:DB_PASSWORD="your_mysql_password_here"
 
 # 4. Server Port (Default is 8080)
 $env:SERVER_PORT="8080"
 
 # 5. Frontend Origin for CORS (Vite default is http://localhost:5173)
 $env:FRONTEND_ORIGIN="http://localhost:5173"
+
+# 6. JWT Secret Key (minimum 256-bit / 32 characters)
+$env:JWT_SECRET="YourCryptographicallyStrongSecretKeyMinimum32CharsLong!"
+
+# 7. JWT Expiration in Milliseconds (Default: 86400000 ms = 24 hours)
+$env:JWT_EXPIRATION_MS="86400000"
 ```
 
 ---
 
-## 7. How to Test the Backend
+## 5. Database Schema & Tables
 
-From the `backend/` directory:
-
-### Normal Test Suite (Can run on any machine without local MySQL)
+### Database Initialization:
 ```powershell
+Get-Content .\database\01_create_database.sql | mysql -u root -p
+Get-Content .\database\02_create_users_table.sql | mysql -u root -p
+```
+
+### Table: `users`
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | PRIMARY KEY, AUTO_INCREMENT | Unique user identifier |
+| `full_name` | `VARCHAR(100)` | NOT NULL | Farmer / user display name |
+| `email` | `VARCHAR(150)` | NOT NULL, UNIQUE, INDEX | Unique login email |
+| `phone` | `VARCHAR(20)` | NULL | Optional contact phone number |
+| `password_hash`| `VARCHAR(255)` | NOT NULL | BCrypt hashed password |
+| `role` | `VARCHAR(20)` | NOT NULL, DEFAULT 'FARMER' | Access role (`FARMER`, `ADMIN`) |
+| `is_active` | `BOOLEAN` | NOT NULL, DEFAULT TRUE | Account activation flag |
+| `created_at` | `TIMESTAMP` | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Record creation timestamp |
+| `updated_at` | `TIMESTAMP` | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE | Last modification timestamp |
+
+---
+
+## 6. Authentication API Endpoints
+
+All endpoints are prefixed with `/api/v1`.
+
+### 1. Register User
+* **Method & URL:** `POST /api/v1/auth/register`
+* **Access:** Public
+* **Request Headers:** `Content-Type: application/json`
+* **Request Body:**
+  ```json
+  {
+    "fullName": "Ramesh Kumar",
+    "email": "ramesh.farmer@example.com",
+    "phone": "9876543210",
+    "password": "SecurePassword123"
+  }
+  ```
+* **Success Response (HTTP 201 Created):**
+  ```json
+  {
+    "success": true,
+    "message": "User registered successfully",
+    "data": {
+      "id": 1,
+      "fullName": "Ramesh Kumar",
+      "email": "ramesh.farmer@example.com",
+      "phone": "9876543210",
+      "role": "FARMER",
+      "active": true,
+      "createdAt": "2026-11-13T20:30:25",
+      "updatedAt": "2026-11-13T20:30:25"
+    },
+    "timestamp": "2026-11-13T20:30:25"
+  }
+  ```
+
+### 2. Login User
+* **Method & URL:** `POST /api/v1/auth/login`
+* **Access:** Public
+* **Request Headers:** `Content-Type: application/json`
+* **Request Body:**
+  ```json
+  {
+    "email": "ramesh.farmer@example.com",
+    "password": "SecurePassword123"
+  }
+  ```
+* **Success Response (HTTP 200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Login successful",
+    "data": {
+      "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+      "tokenType": "Bearer",
+      "expiresIn": 86400000,
+      "user": {
+        "id": 1,
+        "fullName": "Ramesh Kumar",
+        "email": "ramesh.farmer@example.com",
+        "phone": "9876543210",
+        "role": "FARMER",
+        "active": true
+      }
+    },
+    "timestamp": "2026-11-13T20:31:11"
+  }
+  ```
+
+### 3. Get Authenticated User Profile
+* **Method & URL:** `GET /api/v1/users/me`
+* **Access:** Protected (Requires valid Bearer Token)
+* **Request Headers:**
+  - `Authorization: Bearer <accessToken>`
+* **Success Response (HTTP 200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "User profile retrieved successfully",
+    "data": {
+      "id": 1,
+      "fullName": "Ramesh Kumar",
+      "email": "ramesh.farmer@example.com",
+      "phone": "9876543210",
+      "role": "FARMER",
+      "active": true,
+      "createdAt": "2026-11-13T20:30:25",
+      "updatedAt": "2026-11-13T20:30:25"
+    },
+    "timestamp": "2026-11-13T20:31:42"
+  }
+  ```
+* **Unauthorized Response (HTTP 401 Unauthorized):**
+  ```json
+  {
+    "success": false,
+    "message": "Full authentication is required to access this resource: Unauthorized",
+    "data": null,
+    "timestamp": "2026-11-13T20:31:25"
+  }
+  ```
+
+---
+
+## 7. How to Run and Test the Backend
+
+### Run Automated Tests (No local MySQL required):
+```powershell
+cd backend
 .\mvnw.cmd test
 ```
-*Runs all unit and controller tests. The live database integration test is automatically skipped so builds never fail on machines without MySQL.*
+*Executes all 27 unit, MockMvc, and JWT security tests.*
 
-### Live Database Integration Test (Explicitly Opt-In)
-When you want to verify that the application establishes a real connection to your live MySQL database, opt-in using any of these methods:
-
-**Method 1 (System Property):**
+### Run Live Database Integration Test (Opt-In):
 ```powershell
+cd backend
 .\mvnw.cmd test -DrunDbTests=true
 ```
 
-**Method 2 (Maven Profile):**
+### Package Application:
 ```powershell
-.\mvnw.cmd test -P live-db
-```
-
-**Method 3 (Environment Variable):**
-```powershell
-$env:RUN_DB_TESTS="true"
-.\mvnw.cmd test
-```
-
-### Compile and Package into Executable JAR:
-```powershell
+cd backend
 .\mvnw.cmd package
 ```
 
-The resulting executable JAR will be located at:
-`backend/target/agritrack-backend-0.0.1-SNAPSHOT.jar`
-
----
-
-## 8. How to Run the Backend
-
-You can run the backend using either of the following methods:
-
-### Method A: Using Maven Wrapper (Development mode)
+### Start Backend Application:
 ```powershell
 cd backend
 $env:DB_USERNAME="agritrack_user"
-$env:DB_PASSWORD="YourSecurePasswordHere"
-.\mvnw.cmd spring-boot:run
-```
-
-### Method B: Using the packaged JAR
-```powershell
-cd backend
-$env:DB_USERNAME="agritrack_user"
-$env:DB_PASSWORD="YourSecurePasswordHere"
+$env:DB_PASSWORD="your_password"
 java -jar target/agritrack-backend-0.0.1-SNAPSHOT.jar
 ```
-
-When started, you should see:
-```
-Tomcat started on port 8080 (http) with context path '/api/v1'
-Started AgriTrackApplication in X.XXX seconds
-```
-
----
-
-## 9. How to Test the Health Endpoint
-
-Verify that the backend is responding:
-
-### Via Browser:
-Navigate to:
-[http://localhost:8080/api/v1/health](http://localhost:8080/api/v1/health)
-
-### Via Windows PowerShell:
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8080/api/v1/health" -Method Get | ConvertTo-Json -Depth 5
-```
-
-### Expected Output:
-```json
-{
-  "success": true,
-  "message": "AgriTrack API is operational",
-  "data": {
-    "application": "AgriTrack Backend",
-    "status": "UP",
-    "serverTime": "2026-11-03T21:34:48"
-  },
-  "timestamp": "2026-11-03T21:34:48"
-}
-```
-
----
-
-## 10. Common Startup & MySQL Errors Troubleshooting
-
-### 1. `Access denied for user 'agritrack_user'@'localhost'`
-- **Cause**: The password specified in `$env:DB_PASSWORD` does not match the password granted to `agritrack_user`.
-- **Fix**: Reset the password in MySQL:
-  ```powershell
-  mysql -u root -p -e "ALTER USER 'agritrack_user'@'localhost' IDENTIFIED BY 'NewPassword'; FLUSH PRIVILEGES;"
-  $env:DB_PASSWORD="NewPassword"
-  ```
-
-### 2. `Unknown database 'agritrack_db'`
-- **Cause**: The database has not been initialized yet.
-- **Fix**: Run the initialization SQL script:
-  ```powershell
-  Get-Content .\database\01_create_database.sql | mysql -u root -p
-  ```
-
-### 3. `Communications link failure / Connection refused`
-- **Cause**: The MySQL service is stopped.
-- **Fix**: Start the MySQL Windows service:
-  ```powershell
-  Start-Service MySQL80
-  ```
-
-### 4. `Port 8080 already in use`
-- **Cause**: Another process or previous Spring Boot instance is holding port 8080.
-- **Fix**: Find and kill the process holding port 8080:
-  ```powershell
-  Get-Process -Id (Get-NetTCPConnection -LocalPort 8080).OwningProcess | Stop-Process -Force
-  ```
-  Or change the port:
-  ```powershell
-  $env:SERVER_PORT="8081"
-  ```
-
----
-
-## 11. Current API Response Format
-
-All AgriTrack REST APIs follow a standardized JSON envelope:
-
-### Success Response Envelope:
-```json
-{
-  "success": true,
-  "message": "Request completed successfully",
-  "data": { ... },
-  "timestamp": "2026-11-03T12:00:00"
-}
-```
-
-### Error Response Envelope:
-```json
-{
-  "success": false,
-  "message": "Descriptive error message",
-  "data": null,
-  "timestamp": "2026-11-03T12:00:00"
-}
-```
-
----
-
-## 12. Intentionally Deferred to Later Phases
-
-To maintain a disciplined, testable foundation, the following features are intentionally **not** included in Phase 13 and will be introduced in subsequent phases:
-- User authentication, registration, login, and password hashing (Phase 14).
-- JWT token issuance, filter chains, and Spring Security (Phase 14).
-- Entity mappings and JPA repositories for Farms, Fields, Crops, Soil, Activities, etc.
-- Business REST controllers and CRUD service implementations.
-- Mandi / APMC and weather integrations.
-- Replacing frontend demo mock data with live API calls.
+*The application starts at `http://localhost:8080/api/v1`.*
