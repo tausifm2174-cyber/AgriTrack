@@ -1,4 +1,4 @@
-# AgriTrack — Spring Boot Backend (Phase 15: Farm, Field & Soil Backend APIs)
+# AgriTrack — Spring Boot Backend (Phase 16: Crop Management & Lifecycle Backend APIs)
 
 Welcome to the backend service of **AgriTrack – Smart Farm Management System**. This backend is implemented as a clean, modular REST API using **Java 21 LTS** and **Spring Boot 4.1.x**, backed by **MySQL 8.0** with **Spring Security** and **JWT Bearer token authentication**.
 
@@ -23,25 +23,20 @@ AgriTrack employs a three-tier architecture:
 - **Phase 15 (Farm, Field & Soil Backend APIs):**
   - Relational schema tables (`farms`, `fields`, `soil_records`) with ON DELETE CASCADE foreign keys and index optimization.
   - Strict server-side ownership isolation: User -> Farm -> Field -> Soil Record.
-  - Farm REST APIs:
-    - `POST /api/v1/farms` (HTTP 201 Created)
-    - `GET /api/v1/farms` (HTTP 200 OK)
-    - `GET /api/v1/farms/{id}` (HTTP 200 OK / 404 Not Found)
-    - `PUT /api/v1/farms/{id}` (HTTP 200 OK / 404 Not Found)
-    - `DELETE /api/v1/farms/{id}` (HTTP 200 OK / 404 Not Found)
-  - Field REST APIs:
-    - `POST /api/v1/farms/{farmId}/fields` (HTTP 201 Created)
-    - `GET /api/v1/farms/{farmId}/fields` (HTTP 200 OK)
-    - `GET /api/v1/fields/{id}` (HTTP 200 OK / 404 Not Found)
-    - `PUT /api/v1/fields/{id}` (HTTP 200 OK / 404 Not Found)
-    - `DELETE /api/v1/fields/{id}` (HTTP 200 OK / 404 Not Found)
-  - Soil Record REST APIs:
-    - `POST /api/v1/fields/{fieldId}/soil-records` (HTTP 201 Created)
-    - `GET /api/v1/fields/{fieldId}/soil-records` (HTTP 200 OK)
-    - `GET /api/v1/soil-records/{id}` (HTTP 200 OK / 404 Not Found)
-    - `PUT /api/v1/soil-records/{id}` (HTTP 200 OK / 404 Not Found)
-    - `DELETE /api/v1/soil-records/{id}` (HTTP 200 OK / 404 Not Found)
-  - 57 automated unit, mock, and integration tests passing with 100% success.
+  - Farm REST APIs (`/api/v1/farms/**`).
+  - Field REST APIs (`/api/v1/farms/{farmId}/fields`, `/api/v1/fields/{id}`).
+  - Soil Record REST APIs (`/api/v1/fields/{fieldId}/soil-records`, `/api/v1/soil-records/{id}`).
+- **Phase 16 (Crop Management & Lifecycle Backend APIs):**
+  - Relational schema table (`crop_cycles`) with foreign key `fk_crop_cycles_field` to `fields` and `ON DELETE CASCADE`.
+  - Strict server-side ownership isolation: User -> Farm -> Field -> CropCycle.
+  - Crop Cycle REST APIs:
+    - `POST /api/v1/fields/{fieldId}/crop-cycles` (HTTP 201 Created)
+    - `GET /api/v1/fields/{fieldId}/crop-cycles` (HTTP 200 OK)
+    - `GET /api/v1/crop-cycles` (HTTP 200 OK)
+    - `GET /api/v1/crop-cycles/{id}` (HTTP 200 OK / 404 Not Found)
+    - `PUT /api/v1/crop-cycles/{id}` (HTTP 200 OK / 404 Not Found)
+    - `DELETE /api/v1/crop-cycles/{id}` (HTTP 200 OK / 404 Not Found)
+  - 79 automated unit, mock, and integration tests passing with 100% success.
 
 ---
 
@@ -77,6 +72,7 @@ backend/
 │   │   │   │   └── SecurityConfig.java            # Spring Security configuration
 │   │   │   ├── controller/
 │   │   │   │   ├── AuthController.java            # POST /auth/register, POST /auth/login
+│   │   │   │   ├── CropCycleController.java       # /crop-cycles and /fields/{fieldId}/crop-cycles CRUD
 │   │   │   │   ├── FarmController.java            # /farms CRUD endpoints
 │   │   │   │   ├── FieldController.java           # /farms/{farmId}/fields, /fields/{id} CRUD
 │   │   │   │   ├── HealthController.java          # GET /health probe
@@ -86,6 +82,8 @@ backend/
 │   │   │   │   ├── ApiError.java                  # Field-level validation error DTO
 │   │   │   │   ├── ApiResponse.java               # Standard API response JSON envelope
 │   │   │   │   ├── AuthResponse.java              # JWT authentication response DTO
+│   │   │   │   ├── CropCycleRequest.java          # Crop cycle payload DTO
+│   │   │   │   ├── CropCycleResponse.java         # Crop cycle response DTO
 │   │   │   │   ├── FarmRequest.java               # Farm creation & update payload DTO
 │   │   │   │   ├── FarmResponse.java              # Farm response payload DTO
 │   │   │   │   ├── FieldRequest.java              # Field creation & update payload DTO
@@ -96,6 +94,7 @@ backend/
 │   │   │   │   ├── SoilRecordResponse.java        # Soil record response DTO
 │   │   │   │   └── UserResponse.java              # Safe user profile DTO
 │   │   │   ├── entity/
+│   │   │   │   ├── CropCycle.java                 # JPA entity mapping to 'crop_cycles' table
 │   │   │   │   ├── Farm.java                      # JPA entity mapping to 'farms' table
 │   │   │   │   ├── Field.java                     # JPA entity mapping to 'fields' table
 │   │   │   │   ├── Role.java                      # User roles enum (FARMER, ADMIN)
@@ -109,12 +108,14 @@ backend/
 │   │   │   │   ├── ResourceNotFoundException.java # HTTP 404 Not Found
 │   │   │   │   └── UserInactiveException.java     # HTTP 403 Forbidden
 │   │   │   ├── repository/
+│   │   │   │   ├── CropCycleRepository.java       # Spring Data JPA repository for CropCycle
 │   │   │   │   ├── FarmRepository.java            # Spring Data JPA repository for Farm
 │   │   │   │   ├── FieldRepository.java           # Spring Data JPA repository for Field
 │   │   │   │   ├── SoilRecordRepository.java      # Spring Data JPA repository for SoilRecord
 │   │   │   │   └── UserRepository.java            # Spring Data JPA repository for User
 │   │   │   ├── service/
 │   │   │   │   ├── AuthService.java               # Registration & login workflows
+│   │   │   │   ├── CropCycleService.java          # Crop cycle business logic with user isolation
 │   │   │   │   ├── FarmService.java               # Farm business logic with user isolation
 │   │   │   │   ├── FieldService.java              # Field business logic with user isolation
 │   │   │   │   ├── SoilRecordService.java         # Soil record business logic with user isolation
@@ -128,6 +129,8 @@ backend/
 │           ├── AgriTrackApplicationTests.java     # Spring context bootstrap verification
 │           ├── AuthControllerTest.java            # Registration & login endpoint tests
 │           ├── AuthServiceTest.java               # Authentication business logic tests
+│           ├── CropCycleControllerTest.java       # CropCycle endpoint tests with Bearer tokens
+│           ├── CropCycleServiceTest.java          # CropCycle business logic & ownership isolation tests
 │           ├── DatabaseConnectionTest.java        # Live MySQL connectivity (opt-in)
 │           ├── FarmControllerTest.java            # Farm endpoint tests with Bearer tokens
 │           ├── FarmServiceTest.java               # Farm business logic & ownership isolation tests
@@ -148,37 +151,20 @@ backend/
 
 ---
 
-## 4. REST API Reference (Phase 15 Endpoints)
+## 4. REST API Reference (Phase 16 Endpoints)
 
-All endpoints below require standard Bearer token authentication:
+All endpoints require standard Bearer token authentication:
 `Authorization: Bearer <access_token>`
 
-### Farm Endpoints (`/api/v1/farms`)
+### Crop Cycle Endpoints
 | Method | Endpoint | Description | Status Code |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/farms` | Create a new farm under the authenticated user | `201 Created` |
-| `GET` | `/api/v1/farms` | List all farms belonging to the authenticated user | `200 OK` |
-| `GET` | `/api/v1/farms/{id}` | Get farm by ID (returns 404 if owned by another user) | `200 OK` / `404 Not Found` |
-| `PUT` | `/api/v1/farms/{id}` | Update existing farm details | `200 OK` / `404 Not Found` |
-| `DELETE` | `/api/v1/farms/{id}` | Delete farm (cascades to all child fields and soil records) | `200 OK` / `404 Not Found` |
-
-### Field Endpoints
-| Method | Endpoint | Description | Status Code |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/farms/{farmId}/fields` | Create a new field parcel under a specific farm | `201 Created` |
-| `GET` | `/api/v1/farms/{farmId}/fields` | List all fields belonging to a farm | `200 OK` |
-| `GET` | `/api/v1/fields/{id}` | Get field by ID | `200 OK` / `404 Not Found` |
-| `PUT` | `/api/v1/fields/{id}` | Update field details | `200 OK` / `404 Not Found` |
-| `DELETE` | `/api/v1/fields/{id}` | Delete field (cascades to all child soil records) | `200 OK` / `404 Not Found` |
-
-### Soil Record Endpoints
-| Method | Endpoint | Description | Status Code |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/fields/{fieldId}/soil-records` | Add a lab test record to a specific field | `201 Created` |
-| `GET` | `/api/v1/fields/{fieldId}/soil-records` | List all soil records for a specific field | `200 OK` |
-| `GET` | `/api/v1/soil-records/{id}` | Get soil record by ID | `200 OK` / `404 Not Found` |
-| `PUT` | `/api/v1/soil-records/{id}` | Update soil record details | `200 OK` / `404 Not Found` |
-| `DELETE` | `/api/v1/soil-records/{id}` | Delete soil record | `200 OK` / `404 Not Found` |
+| `POST` | `/api/v1/fields/{fieldId}/crop-cycles` | Create a new crop cycle under a specific field | `201 Created` |
+| `GET` | `/api/v1/fields/{fieldId}/crop-cycles` | List all crop cycles belonging to a field | `200 OK` |
+| `GET` | `/api/v1/crop-cycles` | List all crop cycles belonging to the authenticated user | `200 OK` |
+| `GET` | `/api/v1/crop-cycles/{id}` | Get crop cycle by ID (returns 404 if owned by another user) | `200 OK` / `404 Not Found` |
+| `PUT` | `/api/v1/crop-cycles/{id}` | Update existing crop cycle details | `200 OK` / `404 Not Found` |
+| `DELETE` | `/api/v1/crop-cycles/{id}` | Delete crop cycle | `200 OK` / `404 Not Found` |
 
 ---
 
@@ -186,8 +172,9 @@ All endpoints below require standard Bearer token authentication:
 
 AgriTrack enforces strict multi-tenant ownership resolution:
 1. **Farms**: Queried by `userId` resolved directly from the authenticated JWT token subject (`user.id`).
-2. **Fields**: Queried by `farm.userId == currentUser.id`. If a user attempts to access a field belonging to another farmer, a `ResourceNotFoundException` is raised (`HTTP 404 Not Found`), completely hiding resource existence.
-3. **Soil Records**: Queried by `field.farm.userId == currentUser.id`. Unauthorized access requests identically yield `HTTP 404 Not Found`.
+2. **Fields**: Queried by `farm.userId == currentUser.id`.
+3. **Soil Records**: Queried by `field.farm.userId == currentUser.id`.
+4. **Crop Cycles**: Queried by `field.farm.userId == currentUser.id`. If a user attempts to access a crop cycle belonging to another farmer, a `ResourceNotFoundException` is raised (`HTTP 404 Not Found`), completely hiding resource existence.
 
 ---
 
@@ -195,15 +182,18 @@ AgriTrack enforces strict multi-tenant ownership resolution:
 
 Execute all unit and MockMvc tests:
 ```powershell
+cd backend
 .\mvnw.cmd test
 ```
 
 Execute tests including live MySQL database connectivity:
 ```powershell
+cd backend
 .\mvnw.cmd test -DrunDbTests=true
 ```
 
 Build executable production JAR:
 ```powershell
-.\mvnw.cmd clean package -DskipTests
+cd backend
+.\mvnw.cmd package -DskipTests
 ```
