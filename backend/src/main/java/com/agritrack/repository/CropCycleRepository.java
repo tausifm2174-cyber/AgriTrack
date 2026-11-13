@@ -16,6 +16,8 @@ public interface CropCycleRepository extends JpaRepository<CropCycle, Long> {
 
     List<CropCycle> findAllByFieldIdAndFieldFarmUserId(Long fieldId, Long userId);
 
+    List<CropCycle> findAllByFieldFarmIdAndFieldFarmUserId(Long farmId, Long userId);
+
     List<CropCycle> findAllByFieldFarmUserId(Long userId);
 
     Optional<CropCycle> findByIdAndFieldFarmUserId(Long id, Long userId);

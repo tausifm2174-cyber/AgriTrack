@@ -281,7 +281,54 @@ The backend is the sole authority for financial calculations and will not trust 
 
 ---
 
-## 6. Database Setup & Seed Data
+## 6. Expense Management & Financial / Profit & Loss (P&L) Analytics (Phase 19)
+
+### 6.1 Expense Endpoints
+All endpoints require JWT Bearer authentication under `/api/v1`:
+
+| Method | Endpoint | Description | Status Code |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/expenses` | Create an operational expense record | `201 Created` |
+| `GET` | `/expenses` | List/filter expenses by farm, field, crop cycle, category, status, date range | `200 OK` |
+| `GET` | `/expenses/{id}` | Get single expense details | `200 OK` |
+| `PUT` | `/expenses/{id}` | Update existing expense details | `200 OK` |
+| `DELETE` | `/expenses/{id}` | Delete an operational expense | `200 OK` |
+| `GET` | `/expenses/summary` | Aggregate expense metrics (total spend, count, category & payment breakdowns) | `200 OK` |
+
+### 6.2 Financial & P&L Analytics Endpoints
+
+| Method | Endpoint | Description | Status Code |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/financials/profit-loss` | Full Profit & Loss report (Revenue, Expenses, Net Profit, Margin %, Crop/Farm summaries) | `200 OK` |
+| `GET` | `/financials/monthly-trend` | Time-series monthly comparison of sales revenue vs. operational expenses | `200 OK` |
+
+### 6.3 Canonical Categorization & Payment Values
+- **Categories**: `Seeds`, `Fertilizer`, `Pesticides`, `Irrigation`, `Labour`, `Machinery`, `Fuel`, `Transport`, `Soil Testing`, `Other`
+- **Payment Methods**: `CASH`, `UPI`, `BANK_TRANSFER`, `CHEQUE`
+- **Payment Statuses**: `PAID`, `PENDING`
+
+### 6.4 Authoritative Financial & P&L Calculation Rules
+- `Total Revenue = sum(valid Sale.totalAmount)` (strictly excludes `CANCELLED` sales)
+- `Total Expenses = sum(Expense.amount)`
+- `Net Profit = Total Revenue - Total Expenses`
+- `Net Margin % = (Net Profit / Total Revenue) * 100`
+  - If `Total Revenue == 0`:
+    - `expenses == 0` → `0.00%`
+    - `expenses > 0` → `-100.00%`
+- `Cost per Quintal = Total Crop Expenses / (Total Harvested Quantity Kg / 100)`
+  - Guarded against division-by-zero: safely returns `0.00` when total harvested yield is zero or unharvested.
+- Monetary values and percentages are rounded to 2 decimal places using `RoundingMode.HALF_UP`.
+
+### 6.5 Ownership & Relational Verification
+- Authenticated user ownership derives through `Farm -> User`.
+- If `fieldId` is provided, field must belong to the specified farm.
+- If `cropCycleId` is provided, crop cycle must belong to the specified field and farm.
+- Inconsistent relationships are rejected with `400 Bad Request`.
+- Cross-user resource access returns `404 Not Found` to prevent data leakage.
+
+---
+
+## 7. Database Setup & Seed Data
 
 ### 1. Database Creation & Migrations
 Execute the migrations in order:
@@ -292,6 +339,7 @@ mysql -u root -p < database/03_create_farms_fields_soil_tables.sql
 mysql -u root -p < database/04_create_crop_cycles_table.sql
 mysql -u root -p < database/05_create_activities_and_irrigation_tables.sql
 mysql -u root -p < database/06_create_harvest_sales_market_tables.sql
+mysql -u root -p < database/08_create_expenses_table.sql
 ```
 
 ### 2. Market Price Seed Data
@@ -302,9 +350,9 @@ mysql -u root -p < database/07_seed_market_prices.sql
 
 ---
 
-## 7. Running Tests
+## 8. Running Tests
 
-Execute all 166 automated unit and MockMvc tests:
+Execute all 204 automated unit and MockMvc tests:
 ```powershell
 cd backend
 .\mvnw.cmd test

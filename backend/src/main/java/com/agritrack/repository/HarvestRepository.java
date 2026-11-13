@@ -37,4 +37,10 @@ public interface HarvestRepository extends JpaRepository<Harvest, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT h FROM Harvest h WHERE h.id = :id AND h.cropCycle.field.farm.user.id = :userId")
     Optional<Harvest> findByIdAndCropCycleFieldFarmUserIdWithLock(@Param("id") Long id, @Param("userId") Long userId);
+
+    @Query("SELECT h.cropCycle.id, COALESCE(SUM(h.harvestedQuantityKg), 0.00) FROM Harvest h " +
+           "WHERE h.cropCycle.field.farm.user.id = :userId " +
+           "AND (:farmId IS NULL OR h.cropCycle.field.farm.id = :farmId) " +
+           "GROUP BY h.cropCycle.id")
+    List<Object[]> sumHarvestedQuantityByCropCycle(@Param("userId") Long userId, @Param("farmId") Long farmId);
 }
