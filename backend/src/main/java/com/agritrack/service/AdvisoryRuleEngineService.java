@@ -34,9 +34,11 @@ public class AdvisoryRuleEngineService {
     private static final BigDecimal THRESHOLD_TEMP_CELSIUS = new BigDecimal("35.0");
 
     private final AdvisoryRepository advisoryRepository;
+    private final NotificationService notificationService;
 
-    public AdvisoryRuleEngineService(AdvisoryRepository advisoryRepository) {
+    public AdvisoryRuleEngineService(AdvisoryRepository advisoryRepository, NotificationService notificationService) {
         this.advisoryRepository = advisoryRepository;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -150,14 +152,19 @@ public class AdvisoryRuleEngineService {
             if (!"ACKNOWLEDGED".equals(advisory.getStatus()) && !"DISMISSED".equals(advisory.getStatus())) {
                 advisory.setStatus("ACTIVE");
             }
+            Advisory saved = advisoryRepository.save(advisory);
+            notificationService.createAdvisoryNotification(saved);
+            return saved;
         } else {
             advisory = new Advisory(
                     farm, null, null, ruleCode, category, advisoryType, severity,
                     title, message, triggerCondition, recommendedAction, "ACTIVE",
                     validUntil, dedupKey
             );
+            Advisory saved = advisoryRepository.save(advisory);
+            notificationService.createAdvisoryNotification(saved);
+            return saved;
         }
-        return advisoryRepository.save(advisory);
     }
 }
 

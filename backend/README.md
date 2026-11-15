@@ -1,4 +1,4 @@
-# AgriTrack — Spring Boot Backend (Phase 20: Weather Synchronization & Weather-Based Rule Advisory Backend APIs)
+# AgriTrack — Spring Boot Backend (Phase 21: Notification & Alert Management Backend APIs)
 
 Welcome to the backend service of **AgriTrack – Smart Farm Management System**. This backend is implemented as a clean, modular REST API using **Java 21 LTS** and **Spring Boot 4.1.x**, backed by **MySQL 8.0** with **Spring Security** and **JWT Bearer token authentication**.
 
@@ -48,6 +48,18 @@ AgriTrack employs a three-tier architecture:
 - **Phase 19 (Expense Management & Financial / Profit & Loss Analytics Backend APIs):**
   - Relational schema table (`expenses`) with ON DELETE CASCADE to `farms` and ON DELETE SET NULL to `fields` and `crop_cycles`.
   - Strict multi-tenant server-side ownership isolation: User -> Farm -> (optional Field) -> (optional CropCycle) -> Expense.
+  - Operational Expense REST APIs (`/api/v1/expenses/**`).
+  - Financial Analytics & P&L Calculation REST APIs (`/api/v1/analytics/financial/summary`, `/api/v1/analytics/financial/by-crop`, `/api/v1/analytics/financial/monthly`).
+- **Phase 20 (Weather Synchronization & Weather-Based Rule Advisory Backend APIs):**
+  - Relational schema tables (`weather_snapshots`, `weather_forecasts`, `advisories`).
+  - Weather integration with OpenWeatherMap API and high-fidelity fallback weather simulator.
+  - Weather synchronization REST APIs (`/api/v1/farms/{farmId}/weather/**`).
+  - Rule-based agronomic hazard advisory engine (`/api/v1/advisories/**`).
+- **Phase 21 (Notification & Alert Management Backend APIs):**
+  - Relational schema table (`notifications`) with ON DELETE CASCADE to `users` and ON DELETE SET NULL to contextual resources (`farms`, `fields`, `crop_cycles`, `advisories`).
+  - Strict server-side ownership isolation scoped to authenticated user via JWT.
+  - Advisory-to-Notification bridge: automatically generates user notification records when agronomic hazard advisories trigger, backed by composite deduplication key (`user_id`, `dedup_key`) to eliminate notification spam on repeated syncs.
+  - Notification management REST APIs (`/api/v1/notifications/**`) with pagination, unread badge counter, categorical/severity breakdown summaries, read/unread status updates, and bulk clear/read operations.
   - Canonical validation for categories and payment methods.
   - Operational Expense REST APIs (`/api/v1/expenses/**`).
   - Financial Analytics REST APIs (`/api/v1/financials/profit-loss`, `/api/v1/financials/monthly-trend`).
@@ -400,6 +412,7 @@ mysql -u root -p < database/05_create_activities_and_irrigation_tables.sql
 mysql -u root -p < database/06_create_harvest_sales_market_tables.sql
 mysql -u root -p < database/08_create_expenses_table.sql
 mysql -u root -p < database/09_create_weather_and_advisory_tables.sql
+mysql -u root -p < database/10_create_notifications_table.sql
 ```
 
 ### 2. Market Price Seed Data
@@ -412,7 +425,7 @@ mysql -u root -p < database/07_seed_market_prices.sql
 
 ## 9. Running Tests
 
-Execute all 230 automated unit and MockMvc tests:
+Execute all 254 automated unit and MockMvc tests:
 ```powershell
 cd backend
 .\mvnw.cmd test

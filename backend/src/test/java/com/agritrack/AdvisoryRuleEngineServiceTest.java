@@ -6,6 +6,7 @@ import com.agritrack.entity.User;
 import com.agritrack.entity.WeatherSnapshot;
 import com.agritrack.repository.AdvisoryRepository;
 import com.agritrack.service.AdvisoryRuleEngineService;
+import com.agritrack.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class AdvisoryRuleEngineServiceTest {
 
     @Mock
     private AdvisoryRepository advisoryRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private AdvisoryRuleEngineService ruleEngine;
