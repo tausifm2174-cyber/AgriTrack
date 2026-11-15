@@ -64,12 +64,12 @@ export default function SoilRecordCard({ record, onViewDetails }) {
           <div className="agri-soil-card__nutrient-bar-group">
             <div className="agri-soil-card__nutrient-label-row">
               <span>{t('soil.nitrogen', 'Nitrogen (N)')}</span>
-              <strong>{record.nitrogen} kg/ha ({translateStatus(record.nitrogenRating, t)})</strong>
+              <strong>{record.nitrogen != null ? `${record.nitrogen} kg/ha` : '-'} ({translateStatus(record.nitrogenRating, t)})</strong>
             </div>
             <div className="agri-field-card__progress-bar">
               <div
                 className="agri-field-card__progress-fill"
-                style={{ width: `${Math.min(100, (record.nitrogen / 400) * 100)}%`, backgroundColor: '#3b82f6' }}
+                style={{ width: `${Math.min(100, ((record.nitrogen || 0) / 400) * 100)}%`, backgroundColor: '#3b82f6' }}
               />
             </div>
           </div>
@@ -77,12 +77,12 @@ export default function SoilRecordCard({ record, onViewDetails }) {
           <div className="agri-soil-card__nutrient-bar-group">
             <div className="agri-soil-card__nutrient-label-row">
               <span>{t('soil.phosphorus', 'Phosphorus (P)')}</span>
-              <strong>{record.phosphorus} kg/ha ({translateStatus(record.phosphorusRating, t)})</strong>
+              <strong>{record.phosphorus != null ? `${record.phosphorus} kg/ha` : '-'} ({translateStatus(record.phosphorusRating, t)})</strong>
             </div>
             <div className="agri-field-card__progress-bar">
               <div
                 className="agri-field-card__progress-fill"
-                style={{ width: `${Math.min(100, (record.phosphorus / 30) * 100)}%`, backgroundColor: '#f59e0b' }}
+                style={{ width: `${Math.min(100, ((record.phosphorus || 0) / 30) * 100)}%`, backgroundColor: '#f59e0b' }}
               />
             </div>
           </div>
@@ -90,12 +90,12 @@ export default function SoilRecordCard({ record, onViewDetails }) {
           <div className="agri-soil-card__nutrient-bar-group">
             <div className="agri-soil-card__nutrient-label-row">
               <span>{t('soil.potassium', 'Potassium (K)')}</span>
-              <strong>{record.potassium} kg/ha ({translateStatus(record.potassiumRating, t)})</strong>
+              <strong>{record.potassium != null ? `${record.potassium} kg/ha` : '-'} ({translateStatus(record.potassiumRating, t)})</strong>
             </div>
             <div className="agri-field-card__progress-bar">
               <div
                 className="agri-field-card__progress-fill"
-                style={{ width: `${Math.min(100, (record.potassium / 350) * 100)}%`, backgroundColor: '#8b5cf6' }}
+                style={{ width: `${Math.min(100, ((record.potassium || 0) / 350) * 100)}%`, backgroundColor: '#8b5cf6' }}
               />
             </div>
           </div>

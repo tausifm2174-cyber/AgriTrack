@@ -92,7 +92,9 @@
     "standard": "standard",
     "table": "table",
     "tableView": "tableView",
-    "view": "view"
+    "view": "view",
+    "deleting": "Deleting...",
+    "confirmDelete": "Confirm Deletion"
   },
   "navigation": {
     "groups": {
@@ -363,7 +365,8 @@
       "drip": "drip",
       "pond": "à²•à³ƒà²·à²¿ à²¹à³Šà²‚à²¡",
       "rainfed": "à²®à²³à³† à²†à²¶à³à²°à²¿à²¤"
-    }
+    },
+    "deleteCascadeWarning": "Deleting this farm holding will permanently delete all associated fields and soil records. This action cannot be undone."
   },
   "fields": {
     "title": "à²œà²®à³€à²¨à³ à²¤à³à²‚à²¡à³à²—à²³à³",
@@ -384,7 +387,10 @@
     "farmAndField": "à²«à²¾à²°à³à²®à³ à²®à²¤à³à²¤à³ à²•à³à²·à³‡à²¤à³à²°",
     "field": "à²•à³à²·à³‡à²¤à³à²°",
     "filterByFarm": "à²«à²¾à²°à³à²®à³ à²®à³‚à²²à²• à²«à²¿à²²à³à²Ÿà²°à³ à²®à²¾à²¡à²¿",
-    "totalFields": "totalFields"
+    "totalFields": "totalFields",
+    "noFarmsTitle": "No Farm Holdings Found",
+    "noFarmsDesc": "Fields must be associated with a farm holding. Please register your first farm holding before mapping field plots.",
+    "deleteCascadeWarning": "Deleting this field plot will permanently delete all associated soil test records. This action cannot be undone."
   },
   "soil": {
     "title": "à²®à²£à³à²£à²¿à²¨ à²†à²°à³‹à²—à³à²¯ à²®à²¤à³à²¤à³ à²ªà²°à³€à²•à³à²·à³†",
@@ -413,7 +419,13 @@
       "redSandyLoam": "redSandyLoam",
       "sandyLoam": "à²®à²°à²³à³ à²œà³‡à²¡à²¿à²®à²£à³à²£à³ (Sandy Loam)",
       "siltyClay": "siltyClay"
-    }
+    },
+    "noFieldsTitle": "No Fields Available for Testing",
+    "noFieldsDesc": "Soil lab reports must be linked to individual fields. Please map at least one field plot to log soil analyses.",
+    "noRecords": "No Soil Test Records Logged",
+    "noRecordsDesc": "Log your laboratory soil testing certificates to monitor soil fertility, pH, and macro nutrients.",
+    "addTest": "Log First Soil Test",
+    "deleteWarning": "Are you sure you want to delete this soil laboratory test record? This action cannot be undone."
   },
   "crops": {
     "title": "à²¬à³†à²³à³†à²—à²³ à²ªà²Ÿà³à²Ÿà²¿",
@@ -465,7 +477,9 @@
     "cropCycle": "à²šà²•à³à²°",
     "cropVariety": "cropVariety",
     "stage": "stage",
-    "viewMode": "viewMode"
+    "viewMode": "viewMode",
+    "noCrops": "No standing crops assigned",
+    "noCropAssigned": "No crop assigned"
   },
   "cropCalendar": {
     "title": "à²¬à³†à²³à³† à²•à³à²¯à²¾à²²à³†à²‚à²¡à²°à³",

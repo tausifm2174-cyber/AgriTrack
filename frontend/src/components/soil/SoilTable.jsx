@@ -77,28 +77,28 @@ export default function SoilTable({
               </td>
               <td>
                 <span className={`agri-soil-ph-badge ${getPhBadgeClass(r.ph)}`}>
-                  {r.ph} pH
+                  {r.ph != null ? `${r.ph} pH` : '-'}
                 </span>
               </td>
               <td>
                 <div className="agri-soil-npk-cell">
                   <span className="agri-soil-npk-pill agri-soil-npk-pill--n" title={t('soil.nitrogen', 'Nitrogen')}>
-                    N:{r.nitrogen}
+                    N:{r.nitrogen != null ? r.nitrogen : '-'}
                   </span>
                   <span className="agri-soil-npk-pill agri-soil-npk-pill--p" title={t('soil.phosphorus', 'Phosphorus')}>
-                    P:{r.phosphorus}
+                    P:{r.phosphorus != null ? r.phosphorus : '-'}
                   </span>
                   <span className="agri-soil-npk-pill agri-soil-npk-pill--k" title={t('soil.potassium', 'Potassium')}>
-                    K:{r.potassium}
+                    K:{r.potassium != null ? r.potassium : '-'}
                   </span>
                 </div>
 
               </td>
               <td>
-                <strong>{r.organicCarbon}%</strong>
+                <strong>{r.organicCarbon != null ? `${r.organicCarbon}%` : '-'}</strong>
               </td>
               <td>
-                <span>{r.moisturePercent}%</span>
+                <span>{r.moisturePercent != null ? `${r.moisturePercent}%` : '-'}</span>
               </td>
               <td>
                 <SoilStatus status={r.status} variant={r.statusVariant} />

@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, CheckCircle, Info } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '../common';
+import farmService from '../../services/farmService';
+import { adaptFarm } from '../../utils/adapters';
 
 /**
  * AddFarmModal component
- * Polished modal dialog for demo "Add Farm" registration.
+ * Modal dialog for registering a new farm holding with backend persistence.
  */
 export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
-    district: 'Karnal',
-    state: 'Haryana',
     areaAcres: '',
     soilType: 'Alluvial Loam',
     waterSource: 'Borewell / Tube Well',
@@ -21,6 +21,8 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
     notes: '',
   });
 
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   if (!isOpen) return null;
@@ -30,37 +32,54 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.areaAcres) return;
+    setErrorMsg('');
 
-    const newFarm = {
-      id: `farm-${Date.now()}`,
-      name: formData.name,
-      code: `FRM-00${Math.floor(Math.random() * 90 + 10)}`,
-      location: formData.location || 'Demo Village',
-      district: formData.district,
-      state: formData.state,
-      areaAcres: parseFloat(formData.areaAcres) || 5.0,
-      fieldsCount: 0,
-      fieldIds: [],
-      primaryCrops: formData.primaryCrop ? [formData.primaryCrop] : ['Wheat'],
-      soilSummary: `${formData.soilType} (Demo Logged)`,
-      irrigationSummary: formData.waterSource,
-      waterSource: formData.waterSource,
+    if (!formData.name.trim() || !formData.location.trim() || !formData.areaAcres) {
+      setErrorMsg(t('validation.required', 'Please fill in all required fields.'));
+      return;
+    }
+
+    const totalAreaNum = parseFloat(formData.areaAcres);
+    if (isNaN(totalAreaNum) || totalAreaNum <= 0) {
+      setErrorMsg(t('validation.number', 'Please enter a valid area greater than 0.'));
+      return;
+    }
+
+    const payload = {
+      farmName: formData.name.trim(),
+      location: formData.location.trim(),
+      totalArea: totalAreaNum,
+      areaUnit: 'Acres',
+      description: formData.notes ? formData.notes.trim() : null,
       status: 'Active',
-      statusVariant: 'success',
-      establishedYear: new Date().getFullYear(),
-      owner: 'XYZ (Farmer)',
-      notes: formData.notes || 'Newly registered demo farm holding.',
     };
 
-    setSubmitted(true);
-    setTimeout(() => {
-      onFarmAdded?.(newFarm);
-      setSubmitted(false);
-      onClose();
-    }, 1200);
+    setIsSubmitting(true);
+    try {
+      const createdFarm = await farmService.createFarm(payload);
+      const adapted = adaptFarm(createdFarm, []);
+      setSubmitted(true);
+      setTimeout(() => {
+        onFarmAdded?.(adapted);
+        setSubmitted(false);
+        setIsSubmitting(false);
+        setFormData({
+          name: '',
+          location: '',
+          areaAcres: '',
+          soilType: 'Alluvial Loam',
+          waterSource: 'Borewell / Tube Well',
+          primaryCrop: '',
+          notes: '',
+        });
+        onClose();
+      }, 1000);
+    } catch (err) {
+      setErrorMsg(err.message || t('common.error', 'Failed to register farm holding. Please try again.'));
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,7 +89,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
       aria-modal="true"
       aria-labelledby="add-farm-title"
       onClick={(e) => {
-        if (e.target === e.currentTarget && !submitted) onClose();
+        if (e.target === e.currentTarget && !submitted && !isSubmitting) onClose();
       }}
     >
       <div className="agri-modal-dialog">
@@ -88,7 +107,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
             className="agri-modal-close-btn"
             onClick={onClose}
             aria-label={t('common.close', 'Close dialog')}
-            disabled={submitted}
+            disabled={submitted || isSubmitting}
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -96,12 +115,26 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
 
         <form onSubmit={handleSubmit}>
           <div className="agri-modal-body">
-            <div className="agri-demo-badge-banner">
-              <Info size={16} aria-hidden="true" />
-              <span>
-                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'New farms are stored in memory for this session without backend persistence.')}
-              </span>
-            </div>
+            {/* Error Banner */}
+            {errorMsg && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  backgroundColor: '#fef2f2',
+                  color: '#b91c1c',
+                  border: '1px solid #fecaca',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  marginBottom: '1.25rem',
+                }}
+              >
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
@@ -128,6 +161,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                     className="agri-form-input"
                     value={formData.name}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -141,10 +175,11 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       name="location"
                       type="text"
                       required
-                      placeholder="e.g. Sector 4, Demo Village"
+                      placeholder="e.g. Sector 4, Karnal"
                       className="agri-form-input"
                       value={formData.location}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
                   </div>
 
@@ -156,13 +191,14 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       id="farm-area"
                       name="areaAcres"
                       type="number"
-                      step="0.1"
-                      min="0.5"
+                      step="0.01"
+                      min="0.01"
                       required
                       placeholder="e.g. 10.5"
                       className="agri-form-input"
                       value={formData.areaAcres}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
                   </div>
                 </div>
@@ -178,6 +214,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       className="agri-form-select"
                       value={formData.soilType}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     >
                       <option value="Alluvial Loam">{t('soil.types.alluvialLoam', 'Alluvial Loam')}</option>
                       <option value="Deep Black Soil">{t('soil.types.deepBlackSoil', 'Deep Black Soil')}</option>
@@ -198,6 +235,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       className="agri-form-select"
                       value={formData.waterSource}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     >
                       <option value="Borewell / Tube Well">{t('farms.waterSources.borewell', 'Borewell / Tube Well')}</option>
                       <option value="Drip Irrigation Network">{t('farms.waterSources.drip', 'Drip Irrigation Network')}</option>
@@ -206,22 +244,6 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                       <option value="Rainfed Catchment">{t('farms.waterSources.rainfed', 'Rainfed Catchment')}</option>
                     </select>
                   </div>
-
-                </div>
-
-                <div className="agri-form-group">
-                  <label htmlFor="farm-crop" className="agri-form-label">
-                    {t('fields.currentCrop', 'Primary Crop')}
-                  </label>
-                  <input
-                    id="farm-crop"
-                    name="primaryCrop"
-                    type="text"
-                    placeholder="e.g. Wheat (HD 2967) or Maize"
-                    className="agri-form-input"
-                    value={formData.primaryCrop}
-                    onChange={handleChange}
-                  />
                 </div>
 
                 <div className="agri-form-group">
@@ -236,6 +258,7 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                     className="agri-form-textarea"
                     value={formData.notes}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -244,11 +267,18 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
 
           {!submitted && (
             <div className="agri-modal-footer">
-              <Button variant="secondary" onClick={onClose} type="button">
+              <Button variant="secondary" onClick={onClose} type="button" disabled={isSubmitting}>
                 {t('common.cancel', 'Cancel')}
               </Button>
-              <Button variant="primary" type="submit">
-                {t('farms.addFarm', 'Register Farm')}
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    <span>{t('common.saving', 'Registering...')}</span>
+                  </>
+                ) : (
+                  <span>{t('farms.addFarm', 'Register Farm')}</span>
+                )}
               </Button>
             </div>
           )}

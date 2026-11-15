@@ -92,7 +92,9 @@
     "standard": "standard",
     "table": "table",
     "tableView": "tableView",
-    "view": "view"
+    "view": "view",
+    "deleting": "Deleting...",
+    "confirmDelete": "Confirm Deletion"
   },
   "navigation": {
     "groups": {
@@ -363,7 +365,8 @@
       "drip": "drip",
       "pond": "à´•àµà´³à´‚",
       "rainfed": "à´®à´´à´¯àµ† à´†à´¶àµà´°à´¯à´¿à´•àµà´•àµà´¨àµà´¨à´¤àµ"
-    }
+    },
+    "deleteCascadeWarning": "Deleting this farm holding will permanently delete all associated fields and soil records. This action cannot be undone."
   },
   "fields": {
     "title": "à´•àµƒà´·à´¿à´¯à´¿à´Ÿà´™àµà´™àµ¾",
@@ -384,7 +387,10 @@
     "farmAndField": "à´«à´¾à´®àµà´‚ à´ªà´¾à´Ÿà´µàµà´‚",
     "field": "à´ªà´¾à´Ÿà´‚",
     "filterByFarm": "à´«à´¾à´‚ à´…à´¨àµà´¸à´°à´¿à´šàµà´šàµ à´«à´¿àµ½à´Ÿàµà´Ÿàµ¼ à´šàµ†à´¯àµà´¯àµà´•",
-    "totalFields": "totalFields"
+    "totalFields": "totalFields",
+    "noFarmsTitle": "No Farm Holdings Found",
+    "noFarmsDesc": "Fields must be associated with a farm holding. Please register your first farm holding before mapping field plots.",
+    "deleteCascadeWarning": "Deleting this field plot will permanently delete all associated soil test records. This action cannot be undone."
   },
   "soil": {
     "title": "à´®à´£àµà´£àµà´ªà´°à´¿à´¶àµ‹à´§à´¨ & à´†à´°àµ‹à´—àµà´¯à´‚",
@@ -413,7 +419,13 @@
       "redSandyLoam": "redSandyLoam",
       "sandyLoam": "à´®à´£àµ½ à´•à´²àµ¼à´¨àµà´¨ à´Žà´•àµà´•àµ½ à´®à´£àµà´£àµ (Sandy Loam)",
       "siltyClay": "siltyClay"
-    }
+    },
+    "noFieldsTitle": "No Fields Available for Testing",
+    "noFieldsDesc": "Soil lab reports must be linked to individual fields. Please map at least one field plot to log soil analyses.",
+    "noRecords": "No Soil Test Records Logged",
+    "noRecordsDesc": "Log your laboratory soil testing certificates to monitor soil fertility, pH, and macro nutrients.",
+    "addTest": "Log First Soil Test",
+    "deleteWarning": "Are you sure you want to delete this soil laboratory test record? This action cannot be undone."
   },
   "crops": {
     "title": "à´µà´¿à´³ à´µà´¿à´µà´°à´™àµà´™àµ¾",
@@ -465,7 +477,9 @@
     "cropCycle": "à´šà´•àµà´°à´‚",
     "cropVariety": "cropVariety",
     "stage": "stage",
-    "viewMode": "viewMode"
+    "viewMode": "viewMode",
+    "noCrops": "No standing crops assigned",
+    "noCropAssigned": "No crop assigned"
   },
   "cropCalendar": {
     "title": "à´µà´¿à´³ à´•à´²à´£àµà´Ÿàµ¼",

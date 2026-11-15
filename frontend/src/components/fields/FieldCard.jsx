@@ -40,7 +40,7 @@ export default function FieldCard({ field, onViewDetails }) {
           </h2>
           <span className="agri-field-card__farm-name">
             <Warehouse size={12} aria-hidden="true" />
-            <span>{t(`farms.demoNames.${field.farmId}`, field.farmName)}</span>
+            <span>{field.farmName || t(`farms.demoNames.${field.farmId}`, field.farmName) || 'Assigned Farm'}</span>
           </span>
         </div>
         <StatusBadge variant={field.healthVariant || 'success'}>
@@ -52,28 +52,39 @@ export default function FieldCard({ field, onViewDetails }) {
       <div className="agri-field-card__body">
         {/* Crop & Growth Stage Banner */}
         <div className="agri-field-card__crop-banner">
-          <div className="agri-field-card__crop-header">
-            <span className="agri-field-card__crop-title">
-              <Sprout size={15} className="text-primary" aria-hidden="true" />
-              <span>
-                {translateCrop(field.currentCrop, t)}{' '}
-                {field.cropVariety ? `(${translateVariety(field.cropVariety, t)})` : ''}
+          {field.currentCrop ? (
+            <>
+              <div className="agri-field-card__crop-header">
+                <span className="agri-field-card__crop-title">
+                  <Sprout size={15} className="text-primary" aria-hidden="true" />
+                  <span>
+                    {translateCrop(field.currentCrop, t)}{' '}
+                    {field.cropVariety ? `(${translateVariety(field.cropVariety, t)})` : ''}
+                  </span>
+                </span>
+                <span className="agri-field-card__crop-season">{translateSeason(field.cropSeason, t)}</span>
+              </div>
+
+              <div className="agri-field-card__stage-row">
+                <span>{t('crops.stage', 'Stage')}: <strong>{translateStage(field.cropStage, t)}</strong></span>
+                <span>{field.cropProgress}% {t('crops.cropCycle', 'Cycle')}</span>
+              </div>
+
+              <div className="agri-field-card__progress-bar">
+                <div
+                  className="agri-field-card__progress-fill"
+                  style={{ width: `${field.cropProgress || 50}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0' }}>
+              <Sprout size={15} style={{ color: '#94a3b8' }} aria-hidden="true" />
+              <span style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic' }}>
+                {t('crops.noCropAssigned', 'No crop assigned')}
               </span>
-            </span>
-            <span className="agri-field-card__crop-season">{translateSeason(field.cropSeason, t)}</span>
-          </div>
-
-          <div className="agri-field-card__stage-row">
-            <span>{t('crops.stage', 'Stage')}: <strong>{translateStage(field.cropStage, t)}</strong></span>
-            <span>{field.cropProgress}% {t('crops.cropCycle', 'Cycle')}</span>
-          </div>
-
-          <div className="agri-field-card__progress-bar">
-            <div
-              className="agri-field-card__progress-fill"
-              style={{ width: `${field.cropProgress || 50}%` }}
-            />
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Specs Grid */}

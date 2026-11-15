@@ -53,27 +53,39 @@ export default function FarmCard({ farm, onViewDetails }) {
         <div className="agri-farm-card__meta-group">
           <div className="agri-farm-card__meta-row">
             <span className="agri-farm-card__meta-label">{t('dashboard.activeCrops', 'Primary Crops')}</span>
-            <div className="agri-farm-card__crops-pills">
-              {farm.primaryCrops.map((crop, idx) => (
-                <span key={idx} className="agri-farm-card__crop-pill">
-                  {crop}
-                </span>
-              ))}
-            </div>
+            {Array.isArray(farm.primaryCrops) && farm.primaryCrops.length > 0 ? (
+              <div className="agri-farm-card__crops-pills">
+                {farm.primaryCrops.map((crop, idx) => (
+                  <span key={idx} className="agri-farm-card__crop-pill">
+                    {crop}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                {t('crops.noCrops', 'No standing crops assigned')}
+              </span>
+            )}
           </div>
 
           {/* Soil & Water Summary */}
-          <div className="agri-farm-card__meta-row">
-            <span className="agri-farm-card__meta-label">{t('soil.title', 'Soil')} & {t('navigation.irrigation', 'Irrigation')}</span>
-            <p className="agri-farm-card__soil-text">
-              <Sprout size={14} className="text-primary" aria-hidden="true" />
-              <span>{farm.soilSummary}</span>
-            </p>
-            <p className="agri-farm-card__soil-text text-muted" style={{ marginTop: '0.2rem' }}>
-              <Droplet size={14} style={{ color: 'var(--info-text)' }} aria-hidden="true" />
-              <span>{farm.irrigationSummary || farm.waterSource}</span>
-            </p>
-          </div>
+          {(farm.soilSummary || farm.irrigationSummary || farm.waterSource) ? (
+            <div className="agri-farm-card__meta-row">
+              <span className="agri-farm-card__meta-label">{t('soil.title', 'Soil')} & {t('navigation.irrigation', 'Irrigation')}</span>
+              {farm.soilSummary && (
+                <p className="agri-farm-card__soil-text">
+                  <Sprout size={14} className="text-primary" aria-hidden="true" />
+                  <span>{farm.soilSummary}</span>
+                </p>
+              )}
+              {(farm.irrigationSummary || farm.waterSource) && (
+                <p className="agri-farm-card__soil-text text-muted" style={{ marginTop: '0.2rem' }}>
+                  <Droplet size={14} style={{ color: 'var(--info-text)' }} aria-hidden="true" />
+                  <span>{farm.irrigationSummary || farm.waterSource}</span>
+                </p>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
 

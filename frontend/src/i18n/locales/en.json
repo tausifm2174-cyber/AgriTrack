@@ -92,7 +92,9 @@
     "standard": "Standard",
     "table": "Table View",
     "tableView": "Table View",
-    "view": "View toggle"
+    "view": "View toggle",
+    "deleting": "Deleting...",
+    "confirmDelete": "Confirm Deletion"
   },
   "navigation": {
     "groups": {
@@ -363,7 +365,8 @@
       "drip": "Drip Irrigation Network",
       "pond": "Farm Pond & Solar Pump",
       "rainfed": "Rainfed Catchment"
-    }
+    },
+    "deleteCascadeWarning": "Deleting this farm holding will permanently delete all associated fields and soil records. This action cannot be undone."
   },
   "fields": {
     "title": "Field Parcels",
@@ -384,7 +387,10 @@
     "farmAndField": "Farm & Field",
     "field": "Field",
     "filterByFarm": "Filter by farm",
-    "totalFields": "Total Fields"
+    "totalFields": "Total Fields",
+    "noFarmsTitle": "No Farm Holdings Found",
+    "noFarmsDesc": "Fields must be associated with a farm holding. Please register your first farm holding before mapping field plots.",
+    "deleteCascadeWarning": "Deleting this field plot will permanently delete all associated soil test records. This action cannot be undone."
   },
   "soil": {
     "title": "Soil Health & Testing",
@@ -413,7 +419,13 @@
       "redSandyLoam": "Red Sandy Loam",
       "sandyLoam": "Sandy Loam",
       "siltyClay": "Silty Clay"
-    }
+    },
+    "noFieldsTitle": "No Fields Available for Testing",
+    "noFieldsDesc": "Soil lab reports must be linked to individual fields. Please map at least one field plot to log soil analyses.",
+    "noRecords": "No Soil Test Records Logged",
+    "noRecordsDesc": "Log your laboratory soil testing certificates to monitor soil fertility, pH, and macro nutrients.",
+    "addTest": "Log First Soil Test",
+    "deleteWarning": "Are you sure you want to delete this soil laboratory test record? This action cannot be undone."
   },
   "crops": {
     "title": "Crop Portfolio",
@@ -465,7 +477,9 @@
     "cropCycle": "Cycle",
     "cropVariety": "Crop & Variety",
     "stage": "Stage",
-    "viewMode": "View toggle"
+    "viewMode": "View toggle",
+    "noCrops": "No standing crops assigned",
+    "noCropAssigned": "No crop assigned"
   },
   "cropCalendar": {
     "title": "Crop Calendar",
