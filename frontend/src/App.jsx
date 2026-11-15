@@ -1,9 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import './App.css';
 
-// Page components
+// Auth Pages
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+// Business Pages
 import DashboardPage from './pages/DashboardPage';
 import FarmsPage from './pages/FarmsPage';
 import FieldsPage from './pages/FieldsPage';
@@ -25,37 +31,46 @@ import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 
 /**
- * Root Application Router with nested AppLayout
+ * Root Application Router with AuthProvider and Protected Routes
  */
 function App() {
   return (
     <BrowserRouter>
-      <NotificationProvider>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/farms" element={<FarmsPage />} />
-            <Route path="/fields" element={<FieldsPage />} />
-            <Route path="/soil" element={<SoilPage />} />
-            <Route path="/crops" element={<CropsPage />} />
-            <Route path="/crop-calendar" element={<CropCalendarPage />} />
-            <Route path="/activities" element={<ActivitiesPage />} />
-            <Route path="/irrigation" element={<IrrigationPage />} />
-            <Route path="/weather" element={<WeatherPage />} />
-            <Route path="/recommendations" element={<RecommendationsPage />} />
-            <Route path="/harvests" element={<HarvestsPage />} />
-            <Route path="/sales" element={<SalesPage />} />
-            <Route path="/market-prices" element={<MarketPricesPage />} />
-            <Route path="/expenses" element={<ExpensesPage />} />
-            <Route path="/revenue" element={<RevenuePage />} />
-            <Route path="/profit-loss" element={<ProfitLossPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </NotificationProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <Routes>
+            {/* Public Routes (No AppLayout / Sidebar) */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            {/* Protected Routes (Require JWT & Authenticated User) */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/farms" element={<FarmsPage />} />
+                <Route path="/fields" element={<FieldsPage />} />
+                <Route path="/soil" element={<SoilPage />} />
+                <Route path="/crops" element={<CropsPage />} />
+                <Route path="/crop-calendar" element={<CropCalendarPage />} />
+                <Route path="/activities" element={<ActivitiesPage />} />
+                <Route path="/irrigation" element={<IrrigationPage />} />
+                <Route path="/weather" element={<WeatherPage />} />
+                <Route path="/recommendations" element={<RecommendationsPage />} />
+                <Route path="/harvests" element={<HarvestsPage />} />
+                <Route path="/sales" element={<SalesPage />} />
+                <Route path="/market-prices" element={<MarketPricesPage />} />
+                <Route path="/expenses" element={<ExpensesPage />} />
+                <Route path="/revenue" element={<RevenuePage />} />
+                <Route path="/profit-loss" element={<ProfitLossPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Route>
+          </Routes>
+        </NotificationProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

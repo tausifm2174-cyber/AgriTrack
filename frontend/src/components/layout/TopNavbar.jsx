@@ -1,22 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, ChevronDown, User, Bell, LogOut, CheckCircle } from 'lucide-react';
+import { Menu, ChevronDown, User, Bell, LogOut } from 'lucide-react';
 import Breadcrumbs from './Breadcrumbs';
 import NotificationBell from './NotificationBell';
 import LanguageSelector from './LanguageSelector';
+import { useAuth } from '../../context/useAuth';
 
 /**
  * TopNavbar component
+ * Displays live authenticated user details and handles logout via AuthContext.
  * @param {Object} props
  * @param {Function} props.onOpenMobileSidebar
  */
 export default function TopNavbar({ onOpenMobileSidebar }) {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [logoutMessage, setLogoutMessage] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Dynamic user display properties
+  const displayName = user?.fullName || 'Farmer';
+  const displayEmail = user?.email || '';
+  const displayRole = user?.role === 'FARMER' ? t('topbar.role', 'Farmer') : (user?.role || t('topbar.role', 'Farmer'));
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'AG';
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -39,11 +53,9 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
   };
 
   const handleLogout = () => {
-    setLogoutMessage(true);
-    setTimeout(() => {
-      setLogoutMessage(false);
-      setUserDropdownOpen(false);
-    }, 2000);
+    setUserDropdownOpen(false);
+    logout();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -83,11 +95,11 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
             aria-label={t('topbar.profileSettings', 'User profile options')}
           >
             <div className="agri-user-avatar">
-              <span>XYZ</span>
+              <span>{initials}</span>
             </div>
             <div className="agri-user-info">
-              <span className="agri-user-name">XYZ</span>
-              <span className="agri-user-role">{t('topbar.role', 'Farmer')}</span>
+              <span className="agri-user-name">{displayName}</span>
+              <span className="agri-user-role">{displayRole}</span>
             </div>
             <ChevronDown size={15} className="agri-user-chevron" aria-hidden="true" />
           </button>
@@ -97,13 +109,13 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
             <div className="agri-dropdown-menu agri-user-dropdown" role="menu">
               <div className="agri-dropdown-header agri-user-dropdown-header">
                 <div className="agri-user-avatar agri-user-avatar--lg">
-                  <span>XYZ</span>
+                  <span>{initials}</span>
                 </div>
                 <div>
-                  <p className="agri-user-dropdown-name">XYZ</p>
-                  <p className="agri-user-dropdown-email">xyz.farmer@agritrack.in</p>
+                  <p className="agri-user-dropdown-name">{displayName}</p>
+                  <p className="agri-user-dropdown-email">{displayEmail}</p>
                   <span className="agri-badge agri-badge--success" style={{ marginTop: '0.25rem' }}>
-                    {t('topbar.role', 'Farmer')}
+                    {displayRole}
                   </span>
                 </div>
               </div>
@@ -131,22 +143,15 @@ export default function TopNavbar({ onOpenMobileSidebar }) {
               </div>
 
               <div className="agri-dropdown-footer">
-                {logoutMessage ? (
-                  <div className="agri-demo-logout-alert">
-                    <CheckCircle size={14} className="text-success" />
-                    <span>{t('topbar.logoutNotice', 'Demo session. Auth backend planned in next phase.')}</span>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="agri-dropdown-item agri-dropdown-item--danger"
-                    onClick={handleLogout}
-                    role="menuitem"
-                  >
-                    <LogOut size={16} className="agri-dropdown-item__icon" />
-                    <span>{t('topbar.logout', 'Logout (Demo)')}</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="agri-dropdown-item agri-dropdown-item--danger"
+                  onClick={handleLogout}
+                  role="menuitem"
+                >
+                  <LogOut size={16} className="agri-dropdown-item__icon" />
+                  <span>{t('topbar.logout', 'Sign Out')}</span>
+                </button>
               </div>
             </div>
           )}
