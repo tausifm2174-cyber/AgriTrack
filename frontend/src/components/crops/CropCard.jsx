@@ -44,12 +44,12 @@ export default function CropCard({
           <div className="agri-crop-card__location-sub">
             <span className="agri-crop-card__farm-pill">
               <Warehouse size={12} aria-hidden="true" />
-              <span>{t(`farms.demoNames.${crop.farmId}`, crop.farmName)}</span>
+              <span>{crop.farmName || (crop.farmId ? t(`farms.demoNames.${crop.farmId}`, 'Farm Holding') : '')}</span>
             </span>
             <span className="agri-crop-card__dot-sep">•</span>
             <span className="agri-crop-card__field-pill">
               <Grid3X3 size={12} aria-hidden="true" />
-              <span>{formatFieldName(crop.fieldName, t)}</span>
+              <span>{formatFieldName(crop.fieldName, t) || 'Field'}</span>
             </span>
           </div>
         </div>
@@ -68,22 +68,22 @@ export default function CropCard({
         <div className="agri-crop-card__specs">
           <div className="agri-crop-card__spec-item">
             <span className="agri-crop-card__spec-label">{t('fields.area', 'Cultivated Area')}</span>
-            <span className="agri-crop-card__spec-value">{formatAcres(crop.areaAcres)}</span>
+            <span className="agri-crop-card__spec-value">{crop.areaAcres ? formatAcres(crop.areaAcres) : '—'}</span>
           </div>
 
           <div className="agri-crop-card__spec-item">
             <span className="agri-crop-card__spec-label">{t('fields.soilType', 'Soil Medium')}</span>
-            <span className="agri-crop-card__spec-value">{translateSoilType(crop.soilType, t)}</span>
+            <span className="agri-crop-card__spec-value">{crop.soilType ? translateSoilType(crop.soilType, t) : '—'}</span>
           </div>
 
           <div className="agri-crop-card__spec-item">
             <span className="agri-crop-card__spec-label">{t('crops.sowingDate', 'Sowing Date')}</span>
-            <span className="agri-crop-card__spec-value">{crop.sowingDate}</span>
+            <span className="agri-crop-card__spec-value">{crop.sowingDate || '—'}</span>
           </div>
 
           <div className="agri-crop-card__spec-item">
             <span className="agri-crop-card__spec-label">{t('crops.expectedHarvest', 'Expected Harvest')}</span>
-            <span className="agri-crop-card__spec-value">{crop.expectedHarvestDate}</span>
+            <span className="agri-crop-card__spec-value">{crop.expectedHarvestDate || '—'}</span>
           </div>
         </div>
 

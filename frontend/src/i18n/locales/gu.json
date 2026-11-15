@@ -479,7 +479,15 @@
     "stage": "stage",
     "viewMode": "viewMode",
     "noCrops": "No standing crops assigned",
-    "noCropAssigned": "No crop assigned"
+    "noCropAssigned": "No crop assigned",
+    "deleteCrop": "પાક ચક્ર કાઢી નાખો",
+    "deleteWarning": "શું તમે ખરેખર આ પાક ચક્ર કાઢી નાખવા માંગો છો? આ ક્રિયા પૂર્વવત્ કરી શકાતી નથી.",
+    "noFarmsOrFields": "કોઈ ખેતર ઉપલબ્ધ નથી. કૃપા કરીને પાક ચક્ર ઉમેરતા પહેલા ખેતરની નોંધણી કરો.",
+    "noFieldsForFarm": "પસંદ કરેલ ફાર્મ હેઠળ કોઈ ખેતર મળ્યું નથી. કૃપા કરીને પહેલા ખેતર ઉમેરો.",
+    "saving": "પાક ચક્ર સાચવી રહ્યું છે...",
+    "deleting": "કાઢી રહ્યું છે...",
+    "editCrop": "પાક ચક્ર સંપાદિત કરો",
+    "loadError": "પાક ચક્ર લોડ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
   },
   "cropCalendar": {
     "title": "àªªàª¾àª• àª•à«‡àª²à«‡àª¨à«àª¡àª°",

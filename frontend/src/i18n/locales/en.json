@@ -479,7 +479,15 @@
     "stage": "Stage",
     "viewMode": "View toggle",
     "noCrops": "No standing crops assigned",
-    "noCropAssigned": "No crop assigned"
+    "noCropAssigned": "No crop assigned",
+    "deleteCrop": "Delete Crop Cycle",
+    "deleteWarning": "Are you sure you want to delete this crop cycle? This action cannot be undone.",
+    "noFarmsOrFields": "No field parcels available. Please register a farm holding and map field plots before adding crop cycles.",
+    "noFieldsForFarm": "No field plots found under the selected farm holding. Please add a field parcel first.",
+    "saving": "Saving Crop Cycle...",
+    "deleting": "Deleting...",
+    "editCrop": "Edit Crop Cycle",
+    "loadError": "Failed to load crop cycles. Please try again."
   },
   "cropCalendar": {
     "title": "Crop Calendar",

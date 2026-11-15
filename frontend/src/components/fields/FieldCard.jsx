@@ -67,13 +67,13 @@ export default function FieldCard({ field, onViewDetails }) {
 
               <div className="agri-field-card__stage-row">
                 <span>{t('crops.stage', 'Stage')}: <strong>{translateStage(field.cropStage, t)}</strong></span>
-                <span>{field.cropProgress}% {t('crops.cropCycle', 'Cycle')}</span>
+                <span>{field.cropProgress != null ? `${field.cropProgress}% ` : ''}{t('crops.cropCycle', 'Cycle')}</span>
               </div>
 
               <div className="agri-field-card__progress-bar">
                 <div
                   className="agri-field-card__progress-fill"
-                  style={{ width: `${field.cropProgress || 50}%` }}
+                  style={{ width: `${field.cropProgress != null ? Math.min(100, Math.max(0, field.cropProgress)) : 0}%` }}
                 />
               </div>
             </>

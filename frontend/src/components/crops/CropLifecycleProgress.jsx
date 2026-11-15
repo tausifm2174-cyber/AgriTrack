@@ -50,21 +50,21 @@ export default function CropLifecycleProgress({
             {t('crops.currentStage', 'Current')}: <strong>{translateStage(currentStage || 'Vegetative Growth', t)}</strong>
           </span>
           <span className="agri-lifecycle__percent-text">
-            {progressPercent}% {t('crops.lifecycleProgress', 'Cycle Completed')}
+            {progressPercent != null ? `${progressPercent}% ` : ''}{t('crops.lifecycleProgress', 'Cycle Completed')}
           </span>
         </div>
 
         <div
           className="agri-lifecycle__bar"
           role="progressbar"
-          aria-valuenow={progressPercent}
+          aria-valuenow={progressPercent != null ? progressPercent : 0}
           aria-valuemin="0"
           aria-valuemax="100"
-          aria-label={`Crop cycle progress: ${progressPercent}%`}
+          aria-label={`Crop cycle progress: ${progressPercent != null ? `${progressPercent}%` : 'In progress'}`}
         >
           <div
             className="agri-lifecycle__bar-fill"
-            style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
+            style={{ width: `${progressPercent != null ? Math.min(100, Math.max(0, progressPercent)) : 0}%` }}
           />
         </div>
       </div>

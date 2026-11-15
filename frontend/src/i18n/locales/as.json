@@ -479,7 +479,15 @@
     "stage": "stage",
     "viewMode": "viewMode",
     "noCrops": "No standing crops assigned",
-    "noCropAssigned": "No crop assigned"
+    "noCropAssigned": "No crop assigned",
+    "deleteCrop": "শস্য চক্ৰ মচক",
+    "deleteWarning": "আপুনি নিশ্চিতনে যে আপুনি এই শস্য চক্ৰটো মচিব বিচাৰে? এই কামটো পুনৰাবৃত্তি কৰিব নোৱাৰি।",
+    "noFarmsOrFields": "কোনো পথাৰ উপলব্ধ নহয়। শস্য চক্ৰ যোগ কৰাৰ আগতে এখন পথাৰ পঞ্জীয়ন কৰক।",
+    "noFieldsForFarm": "নিৰ্বাচিত ফাৰ্মৰ অধীনত কোনো পথাৰ পোৱা নগ'ল। অনুগ্ৰহ কৰি প্ৰথমে এখন পথাৰ যোগ কৰক।",
+    "saving": "শস্য চক্ৰ সংৰক্ষণ কৰা হৈছে...",
+    "deleting": "মচি থকা হৈছে...",
+    "editCrop": "শস্য চক্ৰ সম্পাদনা কৰক",
+    "loadError": "শস্য চক্ৰ লোড কৰাত ব্যৰ্থ হ'ল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।"
   },
   "cropCalendar": {
     "title": "à¦¶à¦¸à§à¦¯ à¦•à§‡à¦²à§‡à¦£à§à¦¡à¦¾à§°",

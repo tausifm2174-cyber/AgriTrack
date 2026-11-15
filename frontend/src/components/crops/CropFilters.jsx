@@ -29,7 +29,7 @@ export default function CropFilters({
   const { t } = useTranslation();
   // Filter fields dropdown based on selectedFarmId if any
   const availableFields = selectedFarmId
-    ? fields.filter((f) => f.farmId === selectedFarmId)
+    ? fields.filter((f) => String(f.farmId) === String(selectedFarmId))
     : fields;
 
   return (
@@ -61,7 +61,7 @@ export default function CropFilters({
             <option value="">{t('common.all', 'All Holdings')}</option>
             {farms.map((farm) => (
               <option key={farm.id} value={farm.id}>
-                {t(`farms.demoNames.${farm.id}`, farm.name)}
+                {farm.name || t(`farms.demoNames.${farm.id}`, 'Farm Holding')}
               </option>
             ))}
           </select>

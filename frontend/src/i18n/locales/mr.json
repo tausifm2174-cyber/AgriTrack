@@ -479,7 +479,15 @@
     "stage": "stage",
     "viewMode": "viewMode",
     "noCrops": "No standing crops assigned",
-    "noCropAssigned": "No crop assigned"
+    "noCropAssigned": "No crop assigned",
+    "deleteCrop": "पीक चक्र हटवा",
+    "deleteWarning": "तुम्हाला खात्री आहे की तुम्ही हे पीक चक्र हटवू इच्छिता? ही क्रिया पूर्ववत केली जाऊ शकत नाही.",
+    "noFarmsOrFields": "कोणतेही शेत उपलब्ध नाही. कृपया पीक चक्र जोडण्यापूर्वी शेत नोंदणी करा.",
+    "noFieldsForFarm": "निवडलेल्या फार्म अंतर्गत कोणतेही शेत आढळले नाही. कृपया आधी शेत जोडा.",
+    "saving": "पीक चक्र जतन करत आहे...",
+    "deleting": "हटवत आहे...",
+    "editCrop": "पीक चक्र संपादित करा",
+    "loadError": "पीक चक्र लोड करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा."
   },
   "cropCalendar": {
     "title": "à¤ªà¥€à¤• à¤¦à¤¿à¤¨à¤¦à¤°à¥à¤¶à¤¿à¤•à¤¾",

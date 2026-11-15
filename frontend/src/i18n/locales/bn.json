@@ -479,7 +479,15 @@
     "stage": "stage",
     "viewMode": "viewMode",
     "noCrops": "No standing crops assigned",
-    "noCropAssigned": "No crop assigned"
+    "noCropAssigned": "No crop assigned",
+    "deleteCrop": "ফসল চক্র মুছুন",
+    "deleteWarning": "আপনি কি নিশ্চিত যে আপনি এই ফসল চক্রটি মুছতে চান? এই পদক্ষেপটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "noFarmsOrFields": "কোনো জমি পাওয়া যায়নি। ফসল চক্র যোগ করার আগে একটি জমি নিবন্ধন করুন।",
+    "noFieldsForFarm": "নির্বাচিত খামারের অধীনে কোনো জমি পাওয়া যায়নি। অনুগ্রহ করে প্রথমে একটি জমি যোগ করুন।",
+    "saving": "ফসল চক্র সংরক্ষণ করা হচ্ছে...",
+    "deleting": "মুছে ফেলা হচ্ছে...",
+    "editCrop": "ফসল চক্র সম্পাদনা করুন",
+    "loadError": "ফসল চক্র লোড করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
   },
   "cropCalendar": {
     "title": "à¦«à¦¸à¦² à¦•à§à¦¯à¦¾à¦²à§‡à¦¨à§à¦¡à¦¾à¦°",

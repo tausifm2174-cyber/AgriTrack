@@ -45,9 +45,10 @@ export function adaptFarm(farm, fields = []) {
 /**
  * Adapt a backend FieldResponse to UI model.
  * @param {Object} field Backend FieldResponse
+ * @param {Array} [cropCycles=[]] Optional list of CropCycle entities to associate standing crop
  * @returns {Object} UI Field Model
  */
-export function adaptField(field) {
+export function adaptField(field, cropCycles = []) {
   if (!field) return null;
 
   const fieldId = field.id;
@@ -56,6 +57,10 @@ export function adaptField(field) {
     field.irrigationType.toLowerCase() !== 'rainfed' &&
     field.irrigationType.toLowerCase() !== 'none'
   );
+
+  const activeCrop = Array.isArray(cropCycles)
+    ? cropCycles.find((c) => String(c.fieldId) === String(fieldId) && c.status !== 'Completed' && c.status !== 'Inactive')
+    : null;
 
   return {
     id: fieldId,
@@ -75,11 +80,11 @@ export function adaptField(field) {
     healthVariant: (field.status || 'Active').toLowerCase() === 'active' ? 'success' : 'neutral',
     description: field.description || '',
     notes: field.description || field.notes || '',
-    currentCrop: null, // Neutral until Phase 22.3 Crop integration
-    cropVariety: '',
-    cropSeason: '',
-    cropStage: '',
-    cropProgress: 0,
+    currentCrop: activeCrop ? activeCrop.cropName : null,
+    cropVariety: activeCrop ? activeCrop.variety : '',
+    cropSeason: activeCrop ? activeCrop.season : '',
+    cropStage: activeCrop ? activeCrop.currentStage : '',
+    cropProgress: activeCrop?.progressPercent != null ? Number(activeCrop.progressPercent) : null,
     soilHealthStatus: 'Good',
     soilHealthVariant: 'success',
     createdAt: field.createdAt,
@@ -144,6 +149,76 @@ export function adaptSoilRecord(record) {
     sampleId: `SOIL-${record.id}`,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
+  };
+}
+
+/**
+ * Adapt a backend CropCycleResponse to UI model.
+ * @param {Object} cycle Backend CropCycleResponse
+ * @param {Object} [field=null] Optional matching Field model to derive acreage, soil type, and irrigation
+ * @returns {Object} UI Crop Cycle Model
+ */
+export function adaptCropCycle(cycle, field = null) {
+  if (!cycle) return null;
+
+  const cycleId = cycle.id;
+  const stageStep = cycle.currentStageStep != null ? Number(cycle.currentStageStep) : 1;
+  const progressPercent = cycle.progressPercent != null ? Number(cycle.progressPercent) : null;
+  const status = cycle.status || 'Active';
+
+  // Evaluate status variant
+  let statusVariant = 'success';
+  const lowerStatus = status.toLowerCase();
+  if (lowerStatus.includes('near') || lowerStatus.includes('harvest') || lowerStatus.includes('warning')) {
+    statusVariant = 'warning';
+  } else if (lowerStatus.includes('completed') || lowerStatus.includes('done')) {
+    statusVariant = 'info';
+  } else if (lowerStatus.includes('inactive') || lowerStatus.includes('failed') || lowerStatus.includes('cancelled')) {
+    statusVariant = 'neutral';
+  }
+
+  // Derive field-level attributes from field if provided
+  const areaAcres = field?.areaAcres != null ? Number(field.areaAcres) : (field?.area != null ? Number(field.area) : 0);
+  const soilType = field?.soilType || null;
+  const irrigationMethod = field?.irrigationType || field?.irrigationMethod || '';
+
+  // Display-only 5-stage stepper array without fabricating historical dates
+  const stageHistory = [
+    { stage: 'Sowing', date: cycle.sowingDate || '', status: stageStep > 1 ? 'Completed' : (stageStep === 1 ? 'In Progress' : 'Upcoming'), notes: '' },
+    { stage: 'Vegetative Growth', date: '', status: stageStep > 2 ? 'Completed' : (stageStep === 2 ? 'In Progress' : 'Upcoming'), notes: '' },
+    { stage: 'Flowering', date: '', status: stageStep > 3 ? 'Completed' : (stageStep === 3 ? 'In Progress' : 'Upcoming'), notes: '' },
+    { stage: 'Ripening', date: '', status: stageStep > 4 ? 'Completed' : (stageStep === 4 ? 'In Progress' : 'Upcoming'), notes: '' },
+    { stage: 'Harvest Readiness', date: cycle.expectedHarvestDate || '', status: stageStep === 5 ? 'In Progress' : 'Upcoming', notes: '' },
+  ];
+
+  return {
+    id: cycleId,
+    cropName: cycle.cropName || 'Unnamed Crop',
+    variety: cycle.variety || '',
+    category: cycle.category ?? field?.cropCategory ?? null,
+    farmId: cycle.farmId || field?.farmId || '',
+    farmName: cycle.farmName || field?.farmName || '',
+    fieldId: cycle.fieldId || field?.id || '',
+    fieldName: cycle.fieldName || field?.name || (cycle.fieldId ? `Field #${cycle.fieldId}` : ''),
+    areaAcres,
+    season: cycle.season || '',
+    soilType,
+    sowingDate: cycle.sowingDate || '',
+    expectedHarvestDate: cycle.expectedHarvestDate || '',
+    actualHarvestDate: cycle.actualHarvestDate || '',
+    currentStage: cycle.currentStage || 'Sowing',
+    currentStageStep: stageStep,
+    progressPercent,
+    status,
+    statusVariant,
+    irrigationMethod,
+    upcomingMilestone: cycle.currentStage === 'Harvest Readiness' ? 'Harvesting' : (cycle.currentStage ? `${cycle.currentStage} Monitoring` : ''),
+    upcomingMilestoneDate: cycle.expectedHarvestDate || '',
+    yieldEstimate: null,
+    notes: cycle.notes || '',
+    stageHistory,
+    createdAt: cycle.createdAt,
+    updatedAt: cycle.updatedAt,
   };
 }
 

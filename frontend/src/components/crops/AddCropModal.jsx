@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, CheckCircle, Info } from 'lucide-react';
+import { X, AlertCircle, Loader2, Info } from 'lucide-react';
 import { Button } from '../common';
 import { cropLifecycleStages, cropTypes } from '../../data/cropData';
+import cropService from '../../services/cropService';
 
 /**
  * AddCropModal component
- * Handles registering a new crop cycle or editing an existing crop cycle.
+ * Handles registering a new crop cycle or editing an existing crop cycle backed by REST APIs.
  * Includes farm -> field dependent filtering and validation.
  *
  * @param {Object} props
@@ -16,8 +17,8 @@ import { cropLifecycleStages, cropTypes } from '../../data/cropData';
  * @param {Array} props.farms - List of farms
  * @param {Array} props.fields - List of fields
  * @param {Object} [props.cropToEdit] - Existing crop object if in edit mode
- * @param {string} [props.defaultFarmId] - Optional pre-selected farm ID
- * @param {string} [props.defaultFieldId] - Optional pre-selected field ID
+ * @param {string|number} [props.defaultFarmId] - Optional pre-selected farm ID
+ * @param {string|number} [props.defaultFieldId] - Optional pre-selected field ID
  */
 export default function AddCropModal({
   isOpen,
@@ -32,40 +33,46 @@ export default function AddCropModal({
   const { t } = useTranslation();
   const isEditMode = Boolean(cropToEdit);
 
-  // Compute initial farm and fields
-  const initialFarmId = cropToEdit?.farmId || defaultFarmId || farms[0]?.id || '';
-  const initialFieldsForFarm = fields.filter((f) => f.farmId === initialFarmId);
-  const initialFieldId = cropToEdit?.fieldId || defaultFieldId || initialFieldsForFarm[0]?.id || '';
+  // Compute initial farm and fields using string comparison for numeric IDs
+  const initialFarmId = cropToEdit?.farmId || defaultFarmId || (farms.length > 0 ? farms[0].id : '');
+  const initialFieldsForFarm = fields.filter((f) => String(f.farmId) === String(initialFarmId));
+  const initialFieldId = cropToEdit?.fieldId || defaultFieldId || (initialFieldsForFarm.length > 0 ? initialFieldsForFarm[0].id : '');
 
   const [formData, setFormData] = useState({
     farmId: initialFarmId,
     fieldId: initialFieldId,
-    cropName: cropToEdit?.cropName || 'Wheat',
-    variety: cropToEdit?.variety || 'Sharbati',
+    cropName: cropToEdit?.cropName || (cropTypes.length > 0 ? cropTypes[0] : 'Wheat'),
+    variety: cropToEdit?.variety || '',
     season: cropToEdit?.season || 'Rabi',
     sowingDate: cropToEdit?.sowingDate || new Date().toISOString().split('T')[0],
-    expectedHarvestDate: cropToEdit?.expectedHarvestDate || '2027-03-15',
+    expectedHarvestDate: cropToEdit?.expectedHarvestDate || '',
+    actualHarvestDate: cropToEdit?.actualHarvestDate || '',
     initialStage: cropToEdit?.currentStage || 'Sowing',
+    progressPercent: cropToEdit?.progressPercent != null ? cropToEdit.progressPercent : null,
     notes: cropToEdit?.notes || '',
   });
 
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   if (!isOpen) return null;
 
   // Filter available fields based on selected farm
-  const availableFields = fields.filter((f) => f.farmId === formData.farmId);
+  const availableFields = fields.filter((f) => String(f.farmId) === String(formData.farmId));
 
   // Handle farm change: also auto-update fieldId to first available field in that farm
   const handleFarmChange = (e) => {
     const newFarmId = e.target.value;
-    const matchingFields = fields.filter((f) => f.farmId === newFarmId);
+    const matchingFields = fields.filter((f) => String(f.farmId) === String(newFarmId));
     setFormData((prev) => ({
       ...prev,
       farmId: newFarmId,
-      fieldId: matchingFields[0]?.id || '',
+      fieldId: matchingFields.length > 0 ? matchingFields[0].id : '',
     }));
+    if (errors.farmId) {
+      setErrors((prev) => ({ ...prev, farmId: '' }));
+    }
   };
 
   const handleChange = (e) => {
@@ -86,8 +93,14 @@ export default function AddCropModal({
     if (!formData.expectedHarvestDate) newErrors.expectedHarvestDate = t('validation.required', 'Expected harvest date is required');
 
     if (formData.sowingDate && formData.expectedHarvestDate) {
-      if (new Date(formData.expectedHarvestDate) <= new Date(formData.sowingDate)) {
-        newErrors.expectedHarvestDate = t('validation.dateAfter', 'Harvest date must be after sowing date');
+      if (new Date(formData.expectedHarvestDate) < new Date(formData.sowingDate)) {
+        newErrors.expectedHarvestDate = t('validation.dateAfter', 'Harvest date cannot be before sowing date');
+      }
+    }
+
+    if (formData.sowingDate && formData.actualHarvestDate) {
+      if (new Date(formData.actualHarvestDate) < new Date(formData.sowingDate)) {
+        newErrors.actualHarvestDate = t('validation.dateAfter', 'Actual harvest date cannot be before sowing date');
       }
     }
 
@@ -95,78 +108,72 @@ export default function AddCropModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const selectedFarm = farms.find((f) => f.id === formData.farmId);
-    const selectedField = fields.find((f) => f.id === formData.fieldId);
-
-    // Compute progress % based on initial stage
-    let progress = 10;
+    // Resolve stage step & default progress
     let stageStep = 1;
-    let status = 'Active';
-    let statusVariant = 'success';
+    let defaultProgress = 15;
 
     if (formData.initialStage === 'Sowing') {
-      progress = 15;
       stageStep = 1;
+      defaultProgress = 15;
     } else if (formData.initialStage === 'Vegetative Growth') {
-      progress = 45;
       stageStep = 2;
+      defaultProgress = 45;
     } else if (formData.initialStage === 'Flowering') {
-      progress = 65;
       stageStep = 3;
+      defaultProgress = 65;
     } else if (formData.initialStage === 'Ripening') {
-      progress = 85;
       stageStep = 4;
-      status = 'Near Harvest';
-      statusVariant = 'warning';
+      defaultProgress = 85;
     } else if (formData.initialStage === 'Harvest Readiness') {
-      progress = 100;
       stageStep = 5;
-      status = 'Ready for Harvest';
-      statusVariant = 'success';
+      defaultProgress = 100;
     }
 
-    const savedCrop = {
-      id: cropToEdit?.id || `crop-cycle-${Date.now()}`,
+    // Preserve existing progress if editing and valid, otherwise use stage default
+    const progress = formData.progressPercent != null ? Number(formData.progressPercent) : defaultProgress;
+    const status = isEditMode && cropToEdit?.status
+      ? cropToEdit.status
+      : (formData.initialStage === 'Harvest Readiness' ? 'Near Harvest' : 'Active');
+
+    const payload = {
       cropName: formData.cropName.trim(),
       variety: formData.variety.trim(),
-      farmId: formData.farmId,
-      farmName: selectedFarm?.name || 'Farm Holding',
-      fieldId: formData.fieldId,
-      fieldName: selectedField?.name || 'Field Parcel',
-      areaAcres: selectedField?.areaAcres || 5.0,
       season: formData.season,
-      soilType: selectedField?.soilType || 'Loamy Soil',
       sowingDate: formData.sowingDate,
       expectedHarvestDate: formData.expectedHarvestDate,
+      actualHarvestDate: formData.actualHarvestDate || null,
       currentStage: formData.initialStage,
       currentStageStep: stageStep,
       progressPercent: progress,
       status,
-      statusVariant,
-      irrigationMethod: selectedField?.irrigationMethod || 'Drip Irrigation',
-      upcomingMilestone: `${formData.initialStage === 'Harvest Readiness' ? 'Harvesting and Storage' : 'Growth Monitoring & Fertigation'}`,
-      upcomingMilestoneDate: formData.expectedHarvestDate,
-      notes: formData.notes.trim() || 'New crop cycle initiated under farm management guidelines.',
-      stageHistory: cropToEdit?.stageHistory || [
-        { stage: 'Sowing', date: formData.sowingDate, status: 'Completed', notes: 'Sowing recorded.' },
-        { stage: 'Vegetative Growth', date: '', status: stageStep >= 2 ? 'In Progress' : 'Upcoming', notes: '' },
-        { stage: 'Flowering', date: '', status: stageStep >= 3 ? 'In Progress' : 'Upcoming', notes: '' },
-        { stage: 'Ripening', date: '', status: stageStep >= 4 ? 'In Progress' : 'Upcoming', notes: '' },
-        { stage: 'Harvest Readiness', date: formData.expectedHarvestDate, status: stageStep === 5 ? 'In Progress' : 'Upcoming', notes: '' },
-      ],
+      notes: formData.notes ? formData.notes.trim() : null,
     };
 
-    setSubmitted(true);
-    setTimeout(() => {
-      onCropSaved?.(savedCrop, isEditMode);
-      setSubmitted(false);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      if (isEditMode) {
+        const updatedCycle = await cropService.updateCropCycle(cropToEdit.id, payload);
+        onCropSaved?.(updatedCycle, true);
+      } else {
+        const createdCycle = await cropService.createCropCycle(formData.fieldId, payload);
+        onCropSaved?.(createdCycle, false);
+      }
       onClose();
-    }, 1100);
+    } catch (err) {
+      setSubmitError(err.message || t('common.error', 'Failed to save crop cycle. Please try again.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const hasNoFarms = farms.length === 0;
+  const hasNoFields = fields.length === 0;
 
   return (
     <div
@@ -175,14 +182,14 @@ export default function AddCropModal({
       aria-modal="true"
       aria-labelledby="add-crop-title"
       onClick={(e) => {
-        if (e.target === e.currentTarget && !submitted) onClose();
+        if (e.target === e.currentTarget && !isSubmitting) onClose();
       }}
     >
       <div className="agri-modal-dialog">
         <div className="agri-modal-header">
           <div>
             <h3 id="add-crop-title" className="agri-modal-title">
-              {isEditMode ? t('common.edit', 'Edit Crop Cycle') : t('crops.addCrop', 'Add New Crop Cycle')}
+              {isEditMode ? t('crops.editCrop', 'Edit Crop Cycle') : t('crops.addCrop', 'Add New Crop Cycle')}
             </h3>
             <p className="agri-modal-subtitle">
               {isEditMode
@@ -195,32 +202,50 @@ export default function AddCropModal({
             className="agri-modal-close-btn"
             onClick={onClose}
             aria-label={t('common.close', 'Close dialog')}
-            disabled={submitted}
+            disabled={isSubmitting}
           >
             <X size={20} aria-hidden="true" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="agri-modal-body">
-            <div className="agri-demo-badge-banner">
-              <Info size={16} aria-hidden="true" />
-              <span>
-                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'Crop cycle will be recorded in memory for this session without backend API calls.')}
-              </span>
-            </div>
+        {hasNoFarms || hasNoFields ? (
+          <div className="agri-modal-body" style={{ textAlign: 'center', padding: '2.5rem 1.5rem' }}>
+            <Info size={40} className="text-muted" style={{ margin: '0 auto 1rem auto' }} />
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-800)', marginBottom: '0.5rem' }}>
+              {hasNoFarms
+                ? t('fields.noFarmsTitle', 'No Farm Holdings Found')
+                : t('crops.noFieldsForFarm', 'No field parcels available')}
+            </h4>
+            <p style={{ fontSize: '0.9rem', color: 'var(--slate-600)', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+              {t('crops.noFarmsOrFields', 'No field parcels available. Please register a farm holding and map field plots before adding crop cycles.')}
+            </p>
+            <Button variant="secondary" onClick={onClose}>
+              {t('common.close', 'Close')}
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="agri-modal-body">
+              {submitError && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    backgroundColor: '#fef2f2',
+                    color: '#b91c1c',
+                    border: '1px solid #fecaca',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    marginBottom: '1rem',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                  <span>{submitError}</span>
+                </div>
+              )}
 
-            {submitted ? (
-              <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-                <CheckCircle size={48} className="text-primary" style={{ margin: '0 auto 1rem auto' }} aria-hidden="true" />
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--slate-900)' }}>
-                  {isEditMode ? t('messages.cropUpdated', 'Crop Cycle Updated!') : t('messages.cropAdded', 'Crop Cycle Registered Successfully!')}
-                </h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--slate-500)', marginTop: '0.25rem' }}>
-                  {t('common.loading', 'Updating field cultivation status and agronomic milestones...')}
-                </p>
-              </div>
-            ) : (
               <div className="agri-form-grid">
                 {/* Row 1: Farm and Field Dependent Dropdown */}
                 <div className="agri-form-grid--2 agri-form-grid">
@@ -235,6 +260,7 @@ export default function AddCropModal({
                       value={formData.farmId}
                       onChange={handleFarmChange}
                       required
+                      disabled={isEditMode || isSubmitting}
                     >
                       {farms.map((f) => (
                         <option key={f.id} value={f.id}>
@@ -256,13 +282,14 @@ export default function AddCropModal({
                       value={formData.fieldId}
                       onChange={handleChange}
                       required
+                      disabled={isEditMode || isSubmitting}
                     >
                       {availableFields.length === 0 ? (
                         <option value="">{t('fields.noFields', 'No fields available for this farm')}</option>
                       ) : (
                         availableFields.map((f) => (
                           <option key={f.id} value={f.id}>
-                            {f.name} ({f.areaAcres} {t('units.acres', 'Ac')})
+                            {f.name} ({f.areaAcres || f.area} {t('units.acres', 'Ac')})
                           </option>
                         ))
                       )}
@@ -287,6 +314,7 @@ export default function AddCropModal({
                       className={`agri-form-input ${errors.cropName ? 'agri-form-input--error' : ''}`}
                       value={formData.cropName}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
                     <datalist id="crop-options">
                       {cropTypes.map((c) => (
@@ -309,6 +337,7 @@ export default function AddCropModal({
                       className={`agri-form-input ${errors.variety ? 'agri-form-input--error' : ''}`}
                       value={formData.variety}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
                     {errors.variety && <span className="agri-form-error">{errors.variety}</span>}
                   </div>
@@ -326,6 +355,7 @@ export default function AddCropModal({
                       className="agri-form-select"
                       value={formData.season}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     >
                       <option value="Rabi">{t('crops.rabi', 'Rabi')}</option>
                       <option value="Kharif">{t('crops.kharif', 'Kharif')}</option>
@@ -343,6 +373,7 @@ export default function AddCropModal({
                       className="agri-form-select"
                       value={formData.initialStage}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     >
                       {cropLifecycleStages.map((stage) => (
                         <option key={stage.id} value={stage.name}>
@@ -367,6 +398,7 @@ export default function AddCropModal({
                       className={`agri-form-input ${errors.sowingDate ? 'agri-form-input--error' : ''}`}
                       value={formData.sowingDate}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
                     {errors.sowingDate && <span className="agri-form-error">{errors.sowingDate}</span>}
                   </div>
@@ -383,6 +415,7 @@ export default function AddCropModal({
                       className={`agri-form-input ${errors.expectedHarvestDate ? 'agri-form-input--error' : ''}`}
                       value={formData.expectedHarvestDate}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
                     {errors.expectedHarvestDate && (
                       <span className="agri-form-error">{errors.expectedHarvestDate}</span>
@@ -403,23 +436,29 @@ export default function AddCropModal({
                     className="agri-form-textarea"
                     value={formData.notes}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {!submitted && (
             <div className="agri-modal-footer">
-              <Button variant="secondary" onClick={onClose} type="button">
+              <Button variant="secondary" onClick={onClose} type="button" disabled={isSubmitting}>
                 {t('common.cancel', 'Cancel')}
               </Button>
-              <Button variant="primary" type="submit">
-                {isEditMode ? t('common.update', 'Update Crop') : t('crops.addCrop', 'Save Crop Cycle')}
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>{t('crops.saving', 'Saving Crop Cycle...')}</span>
+                  </>
+                ) : (
+                  isEditMode ? t('common.update', 'Update Crop') : t('crops.addCrop', 'Save Crop Cycle')
+                )}
               </Button>
             </div>
-          )}
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -479,7 +479,15 @@
     "stage": "stage",
     "viewMode": "viewMode",
     "noCrops": "No standing crops assigned",
-    "noCropAssigned": "No crop assigned"
+    "noCropAssigned": "No crop assigned",
+    "deleteCrop": "ଫସଲ ଚକ୍ର ବିଲୋପ କରନ୍ତୁ",
+    "deleteWarning": "ଆପଣ ନିଶ୍ଚିତ କି ଆପଣ ଏହି ଫସଲ ଚକ୍ରକୁ ବିଲୋପ କରିବାକୁ ଚାହାଁନ୍ତି? ଏହି କାର୍ଯ୍ୟ ପୂର୍ବବତ୍ କରାଯାଇପାରିବ ନାହିଁ।",
+    "noFarmsOrFields": "କୌଣସି ଜମି ଉପଲବ୍ଧ ନାହିଁ। ଫସଲ ଚକ୍ର ଯୋଡ଼ିବା ପୂର୍ବରୁ ଏକ ଜମି ପଞ୍ଜୀକରଣ କରନ୍ତୁ।",
+    "noFieldsForFarm": "ଚୟନିତ ଫାର୍ମ ଅଧୀନରେ କୌଣସି ଜମି ମିଳିଲା ନାହିଁ। ଦୟାକରି ପ୍ରଥମେ ଏକ ଜମି ଯୋଡ଼ନ୍ତୁ।",
+    "saving": "ଫସଲ ଚକ୍ର ସଂରକ୍ଷଣ କରାଯାଉଛି...",
+    "deleting": "ବିଲୋପ କରାଯାଉଛି...",
+    "editCrop": "ଫସଲ ଚକ୍ର ସମ୍ପାଦନ କରନ୍ତୁ",
+    "loadError": "ଫସଲ ଚକ୍ର ଲୋଡ୍ କରିବାରେ ବିଫଳ। ଦୟାକରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ।"
   },
   "cropCalendar": {
     "title": "à¬«à¬¸à¬² à¬•à­à­Ÿà¬¾à¬²à­‡à¬£à­à¬¡à¬°",
