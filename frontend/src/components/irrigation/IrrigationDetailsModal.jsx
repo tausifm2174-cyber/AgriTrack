@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
   X,
   Edit3,
+  Trash2,
+  Ban,
   Calendar,
   Clock,
   MapPin,
@@ -35,6 +37,8 @@ export default function IrrigationDetailsModal({
   schedule,
   onClose,
   onEdit,
+  onDelete,
+  onCancel,
   farmsMap = {},
   fieldsMap = {},
 }) {
@@ -363,18 +367,50 @@ export default function IrrigationDetailsModal({
 
         {/* Footer */}
         <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              onClose();
-              onEdit(schedule);
-            }}
-            aria-label={t('common.edit')}
-          >
-            <Edit3 size={14} aria-hidden="true" />
-            <span>{t('common.edit')}</span>
-          </Button>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onDelete(schedule);
+                }}
+                style={{ color: 'var(--danger-text, #dc2626)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                aria-label={t('irrigation.deleteSchedule', 'Delete Irrigation Schedule')}
+              >
+                <Trash2 size={14} aria-hidden="true" />
+                <span>{t('common.delete')}</span>
+              </Button>
+            )}
+
+            {schedule.status === 'Scheduled' && onCancel && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onCancel(schedule);
+                }}
+                style={{ color: 'var(--warning-text, #d97706)', borderColor: 'var(--warning-border, #fcd34d)' }}
+                aria-label={t('irrigation.cancelSchedule', 'Cancel Irrigation')}
+              >
+                <Ban size={14} aria-hidden="true" />
+                <span>{t('common.cancel')}</span>
+              </Button>
+            )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onClose();
+                onEdit(schedule);
+              }}
+              aria-label={t('common.edit')}
+            >
+              <Edit3 size={14} aria-hidden="true" />
+              <span>{t('common.edit')}</span>
+            </Button>
+          </div>
 
           <Button variant="primary" size="sm" onClick={onClose}>
             {t('common.close')}

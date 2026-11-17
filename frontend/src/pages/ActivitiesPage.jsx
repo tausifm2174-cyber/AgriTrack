@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, ClipboardList, Plus } from 'lucide-react';
+import { CheckCircle2, ClipboardList, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import {
   ActivityHeader,
   ActivitySummaryCards,
@@ -12,19 +12,18 @@ import {
   AddActivityModal,
 } from '../components/activities';
 import { Button } from '../components/common';
-import {
-  initialActivities,
-  getActivitySummary,
-} from '../data/activityData';
-import { farmData } from '../data/farmData';
-import { fieldData } from '../data/fieldData';
-import { cropCycles } from '../data/cropData';
+import { getActivitySummary } from '../data/activityData';
+import farmService from '../services/farmService';
+import fieldService from '../services/fieldService';
+import cropService from '../services/cropService';
+import activityService from '../services/activityService';
+import { adaptActivity, adaptField } from '../utils/adapters';
 import '../components/activities/activities.css';
 
 /**
  * ActivitiesPage Component
  * Full-featured agricultural operations and activity management module.
- * Supports scheduling, tracking, filtering, details inspection, and responsive layouts.
+ * Integrates live Spring Boot backend APIs for Farms, Fields, Crops, and Activities.
  */
 export default function ActivitiesPage() {
   const { t } = useTranslation();
@@ -32,33 +31,27 @@ export default function ActivitiesPage() {
   const urlFieldId = searchParams.get('fieldId') || '';
   const urlFarmId = searchParams.get('farmId') || '';
 
-  const farms = useMemo(() => farmData.farms || [], []);
-  const fields = useMemo(() => fieldData.fields || [], []);
-  const crops = useMemo(() => cropCycles || [], []);
+  // Data states
+  const [farms, setFarms] = useState([]);
+  const [fields, setFields] = useState([]);
+  const [crops, setCrops] = useState([]);
+  const [activities, setActivities] = useState([]);
 
-  // Local activity state (initialized from realistic demo records)
-  const [activities, setActivities] = useState(initialActivities);
+  // Loading and Error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Filter state initialized from query parameters if present
-  const [filters, setFilters] = useState(() => {
-    let initialFarmId = urlFarmId;
-    if (urlFieldId) {
-      const allFields = fieldData.fields || [];
-      const matchedField = allFields.find((f) => f.id === urlFieldId);
-      if (matchedField) {
-        initialFarmId = matchedField.farmId;
-      }
-    }
-    return {
-      search: '',
-      farmId: initialFarmId,
-      fieldId: urlFieldId,
-      cropName: '',
-      activityType: '',
-      status: '',
-      date: '',
-    };
-  });
+  const [filters, setFilters] = useState(() => ({
+    search: '',
+    farmId: urlFarmId,
+    fieldId: urlFieldId,
+    cropName: '',
+    activityType: '',
+    status: '',
+    date: '',
+  }));
 
   // Modal states
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
@@ -68,7 +61,7 @@ export default function ActivitiesPage() {
   // Toast feedback state
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Lookup maps for fast indexing
+  // Fast indexing lookup maps
   const farmsMap = useMemo(() => {
     return farms.reduce((acc, f) => {
       acc[f.id] = f;
@@ -82,6 +75,63 @@ export default function ActivitiesPage() {
       return acc;
     }, {});
   }, [fields]);
+
+  // Load all live data in parallel
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAllData() {
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+
+        const [farmsRes, fieldsRes, cropsRes, activitiesRes] = await Promise.all([
+          farmService.getAllFarms(),
+          fieldService.getAllFields(),
+          cropService.getAllCropCycles(),
+          activityService.getAllActivities(),
+        ]);
+
+        if (!isMounted) return;
+
+        const rawFarms = Array.isArray(farmsRes) ? farmsRes : [];
+        const rawFields = Array.isArray(fieldsRes) ? fieldsRes : [];
+        const rawCrops = Array.isArray(cropsRes) ? cropsRes : [];
+        const rawActivities = Array.isArray(activitiesRes) ? activitiesRes : [];
+
+        const fMap = rawFarms.reduce((acc, f) => {
+          acc[f.id] = f;
+          return acc;
+        }, {});
+
+        const flMap = rawFields.reduce((acc, f) => {
+          acc[f.id] = f;
+          return acc;
+        }, {});
+
+        const adaptedFields = rawFields.map((f) => adaptField(f, rawCrops));
+        const adaptedActivities = rawActivities.map((a) => adaptActivity(a, flMap, fMap));
+
+        setFarms(rawFarms);
+        setFields(adaptedFields);
+        setCrops(rawCrops);
+        setActivities(adaptedActivities);
+      } catch (err) {
+        if (!isMounted) return;
+        setLoadError(err.response?.data?.message || err.message || t('activities.loadError', 'Failed to load agricultural activities.'));
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadAllData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshKey, t]);
 
   // Toast helper
   const showToast = (message) => {
@@ -108,7 +158,11 @@ export default function ActivitiesPage() {
     });
   };
 
-  // Summary counts based on all activities
+  const handleRetry = () => {
+    setRefreshKey((k) => k + 1);
+  };
+
+  // Summary counts based on live activities
   const summaryMetrics = useMemo(() => {
     return getActivitySummary(activities);
   }, [activities]);
@@ -119,13 +173,13 @@ export default function ActivitiesPage() {
       // Search text match
       if (filters.search) {
         const query = filters.search.toLowerCase().trim();
-        const farmName = (farmsMap[activity.farmId]?.name || '').toLowerCase();
-        const fieldName = (fieldsMap[activity.fieldId]?.name || '').toLowerCase();
-        const matchesTitle = activity.title.toLowerCase().includes(query);
+        const farmName = (activity.farmName || farmsMap[activity.farmId]?.name || '').toLowerCase();
+        const fieldName = (activity.fieldName || fieldsMap[activity.fieldId]?.name || '').toLowerCase();
+        const matchesTitle = (activity.title || '').toLowerCase().includes(query);
         const matchesDesc = (activity.description || '').toLowerCase().includes(query);
         const matchesNotes = (activity.notes || '').toLowerCase().includes(query);
         const matchesCrop = (activity.cropName || '').toLowerCase().includes(query);
-        const matchesType = activity.activityType.toLowerCase().includes(query);
+        const matchesType = (activity.activityType || '').toLowerCase().includes(query);
         const matchesOperator = (activity.operator || '').toLowerCase().includes(query);
         const matchesLocation = farmName.includes(query) || fieldName.includes(query);
 
@@ -135,12 +189,12 @@ export default function ActivitiesPage() {
       }
 
       // Farm filter
-      if (filters.farmId && activity.farmId !== filters.farmId) {
+      if (filters.farmId && String(activity.farmId) !== String(filters.farmId)) {
         return false;
       }
 
       // Field filter
-      if (filters.fieldId && activity.fieldId !== filters.fieldId) {
+      if (filters.fieldId && String(activity.fieldId) !== String(filters.fieldId)) {
         return false;
       }
 
@@ -177,7 +231,6 @@ export default function ActivitiesPage() {
   const handleOpenEditModal = (activity) => {
     setActivityToEdit(activity);
     setIsAddEditModalOpen(true);
-    // If details modal was open, close it
     if (selectedActivityForDetails) {
       setSelectedActivityForDetails(null);
     }
@@ -189,14 +242,15 @@ export default function ActivitiesPage() {
   };
 
   const handleSaveActivity = (savedActivity, isEdit) => {
+    const adapted = adaptActivity(savedActivity, fieldsMap, farmsMap);
     if (isEdit) {
       setActivities((prev) =>
-        prev.map((item) => (item.id === savedActivity.id ? savedActivity : item))
+        prev.map((item) => (String(item.id) === String(adapted.id) ? adapted : item))
       );
-      showToast(`${t('alerts.activityUpdated')}: ${savedActivity.title}`);
+      showToast(`${t('alerts.activityUpdated', 'Activity updated')}: ${adapted.title}`);
     } else {
-      setActivities((prev) => [savedActivity, ...prev]);
-      showToast(`${t('alerts.activityAdded')}: ${savedActivity.title}`);
+      setActivities((prev) => [adapted, ...prev]);
+      showToast(`${t('alerts.activityAdded', 'Activity scheduled')}: ${adapted.title}`);
     }
   };
 
@@ -210,17 +264,22 @@ export default function ActivitiesPage() {
   };
 
   // Delete activity
-  const handleDeleteActivity = (activity) => {
+  const handleDeleteActivity = async (activity) => {
     const confirmed = window.confirm(
-      `${t('common.delete')} "${activity.title}" (${activity.id})?`
+      `${t('activities.deleteWarning', 'Are you sure you want to delete this activity? This action cannot be undone.')}\n\n"${activity.title}"`
     );
     if (!confirmed) return;
 
-    setActivities((prev) => prev.filter((item) => item.id !== activity.id));
-    if (selectedActivityForDetails?.id === activity.id) {
-      setSelectedActivityForDetails(null);
+    try {
+      await activityService.deleteActivity(activity.id);
+      setActivities((prev) => prev.filter((item) => String(item.id) !== String(activity.id)));
+      if (selectedActivityForDetails && String(selectedActivityForDetails.id) === String(activity.id)) {
+        setSelectedActivityForDetails(null);
+      }
+      showToast(`${t('alerts.itemDeleted', 'Item deleted')}: ${activity.title}`);
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || t('common.error'));
     }
-    showToast(`${t('alerts.itemDeleted')}: ${activity.title}`);
   };
 
   return (
@@ -228,14 +287,41 @@ export default function ActivitiesPage() {
       {/* 1. Header with Add Activity Action */}
       <ActivityHeader onAddActivity={handleOpenAddModal} />
 
-      {/* 2. Interactive KPI Summary Cards */}
+      {/* 2. Error Banner */}
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0.875rem 1.25rem',
+            backgroundColor: 'var(--danger-bg, #fef2f2)',
+            border: '1px solid var(--danger-border, #fecaca)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--danger-text, #991b1b)',
+            marginBottom: '1rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{loadError}</span>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleRetry} style={{ gap: '0.35rem' }}>
+            <RefreshCw size={14} aria-hidden="true" />
+            <span>{t('common.retry', 'Retry')}</span>
+          </Button>
+        </div>
+      )}
+
+      {/* 3. Interactive KPI Summary Cards */}
       <ActivitySummaryCards
         summary={summaryMetrics}
         activeStatusFilter={filters.status}
         onStatusFilterChange={(status) => handleFilterChange({ status })}
       />
 
-      {/* 3. Multi-Criteria Filters Toolbar */}
+      {/* 4. Multi-Criteria Filters Toolbar */}
       <ActivityFilters
         filters={filters}
         onFilterChange={handleFilterChange}
@@ -246,8 +332,24 @@ export default function ActivitiesPage() {
         totalResultsCount={filteredActivities.length}
       />
 
-      {/* 4. Activity List: Desktop Table + Mobile Cards */}
-      {filteredActivities.length > 0 ? (
+      {/* 5. Loading Skeletons */}
+      {isLoading ? (
+        <div className="agri-activity-cards-grid" style={{ width: '100%' }}>
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              style={{
+                height: '180px',
+                background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'pulse 1.5s infinite',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--slate-200)',
+              }}
+            />
+          ))}
+        </div>
+      ) : filteredActivities.length > 0 ? (
         <>
           {/* Desktop & Tablet Table */}
           <div className="agri-desktop-table-only">
@@ -284,7 +386,7 @@ export default function ActivitiesPage() {
           <div className="agri-activity-empty__icon" aria-hidden="true">
             <ClipboardList size={28} />
           </div>
-          <h3 className="agri-activity-empty__title">{t('common.noData')}</h3>
+          <h3 className="agri-activity-empty__title">{t('activities.noActivities', t('common.noData'))}</h3>
           <p className="agri-activity-empty__text">
             {Object.values(filters).some(Boolean)
               ? t('common.noData')
@@ -304,18 +406,19 @@ export default function ActivitiesPage() {
         </div>
       )}
 
-      {/* 5. Activity Details Modal */}
+      {/* 6. Activity Details Modal */}
       {selectedActivityForDetails && (
         <ActivityDetailsModal
           activity={selectedActivityForDetails}
           onClose={handleCloseDetailsModal}
           onEdit={handleOpenEditModal}
+          onDelete={handleDeleteActivity}
           farmsMap={farmsMap}
           fieldsMap={fieldsMap}
         />
       )}
 
-      {/* 6. Add / Edit Activity Modal */}
+      {/* 7. Add / Edit Activity Modal */}
       {isAddEditModalOpen && (
         <AddActivityModal
           isOpen={isAddEditModalOpen}
@@ -324,10 +427,11 @@ export default function ActivitiesPage() {
           activityToEdit={activityToEdit}
           farms={farms}
           fields={fields}
+          crops={crops}
         />
       )}
 
-      {/* 7. Action Toast Feedback */}
+      {/* 8. Action Toast Feedback */}
       {toastMessage && (
         <div className="agri-activity-toast" role="status" aria-live="polite">
           <CheckCircle2 size={18} style={{ color: 'var(--primary-400)' }} aria-hidden="true" />

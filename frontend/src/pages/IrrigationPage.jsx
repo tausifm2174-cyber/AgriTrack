@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, Droplets, Plus } from 'lucide-react';
+import { CheckCircle2, Droplets, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import {
   IrrigationHeader,
   IrrigationSummaryCards,
@@ -14,19 +14,18 @@ import {
   AddIrrigationModal,
 } from '../components/irrigation';
 import { Button } from '../components/common';
-import {
-  initialIrrigationRecords,
-  getIrrigationSummary,
-} from '../data/irrigationData';
-import { farmData } from '../data/farmData';
-import { fieldData } from '../data/fieldData';
-import { cropCycles } from '../data/cropData';
+import { getIrrigationSummary } from '../data/irrigationData';
+import farmService from '../services/farmService';
+import fieldService from '../services/fieldService';
+import cropService from '../services/cropService';
+import irrigationService from '../services/irrigationService';
+import { adaptIrrigation, adaptField } from '../utils/adapters';
 import '../components/irrigation/irrigation.css';
 
 /**
  * IrrigationPage Component
  * Full-featured Precision Irrigation Management and Water Delivery Console.
- * Supports scheduling, telemetry, weather advisory, and cascading parcel filters.
+ * Integrates live Spring Boot backend APIs for Farms, Fields, Crops, and Precision Irrigation.
  */
 export default function IrrigationPage() {
   const { t } = useTranslation();
@@ -34,34 +33,28 @@ export default function IrrigationPage() {
   const urlFieldId = searchParams.get('fieldId') || '';
   const urlFarmId = searchParams.get('farmId') || '';
 
-  const farms = useMemo(() => farmData.farms || [], []);
-  const fields = useMemo(() => fieldData.fields || [], []);
-  const crops = useMemo(() => cropCycles || [], []);
+  // Data states
+  const [farms, setFarms] = useState([]);
+  const [fields, setFields] = useState([]);
+  const [crops, setCrops] = useState([]);
+  const [schedules, setSchedules] = useState([]);
 
-  // Irrigation local state initialized from realistic demo data
-  const [schedules, setSchedules] = useState(initialIrrigationRecords);
+  // Loading and Error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Filter state initialized from URL query parameters if present
-  const [filters, setFilters] = useState(() => {
-    let initialFarmId = urlFarmId;
-    if (urlFieldId) {
-      const allFields = fieldData.fields || [];
-      const matchedField = allFields.find((f) => f.id === urlFieldId);
-      if (matchedField) {
-        initialFarmId = matchedField.farmId;
-      }
-    }
-    return {
-      search: '',
-      farmId: initialFarmId,
-      fieldId: urlFieldId,
-      cropName: '',
-      method: '',
-      status: '',
-      priority: '',
-      date: '',
-    };
-  });
+  const [filters, setFilters] = useState(() => ({
+    search: '',
+    farmId: urlFarmId,
+    fieldId: urlFieldId,
+    cropName: '',
+    method: '',
+    status: '',
+    priority: '',
+    date: '',
+  }));
 
   // Modal states
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
@@ -85,6 +78,63 @@ export default function IrrigationPage() {
       return acc;
     }, {});
   }, [fields]);
+
+  // Load all live data in parallel
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAllData() {
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+
+        const [farmsRes, fieldsRes, cropsRes, schedulesRes] = await Promise.all([
+          farmService.getAllFarms(),
+          fieldService.getAllFields(),
+          cropService.getAllCropCycles(),
+          irrigationService.getAllIrrigations(),
+        ]);
+
+        if (!isMounted) return;
+
+        const rawFarms = Array.isArray(farmsRes) ? farmsRes : [];
+        const rawFields = Array.isArray(fieldsRes) ? fieldsRes : [];
+        const rawCrops = Array.isArray(cropsRes) ? cropsRes : [];
+        const rawSchedules = Array.isArray(schedulesRes) ? schedulesRes : [];
+
+        const fMap = rawFarms.reduce((acc, f) => {
+          acc[f.id] = f;
+          return acc;
+        }, {});
+
+        const flMap = rawFields.reduce((acc, f) => {
+          acc[f.id] = f;
+          return acc;
+        }, {});
+
+        const adaptedFields = rawFields.map((f) => adaptField(f, rawCrops));
+        const adaptedSchedules = rawSchedules.map((s) => adaptIrrigation(s, flMap, fMap));
+
+        setFarms(rawFarms);
+        setFields(adaptedFields);
+        setCrops(rawCrops);
+        setSchedules(adaptedSchedules);
+      } catch (err) {
+        if (!isMounted) return;
+        setLoadError(err.response?.data?.message || err.message || t('irrigation.loadError', 'Failed to load irrigation schedules.'));
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadAllData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshKey, t]);
 
   // Toast helper
   const showToast = (message) => {
@@ -112,7 +162,11 @@ export default function IrrigationPage() {
     });
   };
 
-  // Summary counts based on all schedules
+  const handleRetry = () => {
+    setRefreshKey((k) => k + 1);
+  };
+
+  // Summary counts based on live schedules
   const summaryMetrics = useMemo(() => {
     return getIrrigationSummary(schedules);
   }, [schedules]);
@@ -123,11 +177,11 @@ export default function IrrigationPage() {
       // Search text match
       if (filters.search) {
         const query = filters.search.toLowerCase().trim();
-        const farmName = (farmsMap[item.farmId]?.name || '').toLowerCase();
-        const fieldName = (fieldsMap[item.fieldId]?.name || '').toLowerCase();
-        const matchesTitle = item.title.toLowerCase().includes(query);
+        const farmName = (item.farmName || farmsMap[item.farmId]?.name || '').toLowerCase();
+        const fieldName = (item.fieldName || fieldsMap[item.fieldId]?.name || '').toLowerCase();
+        const matchesTitle = (item.title || '').toLowerCase().includes(query);
         const matchesCrop = (item.cropName || '').toLowerCase().includes(query);
-        const matchesMethod = item.irrigationMethod.toLowerCase().includes(query);
+        const matchesMethod = (item.irrigationMethod || '').toLowerCase().includes(query);
         const matchesNotes = (item.notes || '').toLowerCase().includes(query);
         const matchesLocation = farmName.includes(query) || fieldName.includes(query);
 
@@ -137,12 +191,12 @@ export default function IrrigationPage() {
       }
 
       // Farm filter
-      if (filters.farmId && item.farmId !== filters.farmId) {
+      if (filters.farmId && String(item.farmId) !== String(filters.farmId)) {
         return false;
       }
 
       // Field filter
-      if (filters.fieldId && item.fieldId !== filters.fieldId) {
+      if (filters.fieldId && String(item.fieldId) !== String(filters.fieldId)) {
         return false;
       }
 
@@ -195,14 +249,15 @@ export default function IrrigationPage() {
   };
 
   const handleSaveSchedule = (savedSchedule, isEdit) => {
+    const adapted = adaptIrrigation(savedSchedule, fieldsMap, farmsMap);
     if (isEdit) {
       setSchedules((prev) =>
-        prev.map((item) => (item.id === savedSchedule.id ? savedSchedule : item))
+        prev.map((item) => (String(item.id) === String(adapted.id) ? adapted : item))
       );
-      showToast(`${t('alerts.activityUpdated')}: ${savedSchedule.title}`);
+      showToast(`${t('alerts.activityUpdated', 'Schedule updated')}: ${adapted.title}`);
     } else {
-      setSchedules((prev) => [savedSchedule, ...prev]);
-      showToast(`${t('alerts.irrigationScheduled')}: ${savedSchedule.title}`);
+      setSchedules((prev) => [adapted, ...prev]);
+      showToast(`${t('alerts.irrigationScheduled', 'Irrigation scheduled')}: ${adapted.title}`);
     }
   };
 
@@ -215,33 +270,63 @@ export default function IrrigationPage() {
     setSelectedScheduleForDetails(null);
   };
 
-  // Cancel schedule (sets status to Cancelled)
-  const handleCancelSchedule = (schedule) => {
+  // Cancel schedule (sets status to Cancelled on backend)
+  const handleCancelSchedule = async (schedule) => {
     const confirmed = window.confirm(
-      `${t('common.cancel')} "${schedule.title}" (${schedule.id})?`
+      `${t('irrigation.cancelWarning', 'Are you sure you want to cancel this scheduled irrigation run?')}\n\n"${schedule.title}"`
     );
     if (!confirmed) return;
 
-    setSchedules((prev) =>
-      prev.map((item) =>
-        item.id === schedule.id ? { ...item, status: 'Cancelled' } : item
-      )
-    );
-    showToast(`${t('status.cancelled')}: ${schedule.title}`);
+    try {
+      const payload = {
+        title: schedule.title,
+        irrigationMethod: schedule.irrigationMethod,
+        status: 'Cancelled',
+        priority: schedule.priority,
+        scheduledDate: schedule.scheduledDate,
+        scheduledTime: schedule.scheduledTime,
+        durationMinutes: schedule.durationMinutes,
+        waterVolumeLitres: schedule.waterVolumeLitres,
+        soilMoisture: schedule.soilMoisture,
+        weatherCondition: schedule.weatherCondition,
+        rainfallExpected: schedule.rainfallExpected,
+        completedAt: null,
+        notes: schedule.notes,
+        cropCycleId: schedule.cropCycleId,
+      };
+
+      const updated = await irrigationService.updateIrrigation(schedule.id, payload);
+      const adapted = adaptIrrigation(updated, fieldsMap, farmsMap);
+
+      setSchedules((prev) =>
+        prev.map((item) => (String(item.id) === String(adapted.id) ? adapted : item))
+      );
+      if (selectedScheduleForDetails && String(selectedScheduleForDetails.id) === String(schedule.id)) {
+        setSelectedScheduleForDetails(adapted);
+      }
+      showToast(`${t('status.cancelled', 'Cancelled')}: ${schedule.title}`);
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || t('common.error'));
+    }
   };
 
   // Delete schedule
-  const handleDeleteSchedule = (schedule) => {
+  const handleDeleteSchedule = async (schedule) => {
     const confirmed = window.confirm(
-      `${t('common.delete')} "${schedule.title}" (${schedule.id})?`
+      `${t('irrigation.deleteWarning', 'Are you sure you want to delete this irrigation schedule? This action cannot be undone.')}\n\n"${schedule.title}"`
     );
     if (!confirmed) return;
 
-    setSchedules((prev) => prev.filter((item) => item.id !== schedule.id));
-    if (selectedScheduleForDetails?.id === schedule.id) {
-      setSelectedScheduleForDetails(null);
+    try {
+      await irrigationService.deleteIrrigation(schedule.id);
+      setSchedules((prev) => prev.filter((item) => String(item.id) !== String(schedule.id)));
+      if (selectedScheduleForDetails && String(selectedScheduleForDetails.id) === String(schedule.id)) {
+        setSelectedScheduleForDetails(null);
+      }
+      showToast(`${t('alerts.itemDeleted', 'Item deleted')}: ${schedule.title}`);
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || t('common.error'));
     }
-    showToast(`${t('alerts.itemDeleted')}: ${schedule.title}`);
   };
 
   return (
@@ -249,27 +334,54 @@ export default function IrrigationPage() {
       {/* 1. Page Header with Schedule Action */}
       <IrrigationHeader onScheduleIrrigation={handleOpenAddModal} />
 
-      {/* 2. Interactive KPI Summary Cards */}
+      {/* 2. Error Banner */}
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0.875rem 1.25rem',
+            backgroundColor: 'var(--danger-bg, #fef2f2)',
+            border: '1px solid var(--danger-border, #fecaca)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--danger-text, #991b1b)',
+            marginBottom: '1rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{loadError}</span>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleRetry} style={{ gap: '0.35rem' }}>
+            <RefreshCw size={14} aria-hidden="true" />
+            <span>{t('common.retry', 'Retry')}</span>
+          </Button>
+        </div>
+      )}
+
+      {/* 3. Interactive KPI Summary Cards */}
       <IrrigationSummaryCards
         summary={summaryMetrics}
         activeStatusFilter={filters.status}
         onStatusFilterChange={(status) => handleFilterChange({ status })}
       />
 
-      {/* 3. Weather-Aware Irrigation Advisory Section */}
+      {/* 4. Weather-Aware Irrigation Advisory Section */}
       <IrrigationAdvisory
         selectedFarmId={filters.farmId}
         farmsMap={farmsMap}
       />
 
-      {/* 4. Today's & Upcoming Irrigation Highlight Section */}
+      {/* 5. Today's & Upcoming Irrigation Highlight Section */}
       <UpcomingIrrigation
         schedules={schedules}
         onViewSchedule={handleViewSchedule}
         fieldsMap={fieldsMap}
       />
 
-      {/* 5. Multi-Criteria Filter Toolbar */}
+      {/* 6. Multi-Criteria Filter Toolbar */}
       <IrrigationFilters
         filters={filters}
         onFilterChange={handleFilterChange}
@@ -280,8 +392,24 @@ export default function IrrigationPage() {
         totalResultsCount={filteredSchedules.length}
       />
 
-      {/* 6. Irrigation Schedule List: Desktop Table + Mobile Cards */}
-      {filteredSchedules.length > 0 ? (
+      {/* 7. Loading Skeletons */}
+      {isLoading ? (
+        <div className="agri-irrigation-cards-grid" style={{ width: '100%' }}>
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              style={{
+                height: '180px',
+                background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'pulse 1.5s infinite',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--slate-200)',
+              }}
+            />
+          ))}
+        </div>
+      ) : filteredSchedules.length > 0 ? (
         <>
           {/* Desktop & Tablet Table */}
           <div className="agri-desktop-table-only">
@@ -320,7 +448,7 @@ export default function IrrigationPage() {
           <div className="agri-irrigation-empty__icon" aria-hidden="true">
             <Droplets size={28} />
           </div>
-          <h3 className="agri-irrigation-empty__title">{t('common.noData')}</h3>
+          <h3 className="agri-irrigation-empty__title">{t('irrigation.noSchedules', t('common.noData'))}</h3>
           <p className="agri-irrigation-empty__text">
             {Object.values(filters).some(Boolean)
               ? t('common.noData')
@@ -340,18 +468,20 @@ export default function IrrigationPage() {
         </div>
       )}
 
-      {/* 7. Irrigation Details Modal */}
+      {/* 8. Irrigation Details Modal */}
       {selectedScheduleForDetails && (
         <IrrigationDetailsModal
           schedule={selectedScheduleForDetails}
           onClose={handleCloseDetailsModal}
           onEdit={handleOpenEditModal}
+          onDelete={handleDeleteSchedule}
+          onCancel={handleCancelSchedule}
           farmsMap={farmsMap}
           fieldsMap={fieldsMap}
         />
       )}
 
-      {/* 8. Add / Edit Irrigation Modal */}
+      {/* 9. Add / Edit Irrigation Modal */}
       {isAddEditModalOpen && (
         <AddIrrigationModal
           isOpen={isAddEditModalOpen}
@@ -360,10 +490,11 @@ export default function IrrigationPage() {
           scheduleToEdit={scheduleToEdit}
           farms={farms}
           fields={fields}
+          crops={crops}
         />
       )}
 
-      {/* 9. Action Toast Notification */}
+      {/* 10. Action Toast Notification */}
       {toastMessage && (
         <div className="agri-irrigation-toast" role="status" aria-live="polite">
           <CheckCircle2 size={18} style={{ color: 'var(--primary-400)' }} aria-hidden="true" />

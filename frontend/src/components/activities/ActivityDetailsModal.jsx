@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   X,
   Edit3,
+  Trash2,
   Calendar,
   Clock,
   MapPin,
@@ -28,6 +29,7 @@ export default function ActivityDetailsModal({
   activity,
   onClose,
   onEdit,
+  onDelete,
   farmsMap = {},
   fieldsMap = {},
 }) {
@@ -311,18 +313,34 @@ export default function ActivityDetailsModal({
 
         {/* Footer */}
         <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              onClose();
-              onEdit(activity);
-            }}
-            aria-label={t('activities.editActivity')}
-          >
-            <Edit3 size={14} aria-hidden="true" />
-            <span>{t('activities.editActivity')}</span>
-          </Button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onDelete(activity);
+                }}
+                style={{ color: 'var(--danger-text, #dc2626)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                aria-label={t('activities.deleteActivity', 'Delete Activity')}
+              >
+                <Trash2 size={14} aria-hidden="true" />
+                <span>{t('common.delete')}</span>
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onClose();
+                onEdit(activity);
+              }}
+              aria-label={t('activities.editActivity')}
+            >
+              <Edit3 size={14} aria-hidden="true" />
+              <span>{t('activities.editActivity')}</span>
+            </Button>
+          </div>
 
           <Button variant="primary" size="sm" onClick={onClose}>
             {t('common.close')}

@@ -222,3 +222,99 @@ export function adaptCropCycle(cycle, field = null) {
   };
 }
 
+/**
+ * Adapt a backend ActivityResponse to UI model.
+ * @param {Object} activity Backend ActivityResponse
+ * @param {Object} [fieldsMap={}] Optional field lookup map
+ * @param {Object} [farmsMap={}] Optional farm lookup map
+ * @returns {Object} UI Activity Model
+ */
+export function adaptActivity(activity, fieldsMap = {}, farmsMap = {}) {
+  if (!activity) return null;
+
+  const fieldId = activity.fieldId ?? null;
+  const farmId = activity.farmId ?? fieldsMap[fieldId]?.farmId ?? null;
+  const farmName = activity.farmName || farmsMap[farmId]?.name || '';
+  const fieldName = activity.fieldName || fieldsMap[fieldId]?.name || '';
+  const cropCycleId = activity.cropCycleId ?? null;
+  const cropName = activity.cropName || '';
+  const duration = activity.durationHours != null ? Number(activity.durationHours) : null;
+  const quantity = activity.quantity != null ? Number(activity.quantity) : null;
+
+  return {
+    id: activity.id,
+    activityType: activity.activityType || 'Other',
+    title: activity.title || '',
+    status: activity.status || 'Planned',
+    priority: activity.priority || 'Medium',
+    date: activity.activityDate || '',
+    activityDate: activity.activityDate || '',
+    time: activity.activityTime || '',
+    activityTime: activity.activityTime || '',
+    duration,
+    durationHours: duration,
+    operator: activity.operator || '',
+    quantity,
+    quantityUnit: activity.quantityUnit || '',
+    description: activity.description || '',
+    notes: activity.notes || '',
+    farmId,
+    farmName,
+    fieldId,
+    fieldName,
+    cropCycleId,
+    cropId: cropCycleId,
+    cropName,
+    createdAt: activity.createdAt,
+    updatedAt: activity.updatedAt,
+  };
+}
+
+/**
+ * Adapt a backend IrrigationResponse to UI model.
+ * @param {Object} schedule Backend IrrigationResponse
+ * @param {Object} [fieldsMap={}] Optional field lookup map
+ * @param {Object} [farmsMap={}] Optional farm lookup map
+ * @returns {Object} UI Irrigation Schedule Model
+ */
+export function adaptIrrigation(schedule, fieldsMap = {}, farmsMap = {}) {
+  if (!schedule) return null;
+
+  const fieldId = schedule.fieldId ?? null;
+  const farmId = schedule.farmId ?? fieldsMap[fieldId]?.farmId ?? null;
+  const farmName = schedule.farmName || farmsMap[farmId]?.name || '';
+  const fieldName = schedule.fieldName || fieldsMap[fieldId]?.name || '';
+  const cropCycleId = schedule.cropCycleId ?? null;
+  const cropName = schedule.cropName || '';
+  const durationMinutes = schedule.durationMinutes != null ? Number(schedule.durationMinutes) : null;
+  const waterVolumeLitres = schedule.waterVolumeLitres != null ? Number(schedule.waterVolumeLitres) : null;
+  const soilMoisture = schedule.soilMoisture != null ? Number(schedule.soilMoisture) : null;
+  const rainfallExpected = schedule.rainfallExpected != null ? Number(schedule.rainfallExpected) : null;
+
+  return {
+    id: schedule.id,
+    title: schedule.title || '',
+    irrigationMethod: schedule.irrigationMethod || 'Drip',
+    status: schedule.status || 'Scheduled',
+    priority: schedule.priority || 'Medium',
+    scheduledDate: schedule.scheduledDate || '',
+    scheduledTime: schedule.scheduledTime || '',
+    durationMinutes,
+    waterVolumeLitres,
+    soilMoisture,
+    weatherCondition: schedule.weatherCondition || '',
+    rainfallExpected,
+    completedAt: schedule.completedAt || null,
+    notes: schedule.notes || '',
+    farmId,
+    farmName,
+    fieldId,
+    fieldName,
+    cropCycleId,
+    cropId: cropCycleId,
+    cropName,
+    createdAt: schedule.createdAt,
+    updatedAt: schedule.updatedAt,
+  };
+}
+

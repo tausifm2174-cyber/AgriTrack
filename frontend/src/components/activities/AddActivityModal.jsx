@@ -1,8 +1,9 @@
 import { useState, useEffect, useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Check, CalendarPlus, Edit3, AlertCircle } from 'lucide-react';
+import { X, Check, CalendarPlus, Edit3, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '../common';
 import { ACTIVITY_TYPES, ACTIVITY_STATUSES } from '../../data/activityData';
+import activityService from '../../services/activityService';
 
 /**
  * ActivityFormContent Component
@@ -11,8 +12,9 @@ import { ACTIVITY_TYPES, ACTIVITY_STATUSES } from '../../data/activityData';
  */
 function ActivityFormContent({
   activityToEdit,
-  farms,
-  fields,
+  farms = [],
+  fields = [],
+  crops = [],
   onSave,
   onClose,
 }) {
@@ -24,7 +26,7 @@ function ActivityFormContent({
   const typeId = useId();
   const farmSelectId = useId();
   const fieldSelectId = useId();
-  const cropInputId = useId();
+  const cropSelectId = useId();
   const dateId = useId();
   const timeId = useId();
   const durationId = useId();
@@ -37,22 +39,21 @@ function ActivityFormContent({
   const notesId = useId();
 
   // Initial farm & field
-  const defaultFarmId = farms[0]?.id || 'farm-1';
-  const initialFieldsForDefault = fields.filter((f) => f.farmId === defaultFarmId);
-  const defaultFieldId = initialFieldsForDefault[0]?.id || 'field-1a';
-  const defaultCrop = initialFieldsForDefault[0]?.currentCrop || 'Wheat';
+  const defaultFarmId = farms[0]?.id ? String(farms[0].id) : '';
+  const initialFieldsForDefault = fields.filter((f) => String(f.farmId) === defaultFarmId);
+  const defaultFieldId = initialFieldsForDefault[0]?.id ? String(initialFieldsForDefault[0].id) : '';
 
   // Initialize form state
   const [formData, setFormData] = useState(() => {
     if (activityToEdit) {
       return {
-        activityType: activityToEdit.activityType || 'Other',
+        activityType: activityToEdit.activityType || 'Fertilizing',
         title: activityToEdit.title || '',
-        farmId: activityToEdit.farmId || defaultFarmId,
-        fieldId: activityToEdit.fieldId || defaultFieldId,
-        cropName: activityToEdit.cropName || '',
-        date: activityToEdit.date || new Date().toISOString().split('T')[0],
-        time: activityToEdit.time || '',
+        farmId: activityToEdit.farmId ? String(activityToEdit.farmId) : defaultFarmId,
+        fieldId: activityToEdit.fieldId ? String(activityToEdit.fieldId) : defaultFieldId,
+        cropCycleId: activityToEdit.cropCycleId ? String(activityToEdit.cropCycleId) : '',
+        date: activityToEdit.date || activityToEdit.activityDate || new Date().toISOString().split('T')[0],
+        time: activityToEdit.time || activityToEdit.activityTime || '',
         duration: activityToEdit.duration !== undefined && activityToEdit.duration !== null ? String(activityToEdit.duration) : '',
         status: activityToEdit.status || 'Planned',
         priority: activityToEdit.priority || 'Medium',
@@ -68,13 +69,13 @@ function ActivityFormContent({
       title: '',
       farmId: defaultFarmId,
       fieldId: defaultFieldId,
-      cropName: defaultCrop,
+      cropCycleId: '',
       date: new Date().toISOString().split('T')[0],
       time: '08:00 AM',
-      duration: '2.5',
+      duration: '',
       status: 'Planned',
       priority: 'Medium',
-      operator: 'Ramesh Patel',
+      operator: '',
       quantity: '',
       quantityUnit: 'kg',
       description: '',
@@ -83,21 +84,26 @@ function ActivityFormContent({
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   // Fields filtered by the currently chosen farm
-  const availableFields = fields.filter((f) => f.farmId === formData.farmId);
+  const availableFields = fields.filter((f) => String(f.farmId) === String(formData.farmId));
+
+  // Crops filtered by the currently chosen field
+  const availableCrops = crops.filter((c) => String(c.fieldId) === String(formData.fieldId));
 
   // Handle cascading Farm change
   const handleFarmChange = (e) => {
     const newFarmId = e.target.value;
-    const newFields = fields.filter((f) => f.farmId === newFarmId);
+    const newFields = fields.filter((f) => String(f.farmId) === String(newFarmId));
     const newField = newFields[0];
 
     setFormData((prev) => ({
       ...prev,
       farmId: newFarmId,
-      fieldId: newField ? newField.id : '',
-      cropName: newField?.currentCrop || '',
+      fieldId: newField ? String(newField.id) : '',
+      cropCycleId: '',
     }));
 
     if (errors.farmId) setErrors((prev) => ({ ...prev, farmId: null }));
@@ -107,12 +113,11 @@ function ActivityFormContent({
   // Handle cascading Field change
   const handleFieldChange = (e) => {
     const newFieldId = e.target.value;
-    const f = fields.find((item) => item.id === newFieldId);
 
     setFormData((prev) => ({
       ...prev,
       fieldId: newFieldId,
-      cropName: f?.currentCrop || prev.cropName,
+      cropCycleId: '',
     }));
 
     if (errors.fieldId) setErrors((prev) => ({ ...prev, fieldId: null }));
@@ -143,9 +148,6 @@ function ActivityFormContent({
     if (!formData.fieldId) {
       newErrors.fieldId = t('validation.selectField');
     }
-    if (!formData.cropName.trim()) {
-      newErrors.cropName = t('validation.selectCrop');
-    }
     if (!formData.date) {
       newErrors.date = t('validation.enterValidDate');
     }
@@ -153,7 +155,7 @@ function ActivityFormContent({
       newErrors.status = t('validation.required');
     }
 
-    if (formData.duration && (isNaN(Number(formData.duration)) || Number(formData.duration) <= 0)) {
+    if (formData.duration && (isNaN(Number(formData.duration)) || Number(formData.duration) < 0)) {
       newErrors.duration = t('validation.enterValidNumber');
     }
 
@@ -166,41 +168,89 @@ function ActivityFormContent({
   };
 
   // Submit handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const activityPayload = {
-      id: isEditMode
-        ? activityToEdit.id
-        : `ACT-${String(Math.floor(Math.random() * 900) + 100).padStart(3, '0')}`,
-      activityType: formData.activityType,
+    const payload = {
       title: formData.title.trim(),
-      farmId: formData.farmId,
-      fieldId: formData.fieldId,
-      cropName: formData.cropName.trim(),
-      date: formData.date,
-      time: formData.time.trim(),
-      duration: formData.duration ? Number(formData.duration) : null,
-      status: formData.status,
-      priority: formData.priority,
-      operator: formData.operator.trim(),
-      quantity: formData.quantity ? Number(formData.quantity) : null,
-      quantityUnit: formData.quantity ? formData.quantityUnit : '',
-      description: formData.description.trim(),
-      notes: formData.notes.trim(),
-      createdAt: isEditMode && activityToEdit.createdAt
-        ? activityToEdit.createdAt
-        : new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      activityType: formData.activityType,
+      status: formData.status || 'Planned',
+      priority: formData.priority || 'Medium',
+      activityDate: formData.date,
+      activityTime: formData.time ? formData.time.trim() : null,
+      durationHours: formData.duration !== '' ? Number(formData.duration) : null,
+      operator: formData.operator ? formData.operator.trim() : null,
+      quantity: formData.quantity !== '' ? Number(formData.quantity) : null,
+      quantityUnit: formData.quantity !== '' && formData.quantityUnit ? formData.quantityUnit.trim() : null,
+      description: formData.description ? formData.description.trim() : null,
+      notes: formData.notes ? formData.notes.trim() : null,
+      cropCycleId: formData.cropCycleId ? Number(formData.cropCycleId) : null,
     };
 
-    onSave(activityPayload, isEditMode);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      let result;
+      if (isEditMode) {
+        result = await activityService.updateActivity(activityToEdit.id, payload);
+      } else {
+        result = await activityService.createActivity(Number(formData.fieldId), payload);
+      }
+      onSave(result, isEditMode);
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || err.message || t('common.error'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const hasNoFarmsOrFields = farms.length === 0 || fields.length === 0;
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="agri-modal-body" style={{ maxHeight: 'calc(80vh - 120px)', overflowY: 'auto' }}>
+        {hasNoFarmsOrFields && (
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              backgroundColor: 'var(--warning-bg, #fffbeb)',
+              border: '1px solid var(--warning-border, #fef3c7)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--warning-text, #92400e)',
+              fontSize: '0.875rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{t('activities.noFarmsOrFields', 'You need to add at least one farm and field before creating an activity.')}</span>
+          </div>
+        )}
+
+        {submitError && (
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              backgroundColor: 'var(--danger-bg, #fef2f2)',
+              border: '1px solid var(--danger-border, #fecaca)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--danger-text, #991b1b)',
+              fontSize: '0.875rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{submitError}</span>
+          </div>
+        )}
+
         <div className="agri-form-grid">
           {/* Activity Type */}
           <div className="agri-form-group">
@@ -213,6 +263,7 @@ function ActivityFormContent({
               className={`agri-form-select ${errors.activityType ? 'agri-form-select--error' : ''}`}
               value={formData.activityType}
               onChange={handleChange}
+              disabled={isSubmitting}
             >
               {ACTIVITY_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -228,7 +279,7 @@ function ActivityFormContent({
             )}
           </div>
 
-          {/* Status */}
+          {/* Activity Status */}
           <div className="agri-form-group">
             <label htmlFor={statusId} className="agri-form-label agri-form-label--required">
               {t('common.status')}
@@ -239,6 +290,7 @@ function ActivityFormContent({
               className={`agri-form-select ${errors.status ? 'agri-form-select--error' : ''}`}
               value={formData.status}
               onChange={handleChange}
+              disabled={isSubmitting}
             >
               {ACTIVITY_STATUSES.map((status) => (
                 <option key={status} value={status}>
@@ -254,19 +306,20 @@ function ActivityFormContent({
             )}
           </div>
 
-          {/* Title (Full Width) */}
-          <div className="agri-form-group agri-form-grid--full">
+          {/* Title */}
+          <div className="agri-form-group agri-form-group--full">
             <label htmlFor={titleId} className="agri-form-label agri-form-label--required">
-              {t('common.name')}
+              {t('activities.title')}
             </label>
             <input
               id={titleId}
               name="title"
               type="text"
-              placeholder="e.g., Urea Top Dressing - Stage 2"
+              placeholder="e.g., Foliar Zinc Fertilizer Application"
               className={`agri-form-input ${errors.title ? 'agri-form-input--error' : ''}`}
               value={formData.title}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.title && (
               <span className="agri-form-error">
@@ -287,6 +340,7 @@ function ActivityFormContent({
               className={`agri-form-select ${errors.farmId ? 'agri-form-select--error' : ''}`}
               value={formData.farmId}
               onChange={handleFarmChange}
+              disabled={isSubmitting || hasNoFarmsOrFields}
             >
               <option value="">-- {t('navigation.farms')} --</option>
               {farms.map((f) => (
@@ -314,12 +368,12 @@ function ActivityFormContent({
               className={`agri-form-select ${errors.fieldId ? 'agri-form-select--error' : ''}`}
               value={formData.fieldId}
               onChange={handleFieldChange}
-              disabled={availableFields.length === 0}
+              disabled={isSubmitting || availableFields.length === 0}
             >
               <option value="">-- {t('navigation.fields')} --</option>
               {availableFields.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name} ({f.currentCrop || '—'})
+                  {f.name}
                 </option>
               ))}
             </select>
@@ -331,32 +385,32 @@ function ActivityFormContent({
             )}
           </div>
 
-          {/* Crop Name */}
+          {/* Optional Crop Selection for Field */}
           <div className="agri-form-group">
-            <label htmlFor={cropInputId} className="agri-form-label agri-form-label--required">
+            <label htmlFor={cropSelectId} className="agri-form-label">
               {t('navigation.crops')}
             </label>
-            <input
-              id={cropInputId}
-              name="cropName"
-              type="text"
-              placeholder="e.g., Wheat, Mustard"
-              className={`agri-form-input ${errors.cropName ? 'agri-form-input--error' : ''}`}
-              value={formData.cropName}
+            <select
+              id={cropSelectId}
+              name="cropCycleId"
+              className="agri-form-select"
+              value={formData.cropCycleId}
               onChange={handleChange}
-            />
-            {errors.cropName && (
-              <span className="agri-form-error">
-                <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                {errors.cropName}
-              </span>
-            )}
+              disabled={isSubmitting || !formData.fieldId}
+            >
+              <option value="">{t('activities.generalFieldActivity', 'General Field Activity (No Crop)')}</option>
+              {availableCrops.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.cropName || c.name} {c.variety ? `(${c.variety})` : ''}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Priority */}
           <div className="agri-form-group">
             <label htmlFor={priorityId} className="agri-form-label">
-              Priority
+              {t('activities.priorityLevels', 'Priority')}
             </label>
             <select
               id={priorityId}
@@ -364,15 +418,15 @@ function ActivityFormContent({
               className="agri-form-select"
               value={formData.priority}
               onChange={handleChange}
+              disabled={isSubmitting}
             >
-              <option value="Low">{t('activities.priorityLevels.low', 'Low')}</option>
-              <option value="Medium">{t('activities.priorityLevels.medium', 'Medium')}</option>
-              <option value="High">{t('activities.priorityLevels.high', 'High')}</option>
+              <option value="Low">{t('status.low', 'Low')}</option>
+              <option value="Medium">{t('status.medium', 'Medium')}</option>
+              <option value="High">{t('status.high', 'High')}</option>
             </select>
           </div>
 
-
-          {/* Date */}
+          {/* Scheduled Date */}
           <div className="agri-form-group">
             <label htmlFor={dateId} className="agri-form-label agri-form-label--required">
               {t('activities.activityDate')}
@@ -384,6 +438,7 @@ function ActivityFormContent({
               className={`agri-form-input ${errors.date ? 'agri-form-input--error' : ''}`}
               value={formData.date}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.date && (
               <span className="agri-form-error">
@@ -393,7 +448,7 @@ function ActivityFormContent({
             )}
           </div>
 
-          {/* Time */}
+          {/* Scheduled Time */}
           <div className="agri-form-group">
             <label htmlFor={timeId} className="agri-form-label">
               {t('common.time')}
@@ -402,14 +457,15 @@ function ActivityFormContent({
               id={timeId}
               name="time"
               type="text"
-              placeholder="e.g. 08:00 AM"
+              placeholder="e.g., 07:00 AM"
               className="agri-form-input"
               value={formData.time}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
           </div>
 
-          {/* Duration */}
+          {/* Duration in Hours */}
           <div className="agri-form-group">
             <label htmlFor={durationId} className="agri-form-label">
               {t('irrigation.duration')} ({t('units.hours')})
@@ -418,12 +474,13 @@ function ActivityFormContent({
               id={durationId}
               name="duration"
               type="number"
-              step="0.5"
-              min="0.5"
+              step="0.1"
+              min="0"
               placeholder="e.g., 2.5"
               className={`agri-form-input ${errors.duration ? 'agri-form-input--error' : ''}`}
               value={formData.duration}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.duration && (
               <span className="agri-form-error">
@@ -442,46 +499,44 @@ function ActivityFormContent({
               id={operatorId}
               name="operator"
               type="text"
-              placeholder="e.g., Ramesh Patel"
+              placeholder="e.g., Field Operator"
               className="agri-form-input"
               value={formData.operator}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
           </div>
 
           {/* Quantity & Unit */}
           <div className="agri-form-group">
             <label htmlFor={quantityId} className="agri-form-label">
-              {t('irrigation.waterQuantity')}
+              Quantity / Input Applied
             </label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input
                 id={quantityId}
                 name="quantity"
                 type="number"
-                step="any"
+                step="0.1"
                 min="0"
                 placeholder="e.g., 50"
                 className={`agri-form-input ${errors.quantity ? 'agri-form-input--error' : ''}`}
+                style={{ flex: 2 }}
                 value={formData.quantity}
                 onChange={handleChange}
-                style={{ flex: 2 }}
+                disabled={isSubmitting}
               />
-              <select
+              <input
                 id={quantityUnitId}
                 name="quantityUnit"
-                className="agri-form-select"
+                type="text"
+                placeholder="kg / L / bags"
+                className="agri-form-input"
+                style={{ flex: 1.5 }}
                 value={formData.quantityUnit}
                 onChange={handleChange}
-                style={{ flex: 1 }}
-              >
-                <option value="kg">kg</option>
-                <option value="L">L</option>
-                <option value="bags">{t('units.bags', 'bags')}</option>
-                <option value="hours">{t('units.hours', 'hours')}</option>
-                <option value="units">{t('units.units', 'units')}</option>
-              </select>
-
+                disabled={isSubmitting}
+              />
             </div>
             {errors.quantity && (
               <span className="agri-form-error">
@@ -492,7 +547,7 @@ function ActivityFormContent({
           </div>
 
           {/* Description */}
-          <div className="agri-form-group agri-form-grid--full">
+          <div className="agri-form-group agri-form-group--full">
             <label htmlFor={descriptionId} className="agri-form-label">
               {t('common.description')}
             </label>
@@ -500,15 +555,16 @@ function ActivityFormContent({
               id={descriptionId}
               name="description"
               rows={2}
-              placeholder="Detail the operational purpose or guidelines..."
+              placeholder="Operational details and goals for this intervention..."
               className="agri-form-textarea"
               value={formData.description}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
           </div>
 
           {/* Notes */}
-          <div className="agri-form-group agri-form-grid--full">
+          <div className="agri-form-group agri-form-group--full">
             <label htmlFor={notesId} className="agri-form-label">
               {t('activities.notes')}
             </label>
@@ -516,23 +572,33 @@ function ActivityFormContent({
               id={notesId}
               name="notes"
               rows={2}
-              placeholder="Observations on soil moisture, crop stage, weather conditions..."
+              placeholder="Observations, weather constraints, or machine equipment numbers..."
               className="agri-form-textarea"
               value={formData.notes}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
           </div>
         </div>
       </div>
 
-      {/* Footer Actions */}
-      <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-        <Button variant="ghost" size="sm" type="button" onClick={onClose}>
+      {/* Modal Actions Footer */}
+      <div className="agri-modal-footer">
+        <Button variant="ghost" size="sm" type="button" onClick={onClose} disabled={isSubmitting}>
           {t('common.cancel')}
         </Button>
-        <Button variant="primary" size="sm" type="submit">
-          <Check size={14} aria-hidden="true" />
-          <span>{isEditMode ? t('common.save') : t('activities.addActivity')}</span>
+        <Button variant="primary" size="sm" type="submit" disabled={isSubmitting || hasNoFarmsOrFields}>
+          {isSubmitting ? (
+            <>
+              <Loader2 size={14} className="agri-animate-spin" aria-hidden="true" />
+              <span>{t('activities.saving', 'Saving activity...')}</span>
+            </>
+          ) : (
+            <>
+              <Check size={14} aria-hidden="true" />
+              <span>{isEditMode ? t('common.save') : t('activities.addActivity')}</span>
+            </>
+          )}
         </Button>
       </div>
     </form>
@@ -550,6 +616,7 @@ export default function AddActivityModal({
   activityToEdit = null,
   farms = [],
   fields = [],
+  crops = [],
 }) {
   const { t } = useTranslation();
   const isEditMode = Boolean(activityToEdit);
@@ -627,6 +694,7 @@ export default function AddActivityModal({
           activityToEdit={activityToEdit}
           farms={farms}
           fields={fields}
+          crops={crops}
           onSave={handleSave}
           onClose={onClose}
         />

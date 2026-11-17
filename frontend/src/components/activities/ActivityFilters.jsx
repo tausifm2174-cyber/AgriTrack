@@ -23,14 +23,14 @@ export default function ActivityFilters({
   // Farm-dependent fields list
   const availableFields = useMemo(() => {
     if (!filters.farmId) return fields;
-    return fields.filter((f) => f.farmId === filters.farmId);
+    return fields.filter((f) => String(f.farmId) === String(filters.farmId));
   }, [fields, filters.farmId]);
 
   // Distinct crops available based on filtered fields or all
   const availableCrops = useMemo(() => {
     let relevantCropNames = new Set();
     if (filters.fieldId) {
-      const selectedField = fields.find((f) => f.id === filters.fieldId);
+      const selectedField = fields.find((f) => String(f.id) === String(filters.fieldId));
       if (selectedField?.currentCrop) relevantCropNames.add(selectedField.currentCrop);
     } else if (filters.farmId) {
       availableFields.forEach((f) => {

@@ -19,8 +19,8 @@ export default function UpcomingIrrigation({
   fieldsMap = {},
 }) {
   const { t } = useTranslation();
-  // Filter schedules that are Scheduled or In Progress, and date is Today (2026-10-03) or upcoming (>= 2026-10-03)
-  const todayDateStr = '2026-10-03';
+  // Filter schedules that are Scheduled or In Progress, and date is Today or upcoming
+  const todayDateStr = new Date().toISOString().split('T')[0];
   const upcomingItems = schedules.filter((s) => {
     return (s.status === 'Scheduled' || s.status === 'In Progress') && s.scheduledDate >= todayDateStr;
   }).slice(0, 4); // Display up to 4 imminent runs
@@ -99,13 +99,13 @@ export default function UpcomingIrrigation({
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0.2rem 0' }}>
                 <IrrigationMethodPill method={item.irrigationMethod} />
                 <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--slate-800)' }}>
-                  {(item.waterVolumeLitres / 1000).toFixed(1)}k L
+                  {item.waterVolumeLitres != null ? `${(item.waterVolumeLitres / 1000).toFixed(1)}k L` : '—'}
                 </span>
               </div>
 
               {/* Meta & View Action */}
               <div className="agri-upcoming-card__meta">
-                <span>{t('irrigation.duration')}: <strong>{item.durationMinutes} min</strong></span>
+                <span>{t('irrigation.duration')}: <strong>{item.durationMinutes != null ? `${item.durationMinutes} min` : '—'}</strong></span>
                 <button
                   type="button"
                   onClick={() => onViewSchedule(item)}

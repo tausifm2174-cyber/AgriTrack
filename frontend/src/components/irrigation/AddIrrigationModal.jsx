@@ -1,12 +1,13 @@
 import { useState, useEffect, useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Check, Edit3, AlertCircle, Droplets } from 'lucide-react';
+import { X, Check, Edit3, AlertCircle, Droplets, Loader2 } from 'lucide-react';
 import { Button } from '../common';
 import {
   IRRIGATION_METHODS,
   IRRIGATION_STATUSES,
   IRRIGATION_PRIORITIES,
 } from '../../data/irrigationData';
+import irrigationService from '../../services/irrigationService';
 
 /**
  * IrrigationFormContent Component
@@ -14,8 +15,9 @@ import {
  */
 function IrrigationFormContent({
   scheduleToEdit,
-  farms,
-  fields,
+  farms = [],
+  fields = [],
+  crops = [],
   onSave,
   onClose,
 }) {
@@ -26,7 +28,7 @@ function IrrigationFormContent({
   const titleId = useId();
   const farmSelectId = useId();
   const fieldSelectId = useId();
-  const cropInputId = useId();
+  const cropSelectId = useId();
   const methodId = useId();
   const dateId = useId();
   const timeId = useId();
@@ -40,29 +42,28 @@ function IrrigationFormContent({
   const notesId = useId();
 
   // Initial defaults
-  const defaultFarmId = farms[0]?.id || 'farm-1';
-  const initialFieldsForDefault = fields.filter((f) => f.farmId === defaultFarmId);
-  const defaultFieldId = initialFieldsForDefault[0]?.id || 'field-1a';
-  const defaultCrop = initialFieldsForDefault[0]?.currentCrop || 'Wheat';
+  const defaultFarmId = farms[0]?.id ? String(farms[0].id) : '';
+  const initialFieldsForDefault = fields.filter((f) => String(f.farmId) === defaultFarmId);
+  const defaultFieldId = initialFieldsForDefault[0]?.id ? String(initialFieldsForDefault[0].id) : '';
 
   // Form State
   const [formData, setFormData] = useState(() => {
     if (scheduleToEdit) {
       return {
         title: scheduleToEdit.title || '',
-        farmId: scheduleToEdit.farmId || defaultFarmId,
-        fieldId: scheduleToEdit.fieldId || defaultFieldId,
-        cropName: scheduleToEdit.cropName || '',
+        farmId: scheduleToEdit.farmId ? String(scheduleToEdit.farmId) : defaultFarmId,
+        fieldId: scheduleToEdit.fieldId ? String(scheduleToEdit.fieldId) : defaultFieldId,
+        cropCycleId: scheduleToEdit.cropCycleId ? String(scheduleToEdit.cropCycleId) : '',
         irrigationMethod: scheduleToEdit.irrigationMethod || 'Drip',
         scheduledDate: scheduleToEdit.scheduledDate || new Date().toISOString().split('T')[0],
         scheduledTime: scheduleToEdit.scheduledTime || '04:00 PM',
         durationMinutes: scheduleToEdit.durationMinutes !== undefined && scheduleToEdit.durationMinutes !== null ? String(scheduleToEdit.durationMinutes) : '45',
-        waterVolumeLitres: scheduleToEdit.waterVolumeLitres !== undefined && scheduleToEdit.waterVolumeLitres !== null ? String(scheduleToEdit.waterVolumeLitres) : '15000',
+        waterVolumeLitres: scheduleToEdit.waterVolumeLitres !== undefined && scheduleToEdit.waterVolumeLitres !== null ? String(scheduleToEdit.waterVolumeLitres) : '',
         priority: scheduleToEdit.priority || 'Medium',
         status: scheduleToEdit.status || 'Scheduled',
         soilMoisture: scheduleToEdit.soilMoisture !== undefined && scheduleToEdit.soilMoisture !== null ? String(scheduleToEdit.soilMoisture) : '',
-        rainfallExpected: scheduleToEdit.rainfallExpected !== undefined && scheduleToEdit.rainfallExpected !== null ? String(scheduleToEdit.rainfallExpected) : '0',
-        weatherCondition: scheduleToEdit.weatherCondition || 'Normal',
+        rainfallExpected: scheduleToEdit.rainfallExpected !== undefined && scheduleToEdit.rainfallExpected !== null ? String(scheduleToEdit.rainfallExpected) : '',
+        weatherCondition: scheduleToEdit.weatherCondition || '',
         notes: scheduleToEdit.notes || '',
       };
     }
@@ -70,37 +71,42 @@ function IrrigationFormContent({
       title: '',
       farmId: defaultFarmId,
       fieldId: defaultFieldId,
-      cropName: defaultCrop,
+      cropCycleId: '',
       irrigationMethod: 'Drip',
       scheduledDate: new Date().toISOString().split('T')[0],
       scheduledTime: '04:00 PM',
       durationMinutes: '45',
-      waterVolumeLitres: '15000',
+      waterVolumeLitres: '',
       priority: 'Medium',
       status: 'Scheduled',
-      soilMoisture: '38',
-      rainfallExpected: '0',
-      weatherCondition: 'Partly Cloudy',
+      soilMoisture: '',
+      rainfallExpected: '',
+      weatherCondition: '',
       notes: '',
     };
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   // Cascading fields for the current farm
-  const availableFields = fields.filter((f) => f.farmId === formData.farmId);
+  const availableFields = fields.filter((f) => String(f.farmId) === String(formData.farmId));
+
+  // Crops filtered by currently selected field
+  const availableCrops = crops.filter((c) => String(c.fieldId) === String(formData.fieldId));
 
   // Farm change handler
   const handleFarmChange = (e) => {
     const newFarmId = e.target.value;
-    const newFields = fields.filter((f) => f.farmId === newFarmId);
+    const newFields = fields.filter((f) => String(f.farmId) === String(newFarmId));
     const newField = newFields[0];
 
     setFormData((prev) => ({
       ...prev,
       farmId: newFarmId,
-      fieldId: newField ? newField.id : '',
-      cropName: newField?.currentCrop || '',
+      fieldId: newField ? String(newField.id) : '',
+      cropCycleId: '',
     }));
 
     if (errors.farmId) setErrors((prev) => ({ ...prev, farmId: null }));
@@ -110,12 +116,11 @@ function IrrigationFormContent({
   // Field change handler
   const handleFieldChange = (e) => {
     const newFieldId = e.target.value;
-    const f = fields.find((item) => item.id === newFieldId);
 
     setFormData((prev) => ({
       ...prev,
       fieldId: newFieldId,
-      cropName: f?.currentCrop || prev.cropName,
+      cropCycleId: '',
     }));
 
     if (errors.fieldId) setErrors((prev) => ({ ...prev, fieldId: null }));
@@ -143,17 +148,11 @@ function IrrigationFormContent({
     if (!formData.fieldId) {
       newErrors.fieldId = t('validation.selectField');
     }
-    if (!formData.cropName.trim()) {
-      newErrors.cropName = t('validation.selectCrop');
-    }
     if (!formData.irrigationMethod) {
       newErrors.irrigationMethod = t('validation.required');
     }
     if (!formData.scheduledDate) {
       newErrors.scheduledDate = t('validation.enterValidDate');
-    }
-    if (!formData.scheduledTime.trim()) {
-      newErrors.scheduledTime = t('validation.required');
     }
     if (!formData.status) {
       newErrors.status = t('validation.required');
@@ -165,9 +164,11 @@ function IrrigationFormContent({
       newErrors.durationMinutes = t('validation.enterValidNumber');
     }
 
-    const volumeNum = Number(formData.waterVolumeLitres);
-    if (!formData.waterVolumeLitres || isNaN(volumeNum) || volumeNum <= 0) {
-      newErrors.waterVolumeLitres = t('validation.enterValidQuantity');
+    if (formData.waterVolumeLitres !== '') {
+      const volumeNum = Number(formData.waterVolumeLitres);
+      if (isNaN(volumeNum) || volumeNum < 0) {
+        newErrors.waterVolumeLitres = t('validation.enterValidQuantity');
+      }
     }
 
     if (formData.soilMoisture !== '') {
@@ -189,58 +190,107 @@ function IrrigationFormContent({
   };
 
   // Submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     const payload = {
-      id: isEditMode
-        ? scheduleToEdit.id
-        : `IRR-${String(Math.floor(Math.random() * 900) + 100).padStart(3, '0')}`,
       title: formData.title.trim(),
-      farmId: formData.farmId,
-      fieldId: formData.fieldId,
-      cropName: formData.cropName.trim(),
       irrigationMethod: formData.irrigationMethod,
+      status: formData.status || 'Scheduled',
+      priority: formData.priority || 'Medium',
       scheduledDate: formData.scheduledDate,
-      scheduledTime: formData.scheduledTime.trim(),
+      scheduledTime: formData.scheduledTime ? formData.scheduledTime.trim() : null,
       durationMinutes: Number(formData.durationMinutes),
-      waterVolumeLitres: Number(formData.waterVolumeLitres),
-      priority: formData.priority,
-      status: formData.status,
+      waterVolumeLitres: formData.waterVolumeLitres !== '' ? Number(formData.waterVolumeLitres) : null,
       soilMoisture: formData.soilMoisture !== '' ? Number(formData.soilMoisture) : null,
-      rainfallExpected: formData.rainfallExpected !== '' ? Number(formData.rainfallExpected) : 0,
-      weatherCondition: formData.weatherCondition.trim() || 'Normal',
-      notes: formData.notes.trim(),
-      createdAt: isEditMode && scheduleToEdit.createdAt
-        ? scheduleToEdit.createdAt
-        : new Date().toISOString(),
+      weatherCondition: formData.weatherCondition ? formData.weatherCondition.trim() : null,
+      rainfallExpected: formData.rainfallExpected !== '' ? Number(formData.rainfallExpected) : null,
       completedAt: formData.status === 'Completed'
-        ? (scheduleToEdit?.completedAt || new Date().toISOString())
+        ? (scheduleToEdit?.completedAt || new Date().toISOString().split('.')[0])
         : null,
-      updatedAt: new Date().toISOString(),
+      notes: formData.notes ? formData.notes.trim() : null,
+      cropCycleId: formData.cropCycleId ? Number(formData.cropCycleId) : null,
     };
 
-    onSave(payload, isEditMode);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      let result;
+      if (isEditMode) {
+        result = await irrigationService.updateIrrigation(scheduleToEdit.id, payload);
+      } else {
+        result = await irrigationService.createIrrigation(Number(formData.fieldId), payload);
+      }
+      onSave(result, isEditMode);
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || err.message || t('common.error'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const hasNoFarmsOrFields = farms.length === 0 || fields.length === 0;
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="agri-modal-body" style={{ maxHeight: 'calc(80vh - 120px)', overflowY: 'auto' }}>
+        {hasNoFarmsOrFields && (
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              backgroundColor: 'var(--warning-bg, #fffbeb)',
+              border: '1px solid var(--warning-border, #fef3c7)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--warning-text, #92400e)',
+              fontSize: '0.875rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{t('irrigation.noFarmsOrFields', 'You need to add at least one farm and field before scheduling irrigation.')}</span>
+          </div>
+        )}
+
+        {submitError && (
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              backgroundColor: 'var(--danger-bg, #fef2f2)',
+              border: '1px solid var(--danger-border, #fecaca)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--danger-text, #991b1b)',
+              fontSize: '0.875rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{submitError}</span>
+          </div>
+        )}
+
         <div className="agri-form-grid">
-          {/* Title (Full Width) */}
-          <div className="agri-form-group agri-form-grid--full">
+          {/* Title */}
+          <div className="agri-form-group agri-form-group--full">
             <label htmlFor={titleId} className="agri-form-label agri-form-label--required">
-              {t('common.name')}
+              {t('irrigation.title')}
             </label>
             <input
               id={titleId}
               name="title"
               type="text"
-              placeholder="e.g., Field 2B Maize Drip Cycle"
+              placeholder="e.g., Block A Morning Drip Pulse"
               className={`agri-form-input ${errors.title ? 'agri-form-input--error' : ''}`}
               value={formData.title}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.title && (
               <span className="agri-form-error">
@@ -250,7 +300,7 @@ function IrrigationFormContent({
             )}
           </div>
 
-          {/* Farm Selection (Cascading parent) */}
+          {/* Farm Selection */}
           <div className="agri-form-group">
             <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
               {t('navigation.farms')}
@@ -261,6 +311,7 @@ function IrrigationFormContent({
               className={`agri-form-select ${errors.farmId ? 'agri-form-select--error' : ''}`}
               value={formData.farmId}
               onChange={handleFarmChange}
+              disabled={isSubmitting || hasNoFarmsOrFields}
             >
               <option value="">-- {t('navigation.farms')} --</option>
               {farms.map((f) => (
@@ -288,12 +339,12 @@ function IrrigationFormContent({
               className={`agri-form-select ${errors.fieldId ? 'agri-form-select--error' : ''}`}
               value={formData.fieldId}
               onChange={handleFieldChange}
-              disabled={availableFields.length === 0}
+              disabled={isSubmitting || availableFields.length === 0}
             >
               <option value="">-- {t('navigation.fields')} --</option>
               {availableFields.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name} ({f.currentCrop || '—'})
+                  {f.name}
                 </option>
               ))}
             </select>
@@ -305,26 +356,26 @@ function IrrigationFormContent({
             )}
           </div>
 
-          {/* Crop Name */}
+          {/* Crop Selection (Optional) */}
           <div className="agri-form-group">
-            <label htmlFor={cropInputId} className="agri-form-label agri-form-label--required">
+            <label htmlFor={cropSelectId} className="agri-form-label">
               {t('crops.cropName')}
             </label>
-            <input
-              id={cropInputId}
-              name="cropName"
-              type="text"
-              placeholder="e.g., Maize, Wheat"
-              className={`agri-form-input ${errors.cropName ? 'agri-form-input--error' : ''}`}
-              value={formData.cropName}
+            <select
+              id={cropSelectId}
+              name="cropCycleId"
+              className="agri-form-select"
+              value={formData.cropCycleId}
               onChange={handleChange}
-            />
-            {errors.cropName && (
-              <span className="agri-form-error">
-                <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                {errors.cropName}
-              </span>
-            )}
+              disabled={isSubmitting || !formData.fieldId}
+            >
+              <option value="">{t('irrigation.generalFieldIrrigation', 'General Field Irrigation (No Crop)')}</option>
+              {availableCrops.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.cropName || c.name} {c.variety ? `(${c.variety})` : ''}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Irrigation Method */}
@@ -338,6 +389,7 @@ function IrrigationFormContent({
               className={`agri-form-select ${errors.irrigationMethod ? 'agri-form-select--error' : ''}`}
               value={formData.irrigationMethod}
               onChange={handleChange}
+              disabled={isSubmitting}
             >
               {IRRIGATION_METHODS.map((m) => (
                 <option key={m} value={m}>
@@ -365,6 +417,7 @@ function IrrigationFormContent({
               className={`agri-form-input ${errors.scheduledDate ? 'agri-form-input--error' : ''}`}
               value={formData.scheduledDate}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.scheduledDate && (
               <span className="agri-form-error">
@@ -376,41 +429,36 @@ function IrrigationFormContent({
 
           {/* Scheduled Time */}
           <div className="agri-form-group">
-            <label htmlFor={timeId} className="agri-form-label agri-form-label--required">
+            <label htmlFor={timeId} className="agri-form-label">
               {t('common.time')}
             </label>
             <input
               id={timeId}
               name="scheduledTime"
               type="text"
-              placeholder="e.g. 04:00 PM"
-              className={`agri-form-input ${errors.scheduledTime ? 'agri-form-input--error' : ''}`}
+              placeholder="e.g., 04:00 PM"
+              className="agri-form-input"
               value={formData.scheduledTime}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
-            {errors.scheduledTime && (
-              <span className="agri-form-error">
-                <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                {errors.scheduledTime}
-              </span>
-            )}
           </div>
 
-          {/* Duration (mins) */}
+          {/* Duration in Minutes */}
           <div className="agri-form-group">
             <label htmlFor={durationId} className="agri-form-label agri-form-label--required">
-              {t('irrigation.duration')} (min)
+              {t('irrigation.duration')} ({t('units.minutes', 'min')})
             </label>
             <input
               id={durationId}
               name="durationMinutes"
               type="number"
               min="1"
-              step="1"
               placeholder="e.g., 45"
               className={`agri-form-input ${errors.durationMinutes ? 'agri-form-input--error' : ''}`}
               value={formData.durationMinutes}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.durationMinutes && (
               <span className="agri-form-error">
@@ -422,19 +470,19 @@ function IrrigationFormContent({
 
           {/* Water Volume (Litres) */}
           <div className="agri-form-group">
-            <label htmlFor={volumeId} className="agri-form-label agri-form-label--required">
+            <label htmlFor={volumeId} className="agri-form-label">
               {t('irrigation.waterQuantity')} ({t('units.liters')})
             </label>
             <input
               id={volumeId}
               name="waterVolumeLitres"
               type="number"
-              min="1"
-              step="500"
+              min="0"
               placeholder="e.g., 15000"
               className={`agri-form-input ${errors.waterVolumeLitres ? 'agri-form-input--error' : ''}`}
               value={formData.waterVolumeLitres}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.waterVolumeLitres && (
               <span className="agri-form-error">
@@ -447,7 +495,7 @@ function IrrigationFormContent({
           {/* Priority */}
           <div className="agri-form-group">
             <label htmlFor={priorityId} className="agri-form-label">
-              Priority
+              {t('activities.priorityLevels', 'Priority')}
             </label>
             <select
               id={priorityId}
@@ -455,6 +503,7 @@ function IrrigationFormContent({
               className="agri-form-select"
               value={formData.priority}
               onChange={handleChange}
+              disabled={isSubmitting}
             >
               {IRRIGATION_PRIORITIES.map((p) => (
                 <option key={p} value={p}>
@@ -475,6 +524,7 @@ function IrrigationFormContent({
               className={`agri-form-select ${errors.status ? 'agri-form-select--error' : ''}`}
               value={formData.status}
               onChange={handleChange}
+              disabled={isSubmitting}
             >
               {IRRIGATION_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -490,7 +540,7 @@ function IrrigationFormContent({
             )}
           </div>
 
-          {/* Soil Moisture */}
+          {/* Soil Moisture (%) */}
           <div className="agri-form-group">
             <label htmlFor={moistureId} className="agri-form-label">
               {t('soil.title')} (%)
@@ -501,10 +551,12 @@ function IrrigationFormContent({
               type="number"
               min="0"
               max="100"
+              step="0.1"
               placeholder="e.g., 38"
               className={`agri-form-input ${errors.soilMoisture ? 'agri-form-input--error' : ''}`}
               value={formData.soilMoisture}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.soilMoisture && (
               <span className="agri-form-error">
@@ -514,21 +566,39 @@ function IrrigationFormContent({
             )}
           </div>
 
-          {/* Expected Rainfall */}
+          {/* Weather Condition */}
+          <div className="agri-form-group">
+            <label htmlFor={weatherCondId} className="agri-form-label">
+              {t('navigation.weather')}
+            </label>
+            <input
+              id={weatherCondId}
+              name="weatherCondition"
+              type="text"
+              placeholder="e.g., Sunny, Partly Cloudy"
+              className="agri-form-input"
+              value={formData.weatherCondition}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Expected Rainfall (mm) */}
           <div className="agri-form-group">
             <label htmlFor={rainfallId} className="agri-form-label">
-              {t('dashboard.rainfall')} (mm)
+              {t('dashboard.rainfall')} ({t('units.mm')})
             </label>
             <input
               id={rainfallId}
               name="rainfallExpected"
               type="number"
               min="0"
-              step="1"
+              step="0.1"
               placeholder="e.g., 0"
               className={`agri-form-input ${errors.rainfallExpected ? 'agri-form-input--error' : ''}`}
               value={formData.rainfallExpected}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
             {errors.rainfallExpected && (
               <span className="agri-form-error">
@@ -538,24 +608,8 @@ function IrrigationFormContent({
             )}
           </div>
 
-          {/* Weather Condition */}
-          <div className="agri-form-group agri-form-grid--full">
-            <label htmlFor={weatherCondId} className="agri-form-label">
-              {t('weather.currentWeather')}
-            </label>
-            <input
-              id={weatherCondId}
-              name="weatherCondition"
-              type="text"
-              placeholder="e.g., Partly Cloudy, Low Rain Chance"
-              className="agri-form-input"
-              value={formData.weatherCondition}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Operational Notes */}
-          <div className="agri-form-group agri-form-grid--full">
+          {/* Notes */}
+          <div className="agri-form-group agri-form-group--full">
             <label htmlFor={notesId} className="agri-form-label">
               {t('activities.notes')}
             </label>
@@ -563,23 +617,33 @@ function IrrigationFormContent({
               id={notesId}
               name="notes"
               rows={2}
-              placeholder="Add nozzle pressures, valve numbers, pump guidelines, or soil conditions..."
+              placeholder="Notes on pump pressure, fertilizer inject, or soil condition..."
               className="agri-form-textarea"
               value={formData.notes}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
           </div>
         </div>
       </div>
 
-      {/* Footer Actions */}
-      <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-        <Button variant="ghost" size="sm" type="button" onClick={onClose}>
+      {/* Modal Actions Footer */}
+      <div className="agri-modal-footer">
+        <Button variant="ghost" size="sm" type="button" onClick={onClose} disabled={isSubmitting}>
           {t('common.cancel')}
         </Button>
-        <Button variant="primary" size="sm" type="submit">
-          <Check size={14} aria-hidden="true" />
-          <span>{isEditMode ? t('common.save') : t('irrigation.addSchedule')}</span>
+        <Button variant="primary" size="sm" type="submit" disabled={isSubmitting || hasNoFarmsOrFields}>
+          {isSubmitting ? (
+            <>
+              <Loader2 size={14} className="agri-animate-spin" aria-hidden="true" />
+              <span>{t('irrigation.saving', 'Saving schedule...')}</span>
+            </>
+          ) : (
+            <>
+              <Check size={14} aria-hidden="true" />
+              <span>{isEditMode ? t('common.save') : t('irrigation.addSchedule')}</span>
+            </>
+          )}
         </Button>
       </div>
     </form>
@@ -589,14 +653,6 @@ function IrrigationFormContent({
 /**
  * AddIrrigationModal Component
  * Accessible dialog modal wrapping the IrrigationFormContent.
- * 
- * @param {Object} props
- * @param {boolean} props.isOpen
- * @param {Function} props.onClose
- * @param {Function} props.onSaveSchedule
- * @param {Object} [props.scheduleToEdit]
- * @param {Array} [props.farms]
- * @param {Array} [props.fields]
  */
 export default function AddIrrigationModal({
   isOpen,
@@ -605,6 +661,7 @@ export default function AddIrrigationModal({
   scheduleToEdit = null,
   farms = [],
   fields = [],
+  crops = [],
 }) {
   const { t } = useTranslation();
   const isEditMode = Boolean(scheduleToEdit);
@@ -645,8 +702,8 @@ export default function AddIrrigationModal({
                 width: '36px',
                 height: '36px',
                 borderRadius: 'var(--radius-md)',
-                backgroundColor: '#ecfeff',
-                color: '#0891b2',
+                backgroundColor: 'var(--primary-100)',
+                color: 'var(--primary-800)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -676,12 +733,13 @@ export default function AddIrrigationModal({
           </button>
         </div>
 
-        {/* Form Body keyed to current edit target */}
+        {/* Form Body keyed to target schedule */}
         <IrrigationFormContent
-          key={scheduleToEdit ? scheduleToEdit.id : 'new-irrigation'}
+          key={scheduleToEdit ? scheduleToEdit.id : 'new-schedule'}
           scheduleToEdit={scheduleToEdit}
           farms={farms}
           fields={fields}
+          crops={crops}
           onSave={handleSave}
           onClose={onClose}
         />

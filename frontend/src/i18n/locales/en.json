@@ -520,7 +520,16 @@
       "low": "Low",
       "medium": "Medium"
     },
-    "type": "Event Category"
+    "type": "Event Category",
+    "deleteActivity": "Delete Activity",
+    "deleteWarning": "Are you sure you want to delete this activity? This action cannot be undone.",
+    "noFarmsOrFields": "No farms or fields available. Please create a farm and field first.",
+    "noFieldsForFarm": "No fields available for selected farm.",
+    "saving": "Saving Activity...",
+    "deleting": "Deleting...",
+    "loadError": "Failed to load activities. Please check connection and try again.",
+    "noActivities": "No activities found. Log a field activity to begin.",
+    "generalFieldActivity": "General Field Activity (No Crop)"
   },
   "irrigation": {
     "title": "Irrigation Management",
@@ -539,7 +548,20 @@
       "furrow": "Furrow Irrigation",
       "sprinkler": "Sprinkler Irrigation"
     },
-    "schedule": "Irrigation Status"
+    "schedule": "Irrigation Status",
+    "editSchedule": "Edit Irrigation Schedule",
+    "deleteSchedule": "Delete Schedule",
+    "deleteWarning": "Are you sure you want to delete this irrigation schedule? This action cannot be undone.",
+    "cancelSchedule": "Cancel Schedule",
+    "cancelWarning": "Are you sure you want to cancel this irrigation schedule?",
+    "noFarmsOrFields": "No farms or fields available. Please create a farm and field first.",
+    "noFieldsForFarm": "No fields available for selected farm.",
+    "saving": "Saving Schedule...",
+    "deleting": "Deleting...",
+    "cancelling": "Cancelling...",
+    "loadError": "Failed to load irrigation schedules. Please check connection and try again.",
+    "noSchedules": "No irrigation schedules found. Create a schedule to begin.",
+    "generalFieldIrrigation": "General Field Irrigation (No Crop)"
   },
   "weather": {
     "title": "Weather & Agro-Meteorology",
