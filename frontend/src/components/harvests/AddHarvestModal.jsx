@@ -1,25 +1,18 @@
 import { useState, useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, PackageCheck } from 'lucide-react';
+import { X, PackageCheck, AlertTriangle, Loader2 } from 'lucide-react';
 import { Button } from '../common';
-import { farmData } from '../../data/farmData';
-import { fieldData } from '../../data/fieldData';
+import harvestService from '../../services/harvestService';
+import { translateCrop, translateVariety, translateSeason, formatFieldName } from '../../utils/displayLabels';
 
-function getNextHarvestId() {
-  return `HAR-00${Math.floor(Math.random() * 900) + 100}`;
-}
-
-function getNextCropCycleId() {
-  return `crop-cycle-${Date.now()}`;
-}
-
-export default function AddHarvestModal({ onClose, onAddHarvest }) {
+export default function AddHarvestModal({
+  onClose,
+  onSave,
+  cropCycles = [],
+  harvestToEdit = null,
+}) {
   const { t } = useTranslation();
-  const farmSelectId = useId();
-  const fieldSelectId = useId();
-  const cropInputId = useId();
-  const varietyInputId = useId();
-  const seasonSelectId = useId();
+  const cropCycleSelectId = useId();
   const dateInputId = useId();
   const expectedYieldId = useId();
   const actualQtyId = useId();
@@ -29,119 +22,129 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
   const storageId = useId();
   const notesId = useId();
 
-  const farms = farmData.farms || [];
-  const allFields = fieldData.fields || [];
+  const isEditMode = Boolean(harvestToEdit);
 
-  const [farmId, setFarmId] = useState(farms[0]?.id || 'farm-1');
-  const availableFields = allFields.filter((f) => f.farmId === farmId);
-  const [fieldId, setFieldId] = useState(availableFields[0]?.id || 'field-1a');
+  // Available crop cycles for new harvest
+  const eligibleCropCycles = cropCycles.filter(
+    (c) => c.status !== 'Completed' && c.status !== 'Failed' && c.status !== 'Cancelled'
+  );
+  const activeCycleList = eligibleCropCycles.length > 0 ? eligibleCropCycles : cropCycles;
 
-  const selectedField = allFields.find((f) => f.id === fieldId) || availableFields[0];
+  const defaultCycleId = harvestToEdit?.cropCycleId
+    ? String(harvestToEdit.cropCycleId)
+    : (activeCycleList[0] ? String(activeCycleList[0].id) : '');
 
-  const [cropName, setCropName] = useState(selectedField?.currentCrop || 'Wheat');
-  const [variety, setVariety] = useState(selectedField?.cropVariety || 'Sharbati');
-  const [season, setSeason] = useState(selectedField?.cropSeason || 'Rabi');
-  const [harvestDate, setHarvestDate] = useState('2026-10-03');
-  const [expectedYieldKg, setExpectedYieldKg] = useState('2500');
-  const [harvestedQuantityKg, setHarvestedQuantityKg] = useState('2400');
-  const [qualityGrade, setQualityGrade] = useState('A');
-  const [qualityScore, setQualityScore] = useState('92');
-  const [moisturePercent, setMoisturePercent] = useState('11.5');
-  const [storageLocation, setStorageLocation] = useState('Central Granary - Silo #1');
-  const [notes, setNotes] = useState('');
+  const [cropCycleId, setCropCycleId] = useState(defaultCycleId);
+  const [harvestDate, setHarvestDate] = useState(
+    harvestToEdit?.harvestDate || new Date().toISOString().split('T')[0]
+  );
+  const [expectedYieldKg, setExpectedYieldKg] = useState(
+    harvestToEdit?.expectedYieldKg != null ? String(harvestToEdit.expectedYieldKg) : ''
+  );
+  const [harvestedQuantityKg, setHarvestedQuantityKg] = useState(
+    harvestToEdit?.harvestedQuantityKg != null ? String(harvestToEdit.harvestedQuantityKg) : ''
+  );
+  const [qualityGrade, setQualityGrade] = useState(harvestToEdit?.qualityGrade || 'A');
+  const [qualityScore, setQualityScore] = useState(
+    harvestToEdit?.qualityScore != null ? String(harvestToEdit.qualityScore) : '85'
+  );
+  const [moisturePercent, setMoisturePercent] = useState(
+    harvestToEdit?.moisturePercent != null ? String(harvestToEdit.moisturePercent) : ''
+  );
+  const [storageLocation, setStorageLocation] = useState(harvestToEdit?.storageLocation || '');
+  const [notes, setNotes] = useState(harvestToEdit?.notes || '');
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const handleFarmChange = (newFarmId) => {
-    setFarmId(newFarmId);
-    const newFields = allFields.filter((f) => f.farmId === newFarmId);
-    if (newFields.length > 0) {
-      setFieldId(newFields[0].id);
-      setCropName(newFields[0].currentCrop || 'Wheat');
-      setVariety(newFields[0].cropVariety || '');
-      setSeason(newFields[0].cropSeason || 'Rabi');
-    } else {
-      setFieldId('');
-    }
-  };
-
-  const handleFieldChange = (newFieldId) => {
-    setFieldId(newFieldId);
-    const f = allFields.find((field) => field.id === newFieldId);
-    if (f) {
-      setCropName(f.currentCrop || 'Wheat');
-      setVariety(f.cropVariety || '');
-      setSeason(f.cropSeason || 'Rabi');
-    }
-  };
+  // Selected crop cycle object for contextual display
+  const selectedCropCycle = activeCycleList.find((c) => String(c.id) === String(cropCycleId)) || activeCycleList[0];
 
   const validate = () => {
     const errs = {};
-    if (!farmId) errs.farmId = t('validation.required', 'Please select a farm');
-    if (!fieldId) errs.fieldId = t('validation.required', 'Please select a field');
-    if (!cropName.trim()) errs.cropName = t('validation.required', 'Crop name is required');
-    if (!harvestDate) errs.harvestDate = t('validation.required', 'Harvest date is required');
+    if (!isEditMode && !cropCycleId) {
+      errs.cropCycleId = t('validation.required', 'Please select a crop cycle');
+    }
+    if (!harvestDate) {
+      errs.harvestDate = t('validation.required', 'Harvest date is required');
+    }
 
     const actualQty = Number(harvestedQuantityKg);
-    if (isNaN(actualQty) || actualQty < 0) {
+    if (harvestedQuantityKg === '' || isNaN(actualQty) || actualQty < 0) {
       errs.harvestedQuantityKg = t('validation.positiveNumber', 'Harvested quantity must be 0 or greater');
     }
 
-    const expYield = Number(expectedYieldKg);
-    if (isNaN(expYield) || expYield < 0) {
-      errs.expectedYieldKg = t('validation.positiveNumber', 'Expected yield must be 0 or greater');
+    if (expectedYieldKg !== '') {
+      const expYield = Number(expectedYieldKg);
+      if (isNaN(expYield) || expYield < 0) {
+        errs.expectedYieldKg = t('validation.positiveNumber', 'Expected yield must be 0 or greater');
+      }
     }
 
-    const score = Number(qualityScore);
-    if (isNaN(score) || score < 1 || score > 100) {
-      errs.qualityScore = t('validation.range', 'Score must be between 1 and 100');
+    if (qualityScore !== '') {
+      const score = Number(qualityScore);
+      if (isNaN(score) || score < 0 || score > 100) {
+        errs.qualityScore = t('validation.range', 'Score must be between 0 and 100');
+      }
     }
 
-    const moisture = Number(moisturePercent);
-    if (isNaN(moisture) || moisture < 0 || moisture > 100) {
-      errs.moisturePercent = t('validation.range', 'Moisture must be between 0 and 100%');
+    if (moisturePercent !== '') {
+      const moisture = Number(moisturePercent);
+      if (isNaN(moisture) || moisture < 0 || moisture > 100) {
+        errs.moisturePercent = t('validation.range', 'Moisture must be between 0 and 100%');
+      }
     }
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
-    const farmObj = farms.find((f) => f.id === farmId);
-    const fieldObj = allFields.find((f) => f.id === fieldId);
 
     const actual = Number(harvestedQuantityKg);
     const status = actual === 0 ? 'PLANNED' : 'HARVESTED';
 
-    const newHarvest = {
-      id: getNextHarvestId(),
-      farmId,
-      farmName: farmObj ? farmObj.name : 'Green Valley Farm',
-      fieldId,
-      fieldName: fieldObj ? fieldObj.name : 'Field 1A',
-      cropId: getNextCropCycleId(),
-      cropName: cropName.trim(),
-      variety: variety.trim() || 'Standard Variety',
-      season,
+    const payload = {
       harvestDate,
-      expectedYieldKg: Number(expectedYieldKg) || actual,
       harvestedQuantityKg: actual,
-      availableQuantityKg: actual,
-      soldQuantityKg: 0,
-      qualityGrade,
-      qualityScore: Number(qualityScore) || 90,
-      moisturePercent: Number(moisturePercent) || 12.0,
-      status,
-      storageLocation: storageLocation.trim() || 'Central Storage Yard',
-      notes: notes.trim() || 'Harvested under optimal dry weather conditions.',
+      expectedYieldKg: expectedYieldKg !== '' ? Number(expectedYieldKg) : null,
+      availableQuantityKg: isEditMode && harvestToEdit?.availableQuantityKg != null
+        ? harvestToEdit.availableQuantityKg
+        : actual,
+      soldQuantityKg: isEditMode && harvestToEdit?.soldQuantityKg != null
+        ? harvestToEdit.soldQuantityKg
+        : 0,
+      qualityGrade: qualityGrade || 'A',
+      qualityScore: qualityScore !== '' ? Number(qualityScore) : null,
+      moisturePercent: moisturePercent !== '' ? Number(moisturePercent) : null,
+      status: isEditMode ? harvestToEdit.status : status,
+      storageLocation: storageLocation ? storageLocation.trim() : null,
+      notes: notes ? notes.trim() : null,
     };
 
-    onAddHarvest(newHarvest);
-    onClose();
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      let result;
+      if (isEditMode) {
+        result = await harvestService.updateHarvest(harvestToEdit.id, payload);
+      } else {
+        result = await harvestService.createHarvest(Number(cropCycleId), payload);
+      }
+      onSave(result, isEditMode);
+      onClose();
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || err.message || t('common.error', 'An error occurred'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const hasNoCycles = !isEditMode && activeCycleList.length === 0;
 
   return (
     <div
@@ -150,7 +153,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
       aria-modal="true"
       aria-labelledby="add-harvest-title"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !isSubmitting) onClose();
       }}
     >
       <div className="agri-modal-dialog agri-modal-dialog--lg">
@@ -162,7 +165,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
               <span>{t('harvests.intakeLogging', 'Produce Intake & Logging')}</span>
             </div>
             <h3 id="add-harvest-title" className="agri-modal-title">
-              {t('harvests.addHarvest', 'Record New Harvest')}
+              {isEditMode ? t('harvests.editHarvest', 'Edit Harvest Record') : t('harvests.addHarvest', 'Record New Harvest')}
             </h3>
             <p className="agri-modal-subtitle">
               {t('harvests.intakeSubtitle', 'Enter harvested lot metrics, quality evaluation, and granary storage allocation.')}
@@ -172,6 +175,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
+            disabled={isSubmitting}
             aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
@@ -180,95 +184,104 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} noValidate>
-          <div className="agri-modal-body">
-            {/* Dependent Farm and Field selection */}
-            <div className="agri-form-grid agri-form-grid--2">
+          <div className="agri-modal-body" style={{ maxHeight: 'calc(80vh - 120px)', overflowY: 'auto' }}>
+            {/* Warning if no crop cycles exist */}
+            {hasNoCycles && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  backgroundColor: '#fffbeb',
+                  border: '1px solid #fde68a',
+                  borderRadius: 'var(--radius-md)',
+                  color: '#92400e',
+                  fontSize: '0.85rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                <AlertTriangle size={18} style={{ flexShrink: 0 }} />
+                <span>{t('harvests.noCropCycles', 'No active crop cycles available. Please register and plant a crop cycle first.')}</span>
+              </div>
+            )}
+
+            {submitError && (
+              <div
+                style={{
+                  padding: '0.75rem 1rem',
+                  backgroundColor: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: 'var(--radius-md)',
+                  color: '#dc2626',
+                  fontSize: '0.85rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                {submitError}
+              </div>
+            )}
+
+            {/* Standing Crop Cycle Selection */}
+            {!isEditMode ? (
               <div className="agri-form-group">
-                <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
-                  {t('farms.farm', 'Farm / Holding')}
+                <label htmlFor={cropCycleSelectId} className="agri-form-label agri-form-label--required">
+                  {t('crops.cropCycle', 'Standing Crop Cycle')}
                 </label>
                 <select
-                  id={farmSelectId}
+                  id={cropCycleSelectId}
                   className="agri-form-select"
-                  value={farmId}
-                  onChange={(e) => handleFarmChange(e.target.value)}
+                  value={cropCycleId}
+                  onChange={(e) => setCropCycleId(e.target.value)}
+                  disabled={hasNoCycles || isSubmitting}
                 >
-                  {farms.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name} ({f.district})
+                  {activeCycleList.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {translateCrop(c.cropName, t)} ({translateVariety(c.variety, t)}) — {c.fieldName || c.farmName || `Cycle #${c.id}`} [{translateSeason(c.season, t)}]
                     </option>
                   ))}
                 </select>
-                {errors.farmId && <span className="agri-form-help text-danger">{errors.farmId}</span>}
+                {errors.cropCycleId && <span className="agri-form-help text-danger">{errors.cropCycleId}</span>}
               </div>
+            ) : (
+              <div style={{ backgroundColor: 'var(--slate-50)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', border: '1px solid var(--slate-200)', fontSize: '0.85rem' }}>
+                <span style={{ fontWeight: 600, color: 'var(--slate-700)' }}>
+                  {translateCrop(harvestToEdit.cropName, t)} ({translateVariety(harvestToEdit.variety, t)})
+                </span>
+                <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+                  {harvestToEdit.farmName} • {formatFieldName(harvestToEdit.fieldName, t)}
+                </div>
+              </div>
+            )}
 
-              <div className="agri-form-group">
-                <label htmlFor={fieldSelectId} className="agri-form-label agri-form-label--required">
-                  {t('fields.field', 'Field')}
-                </label>
-                <select
-                  id={fieldSelectId}
-                  className="agri-form-select"
-                  value={fieldId}
-                  onChange={(e) => handleFieldChange(e.target.value)}
-                >
-                  {availableFields.map((fld) => (
-                    <option key={fld.id} value={fld.id}>
-                      {fld.name} ({fld.areaAcres} {t('units.acres', 'Acres')} - {fld.currentCrop})
-                    </option>
-                  ))}
-                </select>
-                {errors.fieldId && <span className="agri-form-help text-danger">{errors.fieldId}</span>}
+            {/* Crop Info Preview if new */}
+            {!isEditMode && selectedCropCycle && (
+              <div
+                style={{
+                  backgroundColor: 'var(--slate-50)',
+                  padding: '0.625rem 0.85rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--slate-200)',
+                  marginBottom: '1rem',
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  color: 'var(--slate-600)',
+                }}
+              >
+                <div>
+                  <strong>{t('farms.farm', 'Farm')}:</strong> {selectedCropCycle.farmName || '—'}
+                </div>
+                <div>
+                  <strong>{t('fields.field', 'Field')}:</strong> {selectedCropCycle.fieldName || '—'}
+                </div>
+                <div>
+                  <strong>{t('crops.season', 'Season')}:</strong> {translateSeason(selectedCropCycle.season, t) || '—'}
+                </div>
               </div>
-            </div>
-
-            {/* Crop, Variety, Season */}
-            <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
-              <div className="agri-form-group">
-                <label htmlFor={cropInputId} className="agri-form-label agri-form-label--required">
-                  {t('crops.cropName', 'Crop Name')}
-                </label>
-                <input
-                  id={cropInputId}
-                  type="text"
-                  className="agri-form-input"
-                  value={cropName}
-                  onChange={(e) => setCropName(e.target.value)}
-                  placeholder="e.g. Wheat"
-                />
-                {errors.cropName && <span className="agri-form-help text-danger">{errors.cropName}</span>}
-              </div>
-
-              <div className="agri-form-group">
-                <label htmlFor={varietyInputId} className="agri-form-label">
-                  {t('crops.variety', 'Variety')}
-                </label>
-                <input
-                  id={varietyInputId}
-                  type="text"
-                  className="agri-form-input"
-                  value={variety}
-                  onChange={(e) => setVariety(e.target.value)}
-                  placeholder="e.g. Sharbati"
-                />
-              </div>
-
-              <div className="agri-form-group">
-                <label htmlFor={seasonSelectId} className="agri-form-label">
-                  {t('crops.season', 'Season')}
-                </label>
-                <select
-                  id={seasonSelectId}
-                  className="agri-form-select"
-                  value={season}
-                  onChange={(e) => setSeason(e.target.value)}
-                >
-                  <option value="Rabi">{t('crops.rabi', 'Rabi')}</option>
-                  <option value="Kharif">{t('crops.kharif', 'Kharif')}</option>
-                  <option value="Zaid">{t('crops.zaid', 'Zaid')}</option>
-                </select>
-              </div>
-            </div>
+            )}
 
             {/* Harvest Date, Expected Yield, Actual Yield */}
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
@@ -282,6 +295,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   className="agri-form-input"
                   value={harvestDate}
                   onChange={(e) => setHarvestDate(e.target.value)}
+                  disabled={isSubmitting}
                 />
                 {errors.harvestDate && <span className="agri-form-help text-danger">{errors.harvestDate}</span>}
               </div>
@@ -298,6 +312,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   onChange={(e) => setExpectedYieldKg(e.target.value)}
                   min="0"
                   placeholder="e.g. 2500"
+                  disabled={isSubmitting}
                 />
                 {errors.expectedYieldKg && <span className="agri-form-help text-danger">{errors.expectedYieldKg}</span>}
               </div>
@@ -314,6 +329,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   onChange={(e) => setHarvestedQuantityKg(e.target.value)}
                   min="0"
                   placeholder="e.g. 2400"
+                  disabled={isSubmitting}
                 />
                 <span className="agri-form-help">
                   {(Number(harvestedQuantityKg || 0) / 100).toFixed(1)} {t('units.quintals', 'quintals')}
@@ -333,6 +349,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   className="agri-form-select"
                   value={qualityGrade}
                   onChange={(e) => setQualityGrade(e.target.value)}
+                  disabled={isSubmitting}
                 >
                   <option value="A">{t('harvests.gradeA', 'Grade A (Premium)')}</option>
                   <option value="B">{t('harvests.gradeB', 'Grade B (Standard)')}</option>
@@ -342,7 +359,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
 
               <div className="agri-form-group">
                 <label htmlFor={qualityScoreId} className="agri-form-label">
-                  {t('harvests.qualityScore', 'Quality Score')} (1-100)
+                  {t('harvests.qualityScore', 'Quality Score')} (0-100)
                 </label>
                 <input
                   id={qualityScoreId}
@@ -350,8 +367,9 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   className="agri-form-input"
                   value={qualityScore}
                   onChange={(e) => setQualityScore(e.target.value)}
-                  min="1"
+                  min="0"
                   max="100"
+                  disabled={isSubmitting}
                 />
                 {errors.qualityScore && <span className="agri-form-help text-danger">{errors.qualityScore}</span>}
               </div>
@@ -368,6 +386,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                   value={moisturePercent}
                   onChange={(e) => setMoisturePercent(e.target.value)}
                   placeholder="e.g. 11.5"
+                  disabled={isSubmitting}
                 />
                 {errors.moisturePercent && <span className="agri-form-help text-danger">{errors.moisturePercent}</span>}
               </div>
@@ -385,6 +404,7 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                 value={storageLocation}
                 onChange={(e) => setStorageLocation(e.target.value)}
                 placeholder="e.g. Central Granary - Silo #1"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -400,17 +420,30 @@ export default function AddHarvestModal({ onClose, onAddHarvest }) {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Record observation notes, grain color, drying status..."
+                disabled={isSubmitting}
               />
             </div>
           </div>
 
           {/* Footer */}
           <div className="agri-modal-footer">
-            <Button variant="secondary" size="md" onClick={onClose}>
+            <Button variant="secondary" size="md" onClick={onClose} disabled={isSubmitting}>
               {t('common.cancel', 'Cancel')}
             </Button>
-            <Button variant="primary" size="md" type="submit">
-              {t('common.save', 'Save Harvest Record')}
+            <Button
+              variant="primary"
+              size="md"
+              type="submit"
+              disabled={hasNoCycles || isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>{t('harvests.saving', 'Recording Harvest...')}</span>
+                </>
+              ) : (
+                <span>{isEditMode ? t('common.save', 'Save Changes') : t('common.save', 'Save Harvest Record')}</span>
+              )}
             </Button>
           </div>
         </form>

@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { X, PackageCheck, Sprout, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { X, PackageCheck, Sprout, TrendingUp, ArrowUpRight, ArrowDownRight, Trash2, Edit3 } from 'lucide-react';
 import { Button } from '../common';
 import SalesStatusBadge from './SalesStatusBadge';
 import { formatCurrency, formatWeight } from '../../utils/formatters';
 import { translateCrop, translateVariety } from '../../utils/displayLabels';
 
-export default function SaleDetailsModal({ sale, onClose }) {
+export default function SaleDetailsModal({ sale, onClose, onDelete, onEdit }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -197,6 +197,32 @@ export default function SaleDetailsModal({ sale, onClose }) {
         {/* Footer Navigation */}
         <div className="agri-modal-footer">
           <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto', flexWrap: 'wrap' }}>
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(sale)}
+                style={{ color: 'var(--danger-text, #dc2626)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                aria-label={t('sales.deleteSale', 'Delete Sale')}
+              >
+                <Trash2 size={14} aria-hidden="true" />
+                <span>{t('common.delete', 'Delete')}</span>
+              </Button>
+            )}
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  onEdit(sale);
+                }}
+                aria-label={t('common.edit', 'Edit')}
+              >
+                <Edit3 size={14} aria-hidden="true" />
+                <span>{t('common.edit', 'Edit')}</span>
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={handleGoToHarvest} aria-label={t('sales.viewHarvests', 'View Harvest Lot')}>
               <PackageCheck size={14} />
               <span>{t('sales.viewHarvests', 'View Harvest')}</span>

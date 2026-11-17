@@ -318,3 +318,159 @@ export function adaptIrrigation(schedule, fieldsMap = {}, farmsMap = {}) {
   };
 }
 
+/**
+ * Adapt a backend HarvestResponse to UI model.
+ * @param {Object} harvest Backend HarvestResponse
+ * @param {Object} [cropCyclesMap={}] Optional crop cycle lookup map
+ * @param {Object} [fieldsMap={}] Optional field lookup map
+ * @param {Object} [farmsMap={}] Optional farm lookup map
+ * @returns {Object} UI Harvest Model
+ */
+export function adaptHarvest(harvest, cropCyclesMap = {}, fieldsMap = {}, farmsMap = {}) {
+  if (!harvest) return null;
+
+  const cycleId = harvest.cropCycleId ?? null;
+  const cycle = cropCyclesMap[cycleId] || {};
+  const fieldId = harvest.fieldId ?? cycle.fieldId ?? null;
+  const farmId = harvest.farmId ?? cycle.farmId ?? fieldsMap[fieldId]?.farmId ?? null;
+
+  const cropName = harvest.cropName || cycle.cropName || '';
+  const variety = harvest.variety || cycle.variety || '';
+  const farmName = harvest.farmName || farmsMap[farmId]?.name || '';
+  const fieldName = harvest.fieldName || fieldsMap[fieldId]?.name || '';
+  const season = cycle.season || '';
+
+  const harvestedQuantityKg = harvest.harvestedQuantityKg != null ? Number(harvest.harvestedQuantityKg) : 0;
+  const availableQuantityKg = harvest.availableQuantityKg != null ? Number(harvest.availableQuantityKg) : 0;
+  const soldQuantityKg = harvest.soldQuantityKg != null ? Number(harvest.soldQuantityKg) : 0;
+  const expectedYieldKg = harvest.expectedYieldKg != null ? Number(harvest.expectedYieldKg) : 0;
+  const qualityScore = harvest.qualityScore != null ? Number(harvest.qualityScore) : null;
+  const moisturePercent = harvest.moisturePercent != null ? Number(harvest.moisturePercent) : null;
+
+  return {
+    id: harvest.id,
+    cropCycleId: cycleId,
+    cropName,
+    variety,
+    season,
+    farmId,
+    farmName,
+    fieldId,
+    fieldName,
+    harvestDate: harvest.harvestDate || '',
+    expectedYieldKg,
+    harvestedQuantityKg,
+    availableQuantityKg,
+    soldQuantityKg,
+    qualityGrade: harvest.qualityGrade || 'A',
+    qualityScore,
+    moisturePercent,
+    status: harvest.status || 'HARVESTED',
+    storageLocation: harvest.storageLocation || '',
+    notes: harvest.notes || '',
+    createdAt: harvest.createdAt,
+    updatedAt: harvest.updatedAt,
+  };
+}
+
+/**
+ * Adapt a backend SaleResponse to UI model.
+ * @param {Object} sale Backend SaleResponse
+ * @param {Object} [harvestsMap={}] Optional harvest lookup map
+ * @returns {Object} UI Sale Model
+ */
+export function adaptSale(sale, harvestsMap = {}) {
+  if (!sale) return null;
+
+  const harvestId = sale.harvestId ?? null;
+  const harvest = harvestsMap[harvestId] || {};
+
+  const quantityKg = sale.quantityKg != null ? Number(sale.quantityKg) : 0;
+  const pricePerKg = sale.pricePerKg != null ? Number(sale.pricePerKg) : 0;
+  const pricePerQuintal = sale.pricePerQuintal != null ? Number(sale.pricePerQuintal) : (pricePerKg > 0 ? Number((pricePerKg * 100).toFixed(2)) : 0);
+  const totalAmount = sale.totalAmount != null ? Number(sale.totalAmount) : 0;
+  const paidAmount = sale.paidAmount != null ? Number(sale.paidAmount) : 0;
+  const balanceDue = sale.balanceDue != null ? Number(sale.balanceDue) : 0;
+  const referenceMarketPricePerQ = sale.referenceMarketPricePerQ != null ? Number(sale.referenceMarketPricePerQ) : null;
+
+  return {
+    id: sale.id,
+    harvestId,
+    cropCycleId: sale.cropCycleId ?? harvest.cropCycleId ?? null,
+    cropName: sale.cropName || harvest.cropName || '',
+    variety: sale.variety || harvest.variety || '',
+    farmId: sale.farmId ?? harvest.farmId ?? null,
+    farmName: sale.farmName || harvest.farmName || '',
+    fieldId: sale.fieldId ?? harvest.fieldId ?? null,
+    fieldName: sale.fieldName || harvest.fieldName || '',
+    buyerName: sale.buyerName || '',
+    saleDate: sale.saleDate || '',
+    quantityKg,
+    pricePerKg,
+    pricePerQuintal,
+    totalAmount,
+    market: sale.market || '',
+    status: sale.status || 'COMPLETED',
+    paymentStatus: sale.paymentStatus || 'PENDING',
+    paidAmount,
+    balanceDue,
+    paymentMethod: sale.paymentMethod || '',
+    invoiceNumber: sale.invoiceNumber || '',
+    referenceMarketPricePerQ,
+    notes: sale.notes || '',
+    createdAt: sale.createdAt,
+    updatedAt: sale.updatedAt,
+  };
+}
+
+/**
+ * Adapt a backend MarketPriceResponse to UI model.
+ * @param {Object} record Backend MarketPriceResponse
+ * @param {Array} [historyRecords=[]] Optional historical records for the same crop & market
+ * @returns {Object} UI Market Price Model
+ */
+export function adaptMarketPrice(record, historyRecords = []) {
+  if (!record) return null;
+
+  const pricePerQuintal = record.pricePerQuintal != null ? Number(record.pricePerQuintal) : 0;
+  const pricePerKg = record.pricePerKg != null ? Number(record.pricePerKg) : (pricePerQuintal > 0 ? pricePerQuintal / 100 : 0);
+  const previousPrice = record.previousPrice != null ? Number(record.previousPrice) : pricePerQuintal;
+  const change = record.priceChange != null ? Number(record.priceChange) : 0;
+  const changePercent = record.changePercent != null ? Number(record.changePercent) : 0;
+
+  const arrivalVolumeQ = record.arrivalVolumeQuintals != null ? Number(record.arrivalVolumeQuintals) : null;
+  const minPrice = record.minPrice != null ? Number(record.minPrice) : null;
+  const maxPrice = record.maxPrice != null ? Number(record.maxPrice) : null;
+
+  const history = Array.isArray(historyRecords) && historyRecords.length > 0
+    ? historyRecords
+    : [];
+
+  return {
+    id: record.id,
+    crop: record.cropName || '',
+    cropName: record.cropName || '',
+    variety: record.variety || '',
+    market: record.marketName || '',
+    marketName: record.marketName || '',
+    location: record.location || '',
+    pricePerQuintal,
+    pricePerKg,
+    previousPrice,
+    change,
+    changePercent,
+    trend: record.trend || 'STABLE',
+    qualityGrade: record.qualityGrade || 'A',
+    date: record.priceDate || '',
+    priceDate: record.priceDate || '',
+    source: record.source || '',
+    arrivalVolumeQ,
+    arrivalVolumeQuintals: arrivalVolumeQ,
+    minPrice,
+    maxPrice,
+    history,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+  };
+}
+

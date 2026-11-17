@@ -730,7 +730,16 @@
     "totalHarvests": "Total Harvests",
     "traded": "traded",
     "viewCrops": "View Crop",
-    "viewSales": "View Linked Sales"
+    "viewSales": "View Linked Sales",
+    "deleteHarvest": "Delete Harvest",
+    "deleteWarning": "Are you sure you want to delete this harvest record? This action cannot be undone.",
+    "hasSalesCannotDelete": "Cannot delete harvest with existing sales records. Please delete associated sales first.",
+    "noCropCycles": "No active crop cycles available. Please register and plant a crop cycle first.",
+    "noHarvests": "No harvest records found. Record your first harvest intake to begin.",
+    "saving": "Recording Harvest...",
+    "deleting": "Deleting Harvest...",
+    "loadError": "Failed to load harvest records. Please check connection and try again.",
+    "editHarvest": "Edit Harvest Record"
   },
   "sales": {
     "title": "Crop Sales & Orders",
@@ -811,7 +820,17 @@
     "tradeExecution": "Commercial Trade Execution",
     "transactionNotes": "Transaction & Settlement Notes",
     "unitRealization": "Unit Realization",
-    "viewHarvests": "View Harvest Lot"
+    "viewHarvests": "View Harvest Lot",
+    "deleteSale": "Delete Sale",
+    "deleteWarning": "Are you sure you want to delete this sale order? Quantity will be refunded to harvest stock.",
+    "cancelSale": "Cancel Sale",
+    "cancelWarning": "Are you sure you want to cancel this sale order?",
+    "noHarvestsForSale": "No harvest lots with available stock found. Please record a harvest before logging sales.",
+    "saving": "Executing Sale...",
+    "deleting": "Deleting Sale...",
+    "loadError": "Failed to load sales records. Please check connection and try again.",
+    "editSale": "Edit Sale Order",
+    "noSalesFilterDesc": "No sales match your active filter criteria. Try resetting search filters."
   },
   "marketPrices": {
     "title": "Mandi Market Prices (APMC)",
@@ -876,7 +895,10 @@
     "tradingSession": "Trading Session",
     "trend": "Trend",
     "trendChart": "Trend Chart",
-    "viewTrend": "View trend for"
+    "viewTrend": "View trend for",
+    "loadError": "Failed to load APMC market prices. Please check connection and try again.",
+    "refreshPrices": "Refresh Market Prices",
+    "noFilterPricesDesc": "No APMC market records match your filter criteria. Try resetting or adjusting your search parameters."
   },
   "expenses": {
     "title": "Farm Expenses",
@@ -1251,7 +1273,9 @@
     "saleAdded": "Produce sale logged successfully.",
     "expenseAdded": "Farm expense recorded successfully.",
     "itemDeleted": "Record removed successfully.",
-    "fillRequiredFields": "Please fill all required fields correctly."
+    "fillRequiredFields": "Please fill all required fields correctly.",
+    "harvestUpdated": "Harvest record updated successfully.",
+    "saleUpdated": "Sale record updated successfully."
   },
   "messages": {
     "cropAdded": "Crop Cycle Registered Successfully!",

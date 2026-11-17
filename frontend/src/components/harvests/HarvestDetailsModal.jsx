@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Sprout, Grid3X3, Receipt, PlusCircle, Warehouse, Calendar, CheckCircle2 } from 'lucide-react';
+import { X, Sprout, Grid3X3, Receipt, PlusCircle, Warehouse, Calendar, CheckCircle2, Trash2, Edit3 } from 'lucide-react';
 import { Button } from '../common';
 import HarvestStatusBadge from './HarvestStatusBadge';
 import { formatWeight } from '../../utils/formatters';
@@ -11,7 +11,13 @@ import {
   formatFieldName,
 } from '../../utils/displayLabels';
 
-export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) {
+export default function HarvestDetailsModal({
+  harvest,
+  onClose,
+  onRecordSale,
+  onDelete,
+  onEdit,
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -203,6 +209,32 @@ export default function HarvestDetailsModal({ harvest, onClose, onRecordSale }) 
         {/* Footer Navigation Actions */}
         <div className="agri-modal-footer">
           <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto', flexWrap: 'wrap' }}>
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(harvest)}
+                style={{ color: 'var(--danger-text, #dc2626)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                aria-label={t('harvests.deleteHarvest', 'Delete Harvest')}
+              >
+                <Trash2 size={14} aria-hidden="true" />
+                <span>{t('common.delete', 'Delete')}</span>
+              </Button>
+            )}
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  onEdit(harvest);
+                }}
+                aria-label={t('common.edit', 'Edit')}
+              >
+                <Edit3 size={14} aria-hidden="true" />
+                <span>{t('common.edit', 'Edit')}</span>
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={handleViewCrop} aria-label={t('harvests.viewCrops', 'View Crop')}>
               <Sprout size={14} />
               <span>{t('harvests.viewCrops', 'View Crop')}</span>
