@@ -3,11 +3,12 @@ import { Warehouse, ArrowUpRight, ArrowDownRight, Eye } from 'lucide-react';
 import { calculateProfitByFarm } from '../../utils/financialCalculations';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
 import { Button } from '../common';
-import { farmData } from '../../data/farmData';
 
-export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFarm }) {
+export default function ProfitLossByFarm({ farmSummaries = [], sales = [], expenses = [], onSelectFarm }) {
   const { t } = useTranslation();
-  const farmList = calculateProfitByFarm(sales, expenses, farmData.farms);
+  const farmList = Array.isArray(farmSummaries) && farmSummaries.length > 0
+    ? farmSummaries
+    : calculateProfitByFarm(sales, expenses);
 
   return (
     <div className="agri-pl-panel">
@@ -22,67 +23,81 @@ export default function ProfitLossByFarm({ sales = [], expenses = [], onSelectFa
       </div>
 
       <div className="agri-pl-panel__body">
-        <table className="agri-pl-table">
-          <thead>
-            <tr>
-              <th>{t('farms.farm', 'Farm / Holding')}</th>
-              <th>{t('revenue.totalRevenue', 'Revenue')}</th>
-              <th>{t('expenses.title', 'Expenses')}</th>
-              <th>{t('profitLoss.netProfit', 'Net Profit / Loss')}</th>
-              <th>{t('profitLoss.margin', 'Margin')}</th>
-              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {farmList.map((item) => {
-              const isProfit = item.profit >= 0;
-              return (
-                <tr key={item.farmId}>
-                  <td>
-                    <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
-                      {t(`farms.demoNames.${item.farmId}`, item.farmName)}
-                    </span>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                      {t('profitLoss.salesVouchersCount', '{{sales}} sales • {{expenses}} vouchers', { sales: item.salesCount, expenses: item.expenseCount })}
-                    </div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700, color: '#059669' }}>
-                      {formatCurrency(item.revenue)}
-                    </span>
-                  </td>
-                  <td>
-                    <span style={{ color: '#dc2626' }}>
-                      {formatCurrency(item.expense)}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>
-                      {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                      <span>{isProfit ? '+' : ''}{formatCurrency(item.profit)}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`agri-margin-badge ${isProfit ? 'agri-margin-badge--positive' : 'agri-margin-badge--negative'}`}>
-                      {formatPercentage(item.margin)}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onSelectFarm && onSelectFarm(item)}
-                      aria-label={`${t('common.viewDetails', 'View details')} ${item.farmName}`}
-                    >
-                      <Eye size={13} />
-                      <span>{t('common.details', 'Details')}</span>
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {farmList.length === 0 ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
+            {t('profitLoss.noFarmsRecorded', 'No farm holding financial records found for the selected filter criteria.')}
+          </div>
+        ) : (
+          <table className="agri-pl-table">
+            <thead>
+              <tr>
+                <th>{t('farms.farm', 'Farm / Holding')}</th>
+                <th>{t('revenue.totalRevenue', 'Revenue')}</th>
+                <th>{t('expenses.title', 'Expenses')}</th>
+                <th>{t('profitLoss.netProfit', 'Net Profit / Loss')}</th>
+                <th>{t('profitLoss.margin', 'Margin')}</th>
+                <th style={{ textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {farmList.map((item) => {
+                const isProfit = (item.netProfit != null ? item.netProfit : item.profit) >= 0;
+                const farmName = item.farmName || `Farm #${item.farmId}`;
+                const revenueVal = item.revenue != null ? item.revenue : 0;
+                const expenseVal = item.expenses != null ? item.expenses : (item.expense != null ? item.expense : 0);
+                const profitVal = item.netProfit != null ? item.netProfit : (item.profit != null ? item.profit : 0);
+                const marginVal = item.netMarginPercent != null ? item.netMarginPercent : (item.margin != null ? item.margin : 0);
+
+                return (
+                  <tr key={item.farmId}>
+                    <td>
+                      <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
+                        {t(`farms.demoNames.${item.farmId}`, farmName)}
+                      </span>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
+                        {item.salesCount != null ? (
+                          t('profitLoss.salesVouchersCount', '{{sales}} sales • {{expenses}} vouchers', { sales: item.salesCount, expenses: item.expenseCount })
+                        ) : null}
+                      </div>
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 700, color: '#059669' }}>
+                        {formatCurrency(revenueVal)}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ color: '#dc2626' }}>
+                        {formatCurrency(expenseVal)}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>
+                        {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                        <span>{isProfit ? '+' : ''}{formatCurrency(profitVal)}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`agri-margin-badge ${isProfit ? 'agri-margin-badge--positive' : 'agri-margin-badge--negative'}`}>
+                        {formatPercentage(marginVal)}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onSelectFarm && onSelectFarm(item)}
+                        aria-label={`${t('common.viewDetails', 'View details')} ${farmName}`}
+                      >
+                        <Eye size={13} />
+                        <span>{t('common.details', 'Details')}</span>
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

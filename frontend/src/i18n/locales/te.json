@@ -941,10 +941,7 @@
     "paidOutflows": "paidOutflows",
     "payment": "payment",
     "paymentMethods": {
-      "bankTransfer": "à°¬à±à°¯à°¾à°‚à°•à± à°¬à°¦à°¿à°²à±€",
-      "cash": "à°¨à°—à°¦à±",
-      "credit": "credit",
-      "upi": "à°¯à±à°ªà°¿à° / à°†à°¨à±â€Œà°²à±ˆà°¨à±"
+      "cheque": "బ్యాంక్ చెక్"
     },
     "paymentStatus": "paymentStatus",
     "pendingPayables": "pendingPayables",
@@ -972,7 +969,13 @@
     "voucherRef": "voucherRef",
     "voucherRemarks": "voucherRemarks",
     "vouchersLogged": "vouchersLogged",
-    "zeroDebt": "zeroDebt"
+    "zeroDebt": "zeroDebt",
+    "editExpense": "ఖర్చు వోచర్‌ను సవరించండి",
+    "deleteTitle": "ఖర్చు వోచర్‌ను తొలగించండి",
+    "deleteConfirmMsg": "\"{{desc}}\" ({{amount}}) ఖర్చు వోచర్ #{{id}} ను శాశ్వతంగా తొలగించాలనుకుంటున్నారా?",
+    "createFarmFirst": "ఇన్‌పుట్ వోచర్లు, కూలీ మరియు యంత్ర ఖర్చులను నమోదు చేయడానికి ముందుగా మీ పొలాన్ని నమోదు చేసుకోండి.",
+    "noExpensesLogged": "ఇంకా ఎలాంటి ఖర్చు వోచర్లు నమోదు కాలేదు.",
+    "voucherNumber": "రసీదు / ఇన్‌వాయిస్ సంఖ్య (ఐచ్ఛికం)"
   },
   "revenue": {
     "title": "à°«à°¾à°°à°®à± à°†à°¦à°¾à°¯à°‚ & à°°à°¾à°¬à°¡à±à°²à±",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "totalHarvest",
     "trajectoryComparison": "trajectoryComparison",
     "trajectoryDesc": "trajectoryDesc",
-    "vouchersCount": "vouchersCount"
+    "vouchersCount": "vouchersCount",
+    "createFarmFirst": "లాభ-నష్టాల విశ్లేషణను చూడటానికి ముందుగా మీ పొలాన్ని నమోదు చేసుకోండి.",
+    "noCropsRecorded": "ఎంచుకున్న ఫిల్టర్‌కు ఎలాంటి పంట ఆర్థిక రికార్డులు కనుగొనబడలేదు.",
+    "noFarmsRecorded": "ఎంచుకున్న ఫిల్టర్‌కు ఎలాంటి పొలం ఆర్థిక రికార్డులు కనుగొనబడలేదు."
   },
   "notifications": {
     "title": "à°¨à±‹à°Ÿà°¿à°«à°¿à°•à±‡à°·à°¨à±à°² à°•à±‡à°‚à°¦à±à°°à°‚",
@@ -1259,7 +1265,8 @@
     "dateAfter": "à°•à±‹à°¤ à°¤à±‡à°¦à±€ à°µà°¿à°¤à±à°¤à°¿à°¨ à°¤à±‡à°¦à±€ à°¤à°°à±à°µà°¾à°¤ à°‰à°‚à°¡à°¾à°²à°¿",
     "invalidAmount": "à°šà±†à°²à±à°²à°¿à°‚à°šà°¿à°¨ à°®à±Šà°¤à±à°¤à°‚ à°®à±Šà°¤à±à°¤à°‚ à°…à°®à±à°®à°•à°ªà± à°®à±Šà°¤à±à°¤à°‚ à°•à°‚à°Ÿà±‡ à°Žà°•à±à°•à±à°µ à°‰à°‚à°¡à°•à±‚à°¡à°¦à±",
     "positiveNumber": "à°•à±‹à°¤ à°ªà°°à°¿à°®à°¾à°£à°‚ 0 à°²à±‡à°¦à°¾ à°…à°‚à°¤à°•à°‚à°Ÿà±‡ à°Žà°•à±à°•à±à°µ à°‰à°‚à°¡à°¾à°²à°¿",
-    "range": "range"
+    "range": "range",
+    "dateNotInFuture": "ఖర్చు తేదీ భవిష్యత్తు తేదీ కాకూడదు"
   },
   "alerts": {
     "farmAdded": "à°«à°¾à°°à°®à± à°µà°¿à°œà°¯à°µà°‚à°¤à°‚à°—à°¾ à°œà±‹à°¡à°¿à°‚à°šà°¬à°¡à°¿à°‚à°¦à°¿.",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "à°°à°¿à°•à°¾à°°à±à°¡à± à°¤à±Šà°²à°—à°¿à°‚à°šà°¬à°¡à°¿à°‚à°¦à°¿.",
     "fillRequiredFields": "à°¦à°¯à°šà±‡à°¸à°¿ à°…à°¨à±à°¨à°¿ à°µà°¿à°µà°°à°¾à°²à°¨à± à°¸à°°à°¿à°—à±à°—à°¾ à°ªà±‚à°°à°¿à°‚à°šà°‚à°¡à°¿.",
     "harvestUpdated": "దిగుబడి రికార్డు విజయవంతంగా నవీకరించబడింది.",
-    "saleUpdated": "అమ్మకం రికార్డు విజయవంతంగా నవీకరించబడింది."
+    "saleUpdated": "అమ్మకం రికార్డు విజయవంతంగా నవీకరించబడింది.",
+    "expenseUpdated": "విజయవంతంగా నవీకరించబడింది!",
+    "expenseDeleted": "విజయవంతంగా తొలగించబడింది."
   },
   "messages": {
     "cropAdded": "à°ªà°‚à°Ÿ à°šà°•à±à°°à°‚ à°µà°¿à°œà°¯à°µà°‚à°¤à°‚à°—à°¾ à°¨à°®à±‹à°¦à± à°šà±‡à°¯à°¬à°¡à°¿à°‚à°¦à°¿!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "విత్తనాలు",
+    "fertilizer": "ఎరువులు",
+    "pesticides": "పురుగుమందులు",
+    "irrigation": "నీటిపారుదల",
+    "labour": "కూలీ",
+    "machinery": "యంత్రాలు",
+    "fuel": "ఇంధనం",
+    "transport": "రవాణా",
+    "soiltesting": "నేల పరీక్ష",
+    "other": "ఇతర"
   }
 }

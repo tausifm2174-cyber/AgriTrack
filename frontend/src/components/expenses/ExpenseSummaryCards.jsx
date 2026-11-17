@@ -2,23 +2,34 @@ import { useTranslation } from 'react-i18next';
 import { CreditCard, CheckCircle2, Clock, Calendar, BarChart3 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
-export default function ExpenseSummaryCards({ expenses = [] }) {
+export default function ExpenseSummaryCards({ expenses = [], summary = null }) {
   const { t } = useTranslation();
-  const totalAmount = expenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const totalAmount = summary?.totalExpenses != null
+    ? Number(summary.totalExpenses)
+    : expenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
-  const paidAmount = expenses
-    .filter((e) => e.status === 'PAID')
-    .reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const paidAmount = summary?.paidExpenses != null
+    ? Number(summary.paidExpenses)
+    : expenses
+        .filter((e) => e.status === 'PAID' || e.paymentStatus === 'PAID')
+        .reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
-  const pendingAmount = expenses
-    .filter((e) => e.status === 'PENDING')
-    .reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const pendingAmount = summary?.pendingExpenses != null
+    ? Number(summary.pendingExpenses)
+    : expenses
+        .filter((e) => e.status === 'PENDING' || e.paymentStatus === 'PENDING')
+        .reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
+  const currentMonthPrefix = new Date().toISOString().slice(0, 7);
   const thisMonthExpenses = expenses
-    .filter((e) => e.date && e.date.startsWith('2026-10'))
+    .filter((e) => {
+      const d = e.expenseDate || e.date || '';
+      return d.startsWith(currentMonthPrefix) || d.startsWith('2026-10');
+    })
     .reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
-  const avgExpense = expenses.length > 0 ? Math.round(totalAmount / expenses.length) : 0;
+  const totalCount = summary?.expenseCount != null ? Number(summary.expenseCount) : expenses.length;
+  const avgExpense = totalCount > 0 ? Math.round(totalAmount / totalCount) : 0;
 
   return (
     <div className="agri-expense-summary-grid">
@@ -33,7 +44,7 @@ export default function ExpenseSummaryCards({ expenses = [] }) {
             {formatCurrency(totalAmount)}
           </span>
           <span className="agri-expense-summary-card__subtext">
-            {expenses.length} {t('expenses.vouchersLogged', 'input vouchers logged')}
+            {totalCount} {t('expenses.vouchersLogged', 'input vouchers logged')}
           </span>
         </div>
       </div>

@@ -941,10 +941,7 @@
     "paidOutflows": "paidOutflows",
     "payment": "payment",
     "paymentMethods": {
-      "bankTransfer": "à´¬à´¾à´™àµà´•àµ à´Ÿàµà´°à´¾àµ»à´¸àµà´«àµ¼",
-      "cash": "à´ªà´£à´‚",
-      "credit": "credit",
-      "upi": "à´¯àµà´ªà´¿à´ / à´“àµºà´²àµˆàµ»"
+      "cheque": "ബാങ്ക് ചെക്ക്"
     },
     "paymentStatus": "paymentStatus",
     "pendingPayables": "pendingPayables",
@@ -972,7 +969,13 @@
     "voucherRef": "voucherRef",
     "voucherRemarks": "voucherRemarks",
     "vouchersLogged": "vouchersLogged",
-    "zeroDebt": "zeroDebt"
+    "zeroDebt": "zeroDebt",
+    "editExpense": "ചെലവ് വൗച്ചർ എഡിറ്റ് ചെയ്യുക",
+    "deleteTitle": "ചെലവ് വൗച്ചർ ഇല്ലാതാക്കുക",
+    "deleteConfirmMsg": "\"{{desc}}\" ({{amount}}) ചെലവ് വൗച്ചർ #{{id}} ശാശ്വതമായി ഇല്ലാതാക്കണമെന്ന് ഉറപ്പാണോ?",
+    "createFarmFirst": "ഇൻപുട്ട് ചെലവുകൾ, വേതനം, യന്ത്രച്ചെലവുകൾ എന്നിവ രേഖപ്പെടുത്താൻ ആദ്യം നിങ്ങളുടെ ഫാം രജിസ്റ്റർ ചെയ്യുക.",
+    "noExpensesLogged": "ഇതുവരെ ചെലവ് വൗച്ചറുകൾ രേഖപ്പെടുത്തിയിട്ടില്ല.",
+    "voucherNumber": "രസീത് / ഇൻവോയ്സ് നമ്പർ (ഓപ്ഷണൽ)"
   },
   "revenue": {
     "title": "à´«à´¾à´‚ à´µà´°àµà´®à´¾à´¨à´‚ & à´µà´°à´µàµà´•àµ¾",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "totalHarvest",
     "trajectoryComparison": "trajectoryComparison",
     "trajectoryDesc": "trajectoryDesc",
-    "vouchersCount": "vouchersCount"
+    "vouchersCount": "vouchersCount",
+    "createFarmFirst": "ലാഭനഷ്ട വിശകലനം കാണുന്നതിന് ആദ്യം നിങ്ങളുടെ ഫാം രജിസ്റ്റർ ചെയ്യുക.",
+    "noCropsRecorded": "തിരഞ്ഞെടുത്ത ഫിൽട്ടറിന് വിള സാമ്പത്തിക രേഖകൾ ഒന്നും കണ്ടെത്തിയില്ല.",
+    "noFarmsRecorded": "തിരഞ്ഞെടുത്ത ഫിൽട്ടറിന് ഫാം സാമ്പത്തിക രേഖകൾ ഒന്നും കണ്ടെത്തിയില്ല."
   },
   "notifications": {
     "title": "à´…à´±à´¿à´¯à´¿à´ªàµà´ªàµ à´•àµ‡à´¨àµà´¦àµà´°à´‚",
@@ -1259,7 +1265,8 @@
     "dateAfter": "à´µà´¿à´³à´µàµ†à´Ÿàµà´ªàµà´ªàµ à´¤àµ€à´¯à´¤à´¿ à´µà´¿à´¤à´šàµà´š à´¤àµ€à´¯à´¤à´¿à´•àµà´•àµ à´¶àµ‡à´·à´®à´¾à´¯à´¿à´°à´¿à´•àµà´•à´£à´‚",
     "invalidAmount": "à´¨àµ½à´•à´¿à´¯ à´¤àµà´• à´†à´•àµ† à´µà´¿àµ½à´ªàµà´ªà´¨ à´¤àµà´•à´¯àµ‡à´•àµà´•à´¾àµ¾ à´•àµ‚à´Ÿà´°àµà´¤àµ",
     "positiveNumber": "à´µà´¿à´³à´µàµ†à´Ÿàµà´ªàµà´ªàµ à´…à´³à´µàµ 0 à´…à´²àµà´²àµ†à´™àµà´•à´¿àµ½ à´…à´¤à´¿àµ½ à´•àµ‚à´Ÿàµà´¤à´²à´¾à´¯à´¿à´°à´¿à´•àµà´•à´£à´‚",
-    "range": "range"
+    "range": "range",
+    "dateNotInFuture": "ചെലവ് തീയതി ഭാവിയിലേതാകാൻ പാടില്ല"
   },
   "alerts": {
     "farmAdded": "à´«à´¾à´‚ à´µà´¿à´œà´¯à´•à´°à´®à´¾à´¯à´¿ à´šàµ‡àµ¼à´¤àµà´¤àµ.",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "à´µà´¿à´µà´°à´‚ à´¨àµ€à´•àµà´•à´‚ à´šàµ†à´¯àµà´¤àµ.",
     "fillRequiredFields": "à´†à´µà´¶àµà´¯à´®à´¾à´¯ à´µà´¿à´µà´°à´™àµà´™àµ¾ à´•àµƒà´¤àµà´¯à´®à´¾à´¯à´¿ à´ªàµ‚à´°à´¿à´ªàµà´ªà´¿à´•àµà´•àµà´•.",
     "harvestUpdated": "വിളവെടുപ്പ് രേഖ വിജയകരമായി പുതുക്കി.",
-    "saleUpdated": "വിൽപ്പന രേഖ വിജയകരമായി പുതുക്കി."
+    "saleUpdated": "വിൽപ്പന രേഖ വിജയകരമായി പുതുക്കി.",
+    "expenseUpdated": "വിജയകരമായി പുതുക്കി!",
+    "expenseDeleted": "വിജയകരമായി ഇല്ലാതാക്കി."
   },
   "messages": {
     "cropAdded": "à´µà´¿à´³ à´šà´•àµà´°à´‚ à´µà´¿à´œà´¯à´•à´°à´®à´¾à´¯à´¿ à´°à´œà´¿à´¸àµà´±àµà´±àµ¼ à´šàµ†à´¯àµà´¤àµ!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "വിത്തുകൾ",
+    "fertilizer": "വളം",
+    "pesticides": "കീടനാശിനികൾ",
+    "irrigation": "ജലസേചനം",
+    "labour": "വേതനം/കൂലി",
+    "machinery": "യന്ത്രങ്ങൾ",
+    "fuel": "ഇന്ധനം",
+    "transport": "ഗതാഗതം",
+    "soiltesting": "മണ്ണ് പരിശോധന",
+    "other": "മറ്റുള്ളവ"
   }
 }

@@ -5,9 +5,11 @@ import { formatCurrency, formatPercentage } from '../../utils/formatters';
 import { Button } from '../common';
 import { translateCrop } from '../../utils/displayLabels';
 
-export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCrop }) {
+export default function ProfitLossByCrop({ cropSummaries = [], sales = [], expenses = [], onSelectCrop }) {
   const { t } = useTranslation();
-  const cropList = calculateProfitByCrop(sales, expenses);
+  const cropList = Array.isArray(cropSummaries) && cropSummaries.length > 0
+    ? cropSummaries
+    : calculateProfitByCrop(sales, expenses);
 
   return (
     <div className="agri-pl-panel">
@@ -22,67 +24,83 @@ export default function ProfitLossByCrop({ sales = [], expenses = [], onSelectCr
       </div>
 
       <div className="agri-pl-panel__body">
-        <table className="agri-pl-table">
-          <thead>
-            <tr>
-              <th>{t('crops.crop', 'Crop')}</th>
-              <th>{t('revenue.totalRevenue', 'Revenue')}</th>
-              <th>{t('expenses.title', 'Expenses')}</th>
-              <th>{t('profitLoss.netProfit', 'Net Profit / Loss')}</th>
-              <th>{t('profitLoss.margin', 'Margin')}</th>
-              <th style={{ textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cropList.map((item) => {
-              const isProfit = item.profit >= 0;
-              return (
-                <tr key={item.crop}>
-                  <td>
-                    <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
-                      {translateCrop(item.crop, t)}
-                    </span>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
-                      {t('profitLoss.salesVouchersCount', '{{sales}} sales • {{expenses}} vouchers', { sales: item.salesCount, expenses: item.expenseCount })}
-                    </div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700, color: '#059669' }}>
-                      {formatCurrency(item.revenue)}
-                    </span>
-                  </td>
-                  <td>
-                    <span style={{ color: '#dc2626' }}>
-                      {formatCurrency(item.expense)}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>
-                      {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                      <span>{isProfit ? '+' : ''}{formatCurrency(item.profit)}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`agri-margin-badge ${isProfit ? 'agri-margin-badge--positive' : 'agri-margin-badge--negative'}`}>
-                      {formatPercentage(item.margin)}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onSelectCrop && onSelectCrop(item)}
-                      aria-label={`${t('common.viewDetails', 'View details')} ${item.crop}`}
-                    >
-                      <Eye size={13} />
-                      <span>{t('common.details', 'Details')}</span>
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {cropList.length === 0 ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.85rem' }}>
+            {t('profitLoss.noCropsRecorded', 'No crop financial records found for the selected filter criteria.')}
+          </div>
+        ) : (
+          <table className="agri-pl-table">
+            <thead>
+              <tr>
+                <th>{t('crops.crop', 'Crop')}</th>
+                <th>{t('revenue.totalRevenue', 'Revenue')}</th>
+                <th>{t('expenses.title', 'Expenses')}</th>
+                <th>{t('profitLoss.netProfit', 'Net Profit / Loss')}</th>
+                <th>{t('profitLoss.margin', 'Margin')}</th>
+                <th style={{ textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cropList.map((item) => {
+                const isProfit = (item.netProfit != null ? item.netProfit : item.profit) >= 0;
+                const cropName = item.cropName || item.crop || 'Unknown';
+                const revenueVal = item.revenue != null ? item.revenue : 0;
+                const expenseVal = item.expenses != null ? item.expenses : (item.expense != null ? item.expense : 0);
+                const profitVal = item.netProfit != null ? item.netProfit : (item.profit != null ? item.profit : 0);
+                const marginVal = item.netMarginPercent != null ? item.netMarginPercent : (item.margin != null ? item.margin : 0);
+
+                return (
+                  <tr key={item.cropCycleId || cropName}>
+                    <td>
+                      <span style={{ fontWeight: 700, color: 'var(--slate-900)' }}>
+                        {translateCrop(cropName, t)} {item.variety ? `(${item.variety})` : ''}
+                      </span>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>
+                        {item.costPerQuintal > 0 ? (
+                          <span>{formatCurrency(item.costPerQuintal)}/q • {(item.harvestYieldKg / 100).toFixed(1)} q yield</span>
+                        ) : item.salesCount != null ? (
+                          t('profitLoss.salesVouchersCount', '{{sales}} sales • {{expenses}} vouchers', { sales: item.salesCount, expenses: item.expenseCount })
+                        ) : null}
+                      </div>
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 700, color: '#059669' }}>
+                        {formatCurrency(revenueVal)}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ color: '#dc2626' }}>
+                        {formatCurrency(expenseVal)}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>
+                        {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                        <span>{isProfit ? '+' : ''}{formatCurrency(profitVal)}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`agri-margin-badge ${isProfit ? 'agri-margin-badge--positive' : 'agri-margin-badge--negative'}`}>
+                        {formatPercentage(marginVal)}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onSelectCrop && onSelectCrop(item)}
+                        aria-label={`${t('common.viewDetails', 'View details')} ${cropName}`}
+                      >
+                        <Eye size={13} />
+                        <span>{t('common.details', 'Details')}</span>
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

@@ -1,24 +1,28 @@
-import { useState, useId } from 'react';
+import { useState, useId, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, CreditCard } from 'lucide-react';
+import { X, CreditCard, Loader2 } from 'lucide-react';
 import { Button } from '../common';
-import { farmData } from '../../data/farmData';
-import { fieldData } from '../../data/fieldData';
-import { EXPENSE_CATEGORIES } from '../../data/expenseData';
+import {
+  CANONICAL_CATEGORIES,
+  CANONICAL_PAYMENT_METHODS,
+  CANONICAL_PAYMENT_STATUSES,
+} from '../../services/expenseService';
 
-function getNextExpenseId() {
-  return `EXP-00${Math.floor(Math.random() * 900) + 100}`;
-}
-
-function getNextVoucherNumber() {
-  return `VOUCH-2026-${Math.floor(Math.random() * 9000) + 1000}`;
-}
-
-export default function AddExpenseModal({ onClose, onAddExpense }) {
+export default function AddExpenseModal({
+  farms = [],
+  fields = [],
+  cropCycles = [],
+  preselectedFarmId,
+  preselectedFieldId,
+  preselectedCropCycleId,
+  expenseToEdit = null,
+  onClose,
+  onSave,
+}) {
   const { t } = useTranslation();
   const farmSelectId = useId();
   const fieldSelectId = useId();
-  const cropInputId = useId();
+  const cropCycleSelectId = useId();
   const categorySelectId = useId();
   const descInputId = useId();
   const amountInputId = useId();
@@ -26,57 +30,83 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
   const vendorInputId = useId();
   const paymentMethodSelectId = useId();
   const paymentStatusSelectId = useId();
+  const receiptInputId = useId();
   const notesInputId = useId();
 
-  const farms = farmData.farms || [];
-  const allFields = fieldData.fields || [];
+  const isEditMode = Boolean(expenseToEdit);
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const [farmId, setFarmId] = useState(farms[0]?.id || 'farm-1');
-  const availableFields = allFields.filter((f) => f.farmId === farmId);
-  const [fieldId, setFieldId] = useState(availableFields[0]?.id || 'field-1a');
+  // Form State
+  const [farmId, setFarmId] = useState(() => {
+    if (expenseToEdit?.farmId) return String(expenseToEdit.farmId);
+    if (preselectedFarmId && preselectedFarmId !== 'ALL') return String(preselectedFarmId);
+    return farms[0]?.id ? String(farms[0].id) : '';
+  });
 
-  const selectedField = allFields.find((f) => f.id === fieldId) || availableFields[0];
-  const [cropName, setCropName] = useState(selectedField?.currentCrop || 'Wheat');
+  const availableFields = useMemo(() => {
+    if (!farmId) return [];
+    return fields.filter((f) => String(f.farmId) === String(farmId));
+  }, [fields, farmId]);
 
-  const [category, setCategory] = useState('Fertilizer');
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState('2026-10-03');
-  const [vendor, setVendor] = useState('IFFCO Kisan Sewa Kendra');
-  const [paymentMethod, setPaymentMethod] = useState('UPI');
-  const [status, setStatus] = useState('PAID');
-  const [notes, setNotes] = useState('');
+  const [fieldId, setFieldId] = useState(() => {
+    if (expenseToEdit?.fieldId) return String(expenseToEdit.fieldId);
+    if (preselectedFieldId && preselectedFieldId !== 'ALL') return String(preselectedFieldId);
+    return '';
+  });
+
+  const availableCropCycles = useMemo(() => {
+    if (!farmId) return [];
+    return cropCycles.filter((c) => {
+      const matchFarm = String(c.farmId) === String(farmId);
+      if (!matchFarm) return false;
+      if (fieldId) {
+        return String(c.fieldId) === String(fieldId);
+      }
+      return true;
+    });
+  }, [cropCycles, farmId, fieldId]);
+
+  const [cropCycleId, setCropCycleId] = useState(() => {
+    if (expenseToEdit?.cropCycleId) return String(expenseToEdit.cropCycleId);
+    if (preselectedCropCycleId && preselectedCropCycleId !== 'ALL') return String(preselectedCropCycleId);
+    return '';
+  });
+
+  const [category, setCategory] = useState(expenseToEdit?.category || 'Fertilizer');
+  const [description, setDescription] = useState(expenseToEdit?.description || '');
+  const [amount, setAmount] = useState(expenseToEdit?.amount != null ? String(expenseToEdit.amount) : '');
+  const [expenseDate, setExpenseDate] = useState(expenseToEdit?.expenseDate || expenseToEdit?.date || todayStr);
+  const [vendorName, setVendorName] = useState(expenseToEdit?.vendorName || expenseToEdit?.vendor || '');
+  const [paymentMethod, setPaymentMethod] = useState(expenseToEdit?.paymentMethod || 'UPI');
+  const [paymentStatus, setPaymentStatus] = useState(expenseToEdit?.paymentStatus || expenseToEdit?.status || 'PAID');
+  const [receiptNumber, setReceiptNumber] = useState(expenseToEdit?.receiptNumber || expenseToEdit?.voucherNumber || '');
+  const [notes, setNotes] = useState(expenseToEdit?.notes || '');
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const handleFarmChange = (newFarmId) => {
     setFarmId(newFarmId);
-    const newFields = allFields.filter((f) => f.farmId === newFarmId);
-    if (newFields.length > 0) {
-      setFieldId(newFields[0].id);
-      setCropName(newFields[0].currentCrop || 'Wheat');
-    } else {
-      setFieldId('');
-      setCropName('');
-    }
+    setFieldId('');
+    setCropCycleId('');
   };
 
   const handleFieldChange = (newFieldId) => {
     setFieldId(newFieldId);
-    const f = allFields.find((field) => field.id === newFieldId);
-    if (f) {
-      setCropName(f.currentCrop || 'Wheat');
-    }
+    setCropCycleId('');
   };
 
   const validate = () => {
     const errs = {};
     if (!farmId) errs.farmId = t('validation.selectFarm', 'Please select a farm');
-    if (!fieldId) errs.fieldId = t('validation.selectField', 'Please select a field');
     if (!category) errs.category = t('validation.required', 'Please select an expense category');
     if (!description.trim()) errs.description = t('validation.required', 'Description is required');
-    if (!vendor.trim()) errs.vendor = t('validation.required', 'Vendor / Supplier is required');
-    if (!date) errs.date = t('validation.enterValidDate', 'Expense date is required');
+    if (!expenseDate) {
+      errs.expenseDate = t('validation.enterValidDate', 'Expense date is required');
+    } else if (expenseDate > todayStr) {
+      errs.expenseDate = t('validation.dateNotInFuture', 'Expense date cannot be in the future');
+    }
 
     const numAmt = Number(amount);
     if (isNaN(numAmt) || numAmt <= 0) {
@@ -87,34 +117,36 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const farmObj = farms.find((f) => f.id === farmId);
-    const fieldObj = allFields.find((f) => f.id === fieldId);
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    const newExpense = {
-      id: getNextExpenseId(),
-      farmId,
-      farmName: farmObj ? farmObj.name : 'Green Valley Farm',
-      fieldId,
-      fieldName: fieldObj ? fieldObj.name : 'Field 1A',
-      cropId: fieldObj?.currentCrop ? `crop-cycle-${fieldId}` : null,
-      cropName: cropName.trim() || 'General Farm',
+    const payload = {
+      farmId: Number(farmId),
+      fieldId: fieldId ? Number(fieldId) : null,
+      cropCycleId: cropCycleId ? Number(cropCycleId) : null,
       category,
       description: description.trim(),
       amount: Number(amount),
-      date,
-      vendor: vendor.trim(),
-      paymentMethod,
-      status,
-      receiptNumber: getNextVoucherNumber(),
-      notes: notes.trim() || 'Input voucher cleared and logged into accounts ledger.',
+      expenseDate,
+      vendorName: vendorName.trim() || null,
+      paymentMethod: paymentMethod || 'CASH',
+      paymentStatus: paymentStatus || 'PAID',
+      receiptNumber: receiptNumber.trim() || null,
+      notes: notes.trim() || null,
     };
 
-    onAddExpense(newExpense);
-    onClose();
+    try {
+      await onSave(payload, expenseToEdit?.id);
+      onClose();
+    } catch (err) {
+      setSubmitError(err?.message || 'Failed to save expense voucher. Please check inputs and retry.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -124,7 +156,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
       aria-modal="true"
       aria-labelledby="add-expense-title"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !isSubmitting) onClose();
       }}
     >
       <div className="agri-modal-dialog agri-modal-dialog--lg">
@@ -136,7 +168,7 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
               <span>{t('expenses.costAccounting', 'Operational Expense Ledger')}</span>
             </div>
             <h3 id="add-expense-title" className="agri-modal-title">
-              {t('expenses.addExpense', 'Record Farm Expense')}
+              {isEditMode ? t('expenses.editExpense', 'Edit Expense Voucher') : t('expenses.addExpense', 'Record Farm Expense')}
             </h3>
             <p className="agri-modal-subtitle">
               {t('expenses.recordSubtitle', 'Log input purchase vouchers, farm labor settlements, and machinery charges.')}
@@ -146,30 +178,38 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
             type="button"
             className="agri-modal-close-btn"
             onClick={onClose}
+            disabled={isSubmitting}
             aria-label={t('common.close', 'Close modal')}
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="agri-modal-body">
-            {/* Dependent Farm and Field */}
+        {submitError && (
+          <div className="agri-alert agri-alert--error" style={{ margin: '1rem 1.5rem 0' }}>
+            <span>{submitError}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="agri-modal-body" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
+            {/* Farm & Field Selection */}
             <div className="agri-form-grid agri-form-grid--2">
               <div className="agri-form-group">
                 <label htmlFor={farmSelectId} className="agri-form-label agri-form-label--required">
-                  {t('fields.farm', 'Farm / Holding')}
+                  {t('fields.farm', 'Farm Holding')}
                 </label>
                 <select
                   id={farmSelectId}
                   className="agri-form-select"
                   value={farmId}
                   onChange={(e) => handleFarmChange(e.target.value)}
+                  disabled={isSubmitting}
                 >
+                  <option value="">{t('validation.selectFarm', 'Select a farm')}</option>
                   {farms.map((f) => (
                     <option key={f.id} value={f.id}>
-                      {f.name} ({f.district})
+                      {f.name}
                     </option>
                   ))}
                 </select>
@@ -177,18 +217,20 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
               </div>
 
               <div className="agri-form-group">
-                <label htmlFor={fieldSelectId} className="agri-form-label agri-form-label--required">
-                  {t('expenses.fieldCostCenter', 'Field Cost Center')}
+                <label htmlFor={fieldSelectId} className="agri-form-label">
+                  {t('expenses.fieldCostCenter', 'Field Parcel (Optional)')}
                 </label>
                 <select
                   id={fieldSelectId}
                   className="agri-form-select"
                   value={fieldId}
                   onChange={(e) => handleFieldChange(e.target.value)}
+                  disabled={isSubmitting || !farmId}
                 >
+                  <option value="">{t('expenses.generalFarm', 'Farm-wide / No specific field')}</option>
                   {availableFields.map((fld) => (
                     <option key={fld.id} value={fld.id}>
-                      {fld.name} ({fld.currentCrop})
+                      {fld.name}
                     </option>
                   ))}
                 </select>
@@ -196,20 +238,26 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
               </div>
             </div>
 
-            {/* Crop, Category, Amount */}
+            {/* Crop Cycle, Category, Amount */}
             <div className="agri-form-grid agri-form-grid--3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem' }}>
               <div className="agri-form-group">
-                <label htmlFor={cropInputId} className="agri-form-label">
-                  {t('expenses.assignedCrop', 'Assigned Crop')}
+                <label htmlFor={cropCycleSelectId} className="agri-form-label">
+                  {t('expenses.assignedCrop', 'Standing Crop Cycle')}
                 </label>
-                <input
-                  id={cropInputId}
-                  type="text"
-                  className="agri-form-input"
-                  value={cropName}
-                  onChange={(e) => setCropName(e.target.value)}
-                  placeholder="e.g. Wheat"
-                />
+                <select
+                  id={cropCycleSelectId}
+                  className="agri-form-select"
+                  value={cropCycleId}
+                  onChange={(e) => setCropCycleId(e.target.value)}
+                  disabled={isSubmitting || !farmId}
+                >
+                  <option value="">{t('expenses.generalFarm', 'None / General Farm')}</option>
+                  {availableCropCycles.map((cycle) => (
+                    <option key={cycle.id} value={cycle.id}>
+                      {cycle.cropName} {cycle.variety ? `(${cycle.variety})` : ''}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="agri-form-group">
@@ -221,10 +269,11 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                   className="agri-form-select"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
+                  disabled={isSubmitting}
                 >
-                  {EXPENSE_CATEGORIES.map((cat) => (
+                  {CANONICAL_CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
-                      {cat}
+                      {t(`expenseCategories.${cat.toLowerCase().replace(/\s+/g, '')}`, cat)}
                     </option>
                   ))}
                 </select>
@@ -238,11 +287,13 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                 <input
                   id={amountInputId}
                   type="number"
+                  step="0.01"
+                  min="0.01"
                   className="agri-form-input"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="e.g. 4500"
-                  min="1"
+                  disabled={isSubmitting}
                 />
                 {errors.amount && <span className="agri-form-help text-danger">{errors.amount}</span>}
               </div>
@@ -257,27 +308,31 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                 <input
                   id={descInputId}
                   type="text"
+                  maxLength={255}
                   className="agri-form-input"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t('expenses.voucherDescPlaceholder', 'e.g. Urea & NPK application for vegetative growth')}
+                  disabled={isSubmitting}
                 />
                 {errors.description && <span className="agri-form-help text-danger">{errors.description}</span>}
               </div>
 
               <div className="agri-form-group">
-                <label htmlFor={vendorInputId} className="agri-form-label agri-form-label--required">
+                <label htmlFor={vendorInputId} className="agri-form-label">
                   {t('expenses.vendorPayee', 'Vendor / Supplier / Payee')}
                 </label>
                 <input
                   id={vendorInputId}
                   type="text"
+                  maxLength={150}
                   className="agri-form-input"
-                  value={vendor}
-                  onChange={(e) => setVendor(e.target.value)}
+                  value={vendorName}
+                  onChange={(e) => setVendorName(e.target.value)}
                   placeholder="e.g. IFFCO Kisan Sewa Kendra"
+                  disabled={isSubmitting}
                 />
-                {errors.vendor && <span className="agri-form-help text-danger">{errors.vendor}</span>}
+                {errors.vendorName && <span className="agri-form-help text-danger">{errors.vendorName}</span>}
               </div>
             </div>
 
@@ -290,11 +345,13 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                 <input
                   id={dateInputId}
                   type="date"
+                  max={todayStr}
                   className="agri-form-input"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  value={expenseDate}
+                  onChange={(e) => setExpenseDate(e.target.value)}
+                  disabled={isSubmitting}
                 />
-                {errors.date && <span className="agri-form-help text-danger">{errors.date}</span>}
+                {errors.expenseDate && <span className="agri-form-help text-danger">{errors.expenseDate}</span>}
               </div>
 
               <div className="agri-form-group">
@@ -306,13 +363,17 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                   className="agri-form-select"
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
+                  disabled={isSubmitting}
                 >
-                  <option value="UPI">{t('expenses.paymentMethods.upi', 'UPI Direct')}</option>
-                  <option value="Bank Transfer">{t('expenses.paymentMethods.bankTransfer', 'Bank Transfer (NEFT)')}</option>
-                  <option value="Cash">{t('expenses.paymentMethods.cash', 'Cash Voucher')}</option>
-                  <option value="Credit">{t('expenses.paymentMethods.credit', 'Vendor Credit')}</option>
+                  {CANONICAL_PAYMENT_METHODS.map((method) => (
+                    <option key={method} value={method}>
+                      {method === 'BANK_TRANSFER' ? t('expenses.paymentMethods.bankTransfer', 'Bank Transfer') :
+                       method === 'CASH' ? t('expenses.paymentMethods.cash', 'Cash') :
+                       method === 'UPI' ? t('expenses.paymentMethods.upi', 'UPI') :
+                       t('expenses.paymentMethods.cheque', 'Cheque')}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               <div className="agri-form-group">
@@ -322,13 +383,34 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                 <select
                   id={paymentStatusSelectId}
                   className="agri-form-select"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
+                  value={paymentStatus}
+                  onChange={(e) => setPaymentStatus(e.target.value)}
+                  disabled={isSubmitting}
                 >
-                  <option value="PAID">{t('status.paid', 'Paid in Full')}</option>
-                  <option value="PENDING">{t('status.pending', 'Pending Payment')}</option>
+                  {CANONICAL_PAYMENT_STATUSES.map((statusVal) => (
+                    <option key={statusVal} value={statusVal}>
+                      {statusVal === 'PAID' ? t('status.paid', 'Paid') : t('status.pending', 'Pending')}
+                    </option>
+                  ))}
                 </select>
               </div>
+            </div>
+
+            {/* Receipt / Invoice Number */}
+            <div className="agri-form-group">
+              <label htmlFor={receiptInputId} className="agri-form-label">
+                {t('expenses.voucherNumber', 'Receipt / Invoice Number (Optional)')}
+              </label>
+              <input
+                id={receiptInputId}
+                type="text"
+                maxLength={100}
+                className="agri-form-input"
+                value={receiptNumber}
+                onChange={(e) => setReceiptNumber(e.target.value)}
+                placeholder="e.g. INV-2026-4012"
+                disabled={isSubmitting}
+              />
             </div>
 
             {/* Notes */}
@@ -343,17 +425,25 @@ export default function AddExpenseModal({ onClose, onAddExpense }) {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={t('expenses.notesPlaceholder', 'Include invoice reference, batch details or work order comments...')}
+                disabled={isSubmitting}
               />
             </div>
           </div>
 
           {/* Footer */}
           <div className="agri-modal-footer">
-            <Button variant="secondary" size="md" onClick={onClose}>
+            <Button variant="secondary" size="md" onClick={onClose} disabled={isSubmitting}>
               {t('common.cancel', 'Cancel')}
             </Button>
-            <Button variant="primary" size="md" type="submit">
-              {t('expenses.saveVoucher', 'Save Expense Voucher')}
+            <Button variant="primary" size="md" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>{t('common.saving', 'Saving...')}</span>
+                </>
+              ) : (
+                <span>{isEditMode ? t('common.saveChanges', 'Save Changes') : t('expenses.saveVoucher', 'Save Expense Voucher')}</span>
+              )}
             </Button>
           </div>
         </form>

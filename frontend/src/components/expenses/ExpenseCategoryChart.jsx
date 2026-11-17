@@ -24,9 +24,16 @@ const CATEGORY_COLORS = [
   '#64748b', // Other
 ];
 
-export default function ExpenseCategoryChart({ expenses = [] }) {
+export default function ExpenseCategoryChart({ expenses = [], categoryBreakdown = null }) {
   const { t } = useTranslation();
-  const data = calculateExpensesByCategory(expenses);
+  const data = Array.isArray(categoryBreakdown) && categoryBreakdown.length > 0
+    ? categoryBreakdown.map((b) => ({
+        category: b.category,
+        amount: b.totalAmount != null ? Number(b.totalAmount) : Number(b.amount || 0),
+        count: b.count || 0,
+        percentage: b.percentageOfExpenses != null ? Number(b.percentageOfExpenses) : Number(b.percentage || 0),
+      }))
+    : calculateExpensesByCategory(expenses);
 
   if (data.length === 0) {
     return (

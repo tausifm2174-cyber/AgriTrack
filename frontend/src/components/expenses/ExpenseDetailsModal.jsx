@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Warehouse, Grid3X3, Sprout } from 'lucide-react';
+import { X, Warehouse, Grid3X3, Sprout, Edit2, Trash2 } from 'lucide-react';
 import { Button, StatusBadge } from '../common';
 import { formatCurrency } from '../../utils/formatters';
 
-export default function ExpenseDetailsModal({ expense, onClose }) {
+export default function ExpenseDetailsModal({ expense, onClose, onEdit, onDelete }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -172,6 +172,34 @@ export default function ExpenseDetailsModal({ expense, onClose }) {
               </Button>
             )}
           </div>
+          {onEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onClose();
+                onEdit(expense);
+              }}
+              aria-label={t('common.edit', 'Edit')}
+            >
+              <Edit2 size={14} />
+              <span>{t('common.edit', 'Edit')}</span>
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onDelete(expense);
+              }}
+              style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+              aria-label={t('common.delete', 'Delete')}
+            >
+              <Trash2 size={14} />
+              <span>{t('common.delete', 'Delete')}</span>
+            </Button>
+          )}
           <Button variant="secondary" size="sm" onClick={onClose}>
             {t('common.close', 'Close')}
           </Button>

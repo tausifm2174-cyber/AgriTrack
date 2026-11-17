@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Search, LayoutGrid, Table, X } from 'lucide-react';
-import { EXPENSE_CATEGORIES } from '../../data/expenseData';
+import { CANONICAL_CATEGORIES } from '../../services/expenseService';
 
 export default function ExpenseFilters({
   searchQuery,
@@ -100,7 +100,7 @@ export default function ExpenseFilters({
           aria-label={t('expenses.category', 'Filter by category')}
         >
           <option value="ALL">{t('expenses.allCategories', 'All Categories')}</option>
-          {EXPENSE_CATEGORIES.map((cat) => (
+          {CANONICAL_CATEGORIES.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>

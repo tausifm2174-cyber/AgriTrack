@@ -474,3 +474,218 @@ export function adaptMarketPrice(record, historyRecords = []) {
   };
 }
 
+/**
+ * Adapt a backend ExpenseResponse to UI model.
+ * Preserves backend authority while providing backward-compatible aliases.
+ * @param {Object} record Backend ExpenseResponse
+ * @returns {Object} UI Expense Model
+ */
+export function adaptExpense(record) {
+  if (!record) return null;
+
+  const amount = record.amount != null ? Number(record.amount) : 0;
+  const paymentStatus = record.paymentStatus || 'PAID';
+
+  return {
+    id: record.id,
+    farmId: record.farmId,
+    farmName: record.farmName || '',
+    fieldId: record.fieldId ?? null,
+    fieldName: record.fieldName || '',
+    cropCycleId: record.cropCycleId ?? null,
+    cropId: record.cropCycleId ?? null,
+    cropName: record.cropName || '',
+    category: record.category || 'Other',
+    description: record.description || '',
+    title: record.description || '',
+    amount,
+    expenseDate: record.expenseDate || '',
+    date: record.expenseDate || '',
+    vendorName: record.vendorName || '',
+    vendor: record.vendorName || '',
+    paymentMethod: record.paymentMethod || 'CASH',
+    paymentStatus,
+    status: paymentStatus,
+    receiptNumber: record.receiptNumber || '',
+    voucherNumber: record.receiptNumber || '',
+    notes: record.notes || '',
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+  };
+}
+
+/**
+ * Adapt a backend CategoryExpenseSummary to UI model.
+ * @param {Object} item Backend CategoryExpenseSummary
+ * @returns {Object} UI Category Summary
+ */
+export function adaptExpenseCategorySummary(item) {
+  if (!item) return null;
+  const totalAmount = item.totalAmount != null ? Number(item.totalAmount) : (item.amount != null ? Number(item.amount) : 0);
+  const percentage = item.percentageOfExpenses != null ? Number(item.percentageOfExpenses) : (item.percentage != null ? Number(item.percentage) : 0);
+
+  return {
+    category: item.category || 'Other',
+    totalAmount,
+    amount: totalAmount,
+    percentageOfExpenses: percentage,
+    percentage,
+    count: item.count != null ? Number(item.count) : 0,
+  };
+}
+
+/**
+ * Adapt a backend ExpenseSummaryResponse to UI model.
+ * @param {Object} summary Backend ExpenseSummaryResponse
+ * @returns {Object} UI Expense Summary Model
+ */
+export function adaptExpenseSummary(summary) {
+  if (!summary) {
+    return {
+      totalExpenses: 0,
+      paidExpenses: 0,
+      pendingExpenses: 0,
+      expenseCount: 0,
+      categoryBreakdown: [],
+    };
+  }
+
+  return {
+    totalExpenses: summary.totalExpenses != null ? Number(summary.totalExpenses) : 0,
+    paidExpenses: summary.paidExpenses != null ? Number(summary.paidExpenses) : 0,
+    pendingExpenses: summary.pendingExpenses != null ? Number(summary.pendingExpenses) : 0,
+    expenseCount: summary.expenseCount != null ? Number(summary.expenseCount) : 0,
+    categoryBreakdown: Array.isArray(summary.categoryBreakdown)
+      ? summary.categoryBreakdown.map(adaptExpenseCategorySummary)
+      : [],
+  };
+}
+
+/**
+ * Adapt a backend CropFinancialSummary to UI model.
+ * @param {Object} item Backend CropFinancialSummary
+ * @returns {Object} UI Crop Financial Model
+ */
+export function adaptCropFinancialSummary(item) {
+  if (!item) return null;
+  const revenue = item.revenue != null ? Number(item.revenue) : 0;
+  const expenses = item.expenses != null ? Number(item.expenses) : 0;
+  const netProfit = item.netProfit != null ? Number(item.netProfit) : 0;
+  const netMarginPercent = item.netMarginPercent != null ? Number(item.netMarginPercent) : 0;
+  const harvestYieldKg = item.harvestYieldKg != null ? Number(item.harvestYieldKg) : 0;
+  const costPerQuintal = item.costPerQuintal != null ? Number(item.costPerQuintal) : 0;
+
+  return {
+    cropCycleId: item.cropCycleId,
+    cropName: item.cropName || '',
+    crop: item.cropName || '',
+    variety: item.variety || '',
+    season: item.season || '',
+    revenue,
+    expenses,
+    expense: expenses,
+    netProfit,
+    profit: netProfit,
+    netMarginPercent,
+    margin: netMarginPercent,
+    harvestYieldKg,
+    costPerQuintal,
+    salesCount: item.salesCount != null ? Number(item.salesCount) : 0,
+    expenseCount: item.expenseCount != null ? Number(item.expenseCount) : 0,
+  };
+}
+
+/**
+ * Adapt a backend FarmFinancialSummary to UI model.
+ * @param {Object} item Backend FarmFinancialSummary
+ * @returns {Object} UI Farm Financial Model
+ */
+export function adaptFarmFinancialSummary(item) {
+  if (!item) return null;
+  const revenue = item.revenue != null ? Number(item.revenue) : 0;
+  const expenses = item.expenses != null ? Number(item.expenses) : 0;
+  const netProfit = item.netProfit != null ? Number(item.netProfit) : 0;
+  const netMarginPercent = item.netMarginPercent != null ? Number(item.netMarginPercent) : 0;
+
+  return {
+    farmId: item.farmId,
+    farmName: item.farmName || '',
+    revenue,
+    expenses,
+    expense: expenses,
+    netProfit,
+    profit: netProfit,
+    netMarginPercent,
+    margin: netMarginPercent,
+    salesCount: item.salesCount != null ? Number(item.salesCount) : 0,
+    expenseCount: item.expenseCount != null ? Number(item.expenseCount) : 0,
+  };
+}
+
+/**
+ * Adapt a backend MonthlyFinancialSummary to UI model.
+ * @param {Object} item Backend MonthlyFinancialSummary
+ * @returns {Object} UI Monthly Financial Trend Model
+ */
+export function adaptMonthlyFinancialSummary(item) {
+  if (!item) return null;
+  const revenue = item.revenue != null ? Number(item.revenue) : 0;
+  const expenses = item.expenses != null ? Number(item.expenses) : 0;
+  const netProfit = item.netProfit != null ? Number(item.netProfit) : 0;
+
+  return {
+    year: item.year != null ? Number(item.year) : null,
+    month: item.monthLabel || (item.month != null ? String(item.month) : ''),
+    monthNumber: item.month != null ? Number(item.month) : null,
+    monthLabel: item.monthLabel || '',
+    revenue,
+    expenses,
+    netProfit,
+    profit: netProfit,
+  };
+}
+
+/**
+ * Adapt a backend ProfitLossSummaryResponse to UI model.
+ * Backend is authoritative for all aggregate and breakdown financial figures.
+ * @param {Object} summary Backend ProfitLossSummaryResponse
+ * @returns {Object} UI Profit & Loss Model
+ */
+export function adaptProfitLossSummary(summary) {
+  if (!summary) {
+    return {
+      totalRevenue: 0,
+      totalExpenses: 0,
+      netProfit: 0,
+      profitMarginPercent: 0,
+      netMargin: 0,
+      cropSummaries: [],
+      farmSummaries: [],
+      categoryBreakdown: [],
+      monthlyTrends: [],
+    };
+  }
+
+  const profitMarginPercent = summary.profitMarginPercent != null ? Number(summary.profitMarginPercent) : 0;
+
+  return {
+    totalRevenue: summary.totalRevenue != null ? Number(summary.totalRevenue) : 0,
+    totalExpenses: summary.totalExpenses != null ? Number(summary.totalExpenses) : 0,
+    netProfit: summary.netProfit != null ? Number(summary.netProfit) : 0,
+    profitMarginPercent,
+    netMargin: profitMarginPercent,
+    cropSummaries: Array.isArray(summary.cropSummaries)
+      ? summary.cropSummaries.map(adaptCropFinancialSummary)
+      : [],
+    farmSummaries: Array.isArray(summary.farmSummaries)
+      ? summary.farmSummaries.map(adaptFarmFinancialSummary)
+      : [],
+    categoryBreakdown: Array.isArray(summary.categoryBreakdown)
+      ? summary.categoryBreakdown.map(adaptExpenseCategorySummary)
+      : [],
+    monthlyTrends: Array.isArray(summary.monthlyTrends)
+      ? summary.monthlyTrends.map(adaptMonthlyFinancialSummary)
+      : [],
+  };
+}
+

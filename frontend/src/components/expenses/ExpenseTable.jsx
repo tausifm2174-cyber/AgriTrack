@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { Eye } from 'lucide-react';
+import { Eye, Edit2, Trash2 } from 'lucide-react';
 import { Button, StatusBadge } from '../common';
 import { formatCurrency } from '../../utils/formatters';
 import { formatFieldName, translateCrop } from '../../utils/displayLabels';
 
-export default function ExpenseTable({ expenses, onViewDetails }) {
+export default function ExpenseTable({ expenses, onViewDetails, onEdit, onDelete }) {
   const { t } = useTranslation();
 
   return (
@@ -104,7 +104,7 @@ export default function ExpenseTable({ expenses, onViewDetails }) {
                     </StatusBadge>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.35rem' }}>
                       <Button
                         variant="outline"
                         size="sm"
@@ -114,6 +114,27 @@ export default function ExpenseTable({ expenses, onViewDetails }) {
                         <Eye size={14} />
                         <span>{t('common.viewDetails', 'View')}</span>
                       </Button>
+                      {onEdit && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onEdit(exp)}
+                          aria-label={`${t('common.edit', 'Edit')} ${exp.id}`}
+                        >
+                          <Edit2 size={14} />
+                        </Button>
+                      )}
+                      {onDelete && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onDelete(exp)}
+                          style={{ color: '#dc2626' }}
+                          aria-label={`${t('common.delete', 'Delete')} ${exp.id}`}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

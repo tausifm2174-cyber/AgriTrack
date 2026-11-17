@@ -941,10 +941,7 @@
     "paidOutflows": "paidOutflows",
     "payment": "payment",
     "paymentMethods": {
-      "bankTransfer": "à¦¬à§à¦¯à¦¾à¦‚à¦• à¦Ÿà§à¦°à¦¾à¦¨à§à¦¸à¦«à¦¾à¦°",
-      "cash": "à¦¨à¦—à¦¦",
-      "credit": "credit",
-      "upi": "à¦‡à¦‰à¦ªà¦¿à¦†à¦‡ / à¦…à¦¨à¦²à¦¾à¦‡à¦¨"
+      "cheque": "ব্যাংক চেক"
     },
     "paymentStatus": "paymentStatus",
     "pendingPayables": "pendingPayables",
@@ -972,7 +969,13 @@
     "voucherRef": "voucherRef",
     "voucherRemarks": "voucherRemarks",
     "vouchersLogged": "vouchersLogged",
-    "zeroDebt": "zeroDebt"
+    "zeroDebt": "zeroDebt",
+    "editExpense": "খরচের ভাউচার সম্পাদনা করুন",
+    "deleteTitle": "খরচের ভাউচার মুছুন",
+    "deleteConfirmMsg": "আপনি কি নিশ্চিত যে \"{{desc}}\" ({{amount}}) খরচের ভাউচার #{{id}} স্থায়ীভাবে মুছে ফেলতে চান?",
+    "createFarmFirst": "ইনপুট ভাউচার, শ্রম ও যন্ত্রপাতির খরচ রেকর্ড করতে অনুগ্রহ করে প্রথমে আপনার খামার নিবন্ধন করুন।",
+    "noExpensesLogged": "এখনও পর্যন্ত কোনো খরচের ভাউচার রেকর্ড করা হয়নি।",
+    "voucherNumber": "রশিদ / চালান নম্বর (ঐচ্ছিক)"
   },
   "revenue": {
     "title": "à¦–à¦¾à¦®à¦¾à¦°à§‡à¦° à¦†à¦¯à¦¼ à¦“ à¦ªà§à¦°à¦¾à¦ªà§à¦¤à¦¿",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "totalHarvest",
     "trajectoryComparison": "trajectoryComparison",
     "trajectoryDesc": "trajectoryDesc",
-    "vouchersCount": "vouchersCount"
+    "vouchersCount": "vouchersCount",
+    "createFarmFirst": "লাভ-ক্ষতি আর্থিক বিশ্লেষণ দেখতে প্রথমে আপনার খামার নিবন্ধন করুন।",
+    "noCropsRecorded": "নির্বাচিত ফিল্টারের জন্য কোনো ফসলের আর্থিক রেকর্ড পাওয়া যায়নি।",
+    "noFarmsRecorded": "নির্বাচিত ফিল্টারের জন্য কোনো খামারের আর্থিক রেকর্ড পাওয়া যায়নি।"
   },
   "notifications": {
     "title": "à¦¬à¦¿à¦œà§à¦žà¦ªà§à¦¤à¦¿ à¦•à§‡à¦¨à§à¦¦à§à¦°",
@@ -1259,7 +1265,8 @@
     "dateAfter": "à¦«à¦¸à¦² à¦•à¦¾à¦Ÿà¦¾à¦° à¦¤à¦¾à¦°à¦¿à¦– à¦¬à¦ªà¦¨à§‡à¦° à¦¤à¦¾à¦°à¦¿à¦–à§‡à¦° à¦ªà¦°à§‡ à¦¹à¦¤à§‡ à¦¹à¦¬à§‡",
     "invalidAmount": "à¦ªà¦°à¦¿à¦¶à§‹à¦§à¦¿à¦¤ à¦…à¦°à§à¦¥ à¦®à§‹à¦Ÿ à¦¬à¦¿à¦•à§à¦°à¦¯à¦¼ à¦…à¦°à§à¦¥à§‡à¦° à¦šà§‡à¦¯à¦¼à§‡ à¦¬à§‡à¦¶à¦¿ à¦¹à¦¤à§‡ à¦ªà¦¾à¦°à§‡ à¦¨à¦¾",
     "positiveNumber": "à¦«à¦¸à¦² à¦¤à§‹à¦²à¦¾à¦° à¦ªà¦°à¦¿à¦®à¦¾à¦£ à§¦ à¦¬à¦¾ à¦¤à¦¾à¦° à¦¬à§‡à¦¶à¦¿ à¦¹à¦¤à§‡ à¦¹à¦¬à§‡",
-    "range": "range"
+    "range": "range",
+    "dateNotInFuture": "খরচের তারিখ ভবিষ্যতের হতে পারে না"
   },
   "alerts": {
     "farmAdded": "à¦–à¦¾à¦®à¦¾à¦° à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "à¦°à§‡à¦•à¦°à§à¦¡ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦®à§à¦›à§‡ à¦«à§‡à¦²à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
     "fillRequiredFields": "à¦…à¦¨à§à¦—à§à¦°à¦¹ à¦•à¦°à§‡ à¦¸à¦®à¦¸à§à¦¤ à¦ªà§à¦°à¦¯à¦¼à§‹à¦œà¦¨à§€à¦¯à¦¼ à¦˜à¦° à¦¸à¦ à¦¿à¦•à¦­à¦¾à¦¬à§‡ à¦ªà§‚à¦°à¦£ à¦•à¦°à§à¦¨à¥¤",
     "harvestUpdated": "ফসল তোলার রেকর্ড সফলভাবে আপডেট করা হয়েছে।",
-    "saleUpdated": "বিক্রির রেকর্ড সফলভাবে আপডেট করা হয়েছে।"
+    "saleUpdated": "বিক্রির রেকর্ড সফলভাবে আপডেট করা হয়েছে।",
+    "expenseUpdated": "সফলভাবে আপডেট হয়েছে!",
+    "expenseDeleted": "সফলভাবে মুছে ফেলা হয়েছে।"
   },
   "messages": {
     "cropAdded": "à¦«à¦¸à¦² à¦šà¦•à§à¦° à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¨à¦¿à¦¬à¦¨à§à¦§à¦¿à¦¤ à¦¹à¦¯à¦¼à§‡à¦›à§‡!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "বীজ",
+    "fertilizer": "সার",
+    "pesticides": "কীটনাশক",
+    "irrigation": "সেচ",
+    "labour": "শ্রম",
+    "machinery": "যন্ত্রপাতি",
+    "fuel": "জ্বালানি",
+    "transport": "পরিবহন",
+    "soiltesting": "মাটি পরীক্ষা",
+    "other": "অন্যান্য"
   }
 }

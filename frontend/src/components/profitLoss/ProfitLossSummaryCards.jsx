@@ -8,8 +8,8 @@ export default function ProfitLossSummaryCards({
   netProfit = 0,
   netMargin = 0,
   costPerQuintal = 0,
-  harvestYieldKg = 15000,
-  averageMandiRate = 3993,
+  harvestYieldKg = 0,
+  averageMandiRate = 0,
 }) {
   const { t } = useTranslation();
   const isProfitable = netProfit >= 0;

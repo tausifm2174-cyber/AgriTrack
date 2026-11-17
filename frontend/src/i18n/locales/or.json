@@ -941,10 +941,7 @@
     "paidOutflows": "paidOutflows",
     "payment": "payment",
     "paymentMethods": {
-      "bankTransfer": "à¬¬à­à­Ÿà¬¾à¬™à­à¬• à¬Ÿà­à¬°à¬¾à¬¨à­à¬¸à¬«à¬°",
-      "cash": "à¬¨à¬—à¬¦",
-      "credit": "credit",
-      "upi": "à­Ÿà­à¬ªà¬¿à¬†à¬‡ / à¬…à¬¨à¬²à¬¾à¬‡à¬¨"
+      "cheque": "ବ୍ୟାଙ୍କ ଚେକ୍"
     },
     "paymentStatus": "paymentStatus",
     "pendingPayables": "pendingPayables",
@@ -972,7 +969,13 @@
     "voucherRef": "voucherRef",
     "voucherRemarks": "voucherRemarks",
     "vouchersLogged": "vouchersLogged",
-    "zeroDebt": "zeroDebt"
+    "zeroDebt": "zeroDebt",
+    "editExpense": "ଖର୍ଚ୍ଚ ଭାଉଚର ସମ୍ପାଦନ କରନ୍ତୁ",
+    "deleteTitle": "ଖର୍ଚ୍ଚ ଭାଉଚର ବିଲୋପ କରନ୍ତୁ",
+    "deleteConfirmMsg": "ଆପଣ ନିଶ୍ଚିତ କି \"{{desc}}\" ({{amount}}) ଖର୍ଚ୍ଚ ଭାଉଚର #{{id}} କୁ ସ୍ଥାୟୀ ଭାବରେ ବିଲୋପ କରିବାକୁ ଚାହାଁନ୍ତି?",
+    "createFarmFirst": "କୃଷି ଇନପୁଟ୍ ଭାଉଚର, ମଜୁରୀ ଏବଂ ଯନ୍ତ୍ରପାତି ଖର୍ଚ୍ଚ ରେକର୍ଡ କରିବାକୁ ଦୟାକରି ପ୍ରଥମେ ନିଜ କ୍ଷେତ ପଞ୍ଜୀକରଣ କରନ୍ତୁ।",
+    "noExpensesLogged": "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଖର୍ଚ୍ଚ ଭାଉଚର ରେକର୍ଡ ହୋଇନାହିଁ।",
+    "voucherNumber": "ରସିଦ / ଚାଲାଣ ନମ୍ବର (ଐଚ୍ଛିକ)"
   },
   "revenue": {
     "title": "à¬«à¬¾à¬°à­à¬® à¬†à­Ÿ à¬“ à¬°à¬¸à¬¿à¬¦",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "totalHarvest",
     "trajectoryComparison": "trajectoryComparison",
     "trajectoryDesc": "trajectoryDesc",
-    "vouchersCount": "vouchersCount"
+    "vouchersCount": "vouchersCount",
+    "createFarmFirst": "ଲାଭ-କ୍ଷତି ଆର୍ଥିକ ବିଶ୍ଳେଷଣ ଦେଖିବାକୁ ପ୍ରଥମେ ନିଜ କ୍ଷେତ ପଞ୍ଜୀକରଣ କରନ୍ତୁ।",
+    "noCropsRecorded": "ଚୟନିତ ଫିଲ୍ଟର୍ ପାଇଁ କୌଣସି ଫସଲ ଆର୍ଥିକ ରେକର୍ଡ ମିଳିଲା ନାହିଁ।",
+    "noFarmsRecorded": "ଚୟନିତ ଫିଲ୍ଟର୍ ପାଇଁ କୌଣସି କ୍ଷେତ ଆର୍ଥିକ ରେକର୍ଡ ମିଳିଲା ନାହିଁ।"
   },
   "notifications": {
     "title": "à¬¬à¬¿à¬œà­à¬žà¬ªà­à¬¤à¬¿ à¬•à­‡à¬¨à­à¬¦à­à¬°",
@@ -1259,7 +1265,8 @@
     "dateAfter": "à¬…à¬®à¬³ à¬¤à¬¾à¬°à¬¿à¬– à¬¬à­à¬£à¬¿à¬¬à¬¾ à¬¤à¬¾à¬°à¬¿à¬– à¬ªà¬°à­‡ à¬¹à­‡à¬¬à¬¾ à¬‰à¬šà¬¿à¬¤",
     "invalidAmount": "à¬ªà­ˆà¬  à¬°à¬¾à¬¶à¬¿ à¬®à­‹à¬Ÿ à¬¬à¬¿à¬•à­à¬°à­Ÿ à¬°à¬¾à¬¶à¬¿à¬ à¬¾à¬°à­ à¬…à¬§à¬¿à¬• à¬¹à­‹à¬‡à¬ªà¬¾à¬°à¬¿à¬¬ à¬¨à¬¾à¬¹à¬¿à¬",
     "positiveNumber": "à¬…à¬®à¬³ à¬ªà¬°à¬¿à¬®à¬¾à¬£ à­¦ à¬•à¬¿à¬®à­à¬¬à¬¾ à¬…à¬§à¬¿à¬• à¬¹à­‡à¬¬à¬¾ à¬‰à¬šà¬¿à¬¤",
-    "range": "range"
+    "range": "range",
+    "dateNotInFuture": "ଖର୍ଚ୍ଚ ତାରିଖ ଭବିଷ୍ୟତର ହୋଇପାରିବ ନାହିଁ"
   },
   "alerts": {
     "farmAdded": "à¬«à¬¾à¬°à­à¬® à¬¸à¬«à¬³à¬¤à¬¾à¬° à¬¸à¬¹ à¬¯à­‹à¬¡à¬¼à¬¾à¬—à¬²à¬¾à¥¤",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "à¬°à­‡à¬•à¬°à­à¬¡ à¬•à¬¢à¬¼à¬¾à¬—à¬²à¬¾à¥¤",
     "fillRequiredFields": "à¬¦à­Ÿà¬¾à¬•à¬°à¬¿ à¬¸à¬®à¬¸à­à¬¤ à¬†à¬¬à¬¶à­à­Ÿà¬• à¬¤à¬¥à­à­Ÿ à¬¸à¬ à¬¿à¬•à­ à¬­à¬¾à¬¬à¬°à­‡ à¬ªà­‚à¬°à¬£ à¬•à¬°à¬¨à­à¬¤à­à¥¤",
     "harvestUpdated": "ଅମଳ ରେକର୍ଡ ସଫଳତାର ସହିତ ଅଦ୍ୟତନ ହୋଇଛି।",
-    "saleUpdated": "ବିକ୍ରୟ ରେକର୍ଡ ସଫଳତାର ସହିତ ଅଦ୍ୟତନ ହୋଇଛି।"
+    "saleUpdated": "ବିକ୍ରୟ ରେକର୍ଡ ସଫଳତାର ସହିତ ଅଦ୍ୟତନ ହୋଇଛି।",
+    "expenseUpdated": "ସଫଳତାର ସହିତ ଅଦ୍ୟତନ ହୋଇଛି!",
+    "expenseDeleted": "ସଫଳତାର ସହିତ ବିଲୋପ ହୋଇଛି।"
   },
   "messages": {
     "cropAdded": "à¬«à¬¸à¬² à¬šà¬•à­à¬° à¬¸à¬«à¬³à¬¤à¬¾à¬° à¬¸à¬¹ à¬ªà¬žà­à¬œà­€à¬•à­ƒà¬¤ à¬¹à­‡à¬²à¬¾!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "ବିହନ",
+    "fertilizer": "ଖତ/ସାର",
+    "pesticides": "କୀଟନାଶକ",
+    "irrigation": "ଜଳସେଚନ",
+    "labour": "ମଜୁରୀ",
+    "machinery": "ଯନ୍ତ୍ରପାତି",
+    "fuel": "ଇନ୍ଧନ",
+    "transport": "ପରିବହନ",
+    "soiltesting": "ମାଟି ପରୀକ୍ଷା",
+    "other": "ଅନ୍ୟାନ୍ୟ"
   }
 }

@@ -941,10 +941,7 @@
     "paidOutflows": "paidOutflows",
     "payment": "payment",
     "paymentMethods": {
-      "bankTransfer": "à¨¬à©ˆà¨‚à¨• à¨Ÿà¨°à¨¾à¨‚à¨¸à¨«à¨°",
-      "cash": "à¨¨à¨•à¨¦",
-      "credit": "credit",
-      "upi": "à¨¯à©‚à¨ªà©€à¨†à¨ˆ / à¨†à¨¨à¨²à¨¾à¨ˆà¨¨"
+      "cheque": "ਬੈਂਕ ਚੈੱਕ"
     },
     "paymentStatus": "paymentStatus",
     "pendingPayables": "pendingPayables",
@@ -972,7 +969,13 @@
     "voucherRef": "voucherRef",
     "voucherRemarks": "voucherRemarks",
     "vouchersLogged": "vouchersLogged",
-    "zeroDebt": "zeroDebt"
+    "zeroDebt": "zeroDebt",
+    "editExpense": "ਖਰਚ ਵਾਊਚਰ ਸੰਪਾਦਿਤ ਕਰੋ",
+    "deleteTitle": "ਖਰਚ ਵਾਊਚਰ ਮਿਟਾਓ",
+    "deleteConfirmMsg": "ਕੀ ਤੁਸੀਂ ਵਾਕਈ \"{{desc}}\" ({{amount}}) ਲਈ ਖਰਚ ਵਾਊਚਰ #{{id}} ਪੱਕੇ ਤੌਰ ਤੇ ਮਿਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਹ ਖਾਤਾ ਬਹੀ ਦਾ ਮਿਲਾਨ ਕਰੇਗਾ।",
+    "createFarmFirst": "ਖੇਤੀ ਲਾਗਤ, ਮਜ਼ਦੂਰੀ ਅਤੇ ਮਸ਼ੀਨਰੀ ਖਰਚੇ ਦਰਜ ਕਰਨ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਆਪਣਾ ਖੇਤ ਦਰਜ ਕਰੋ।",
+    "noExpensesLogged": "ਅਜੇ ਤੱਕ ਕੋਈ ਖਰਚ ਵਾਊਚਰ ਦਰਜ ਨਹੀਂ ਹੋਇਆ। ਆਪਣਾ ਪਹਿਲਾ ਵਾਊਚਰ ਦਰਜ ਕਰਨ ਲਈ \"ਖੇਤ ਖਰਚ ਦਰਜ ਕਰੋ\" ਤੇ ਕਲਿੱਕ ਕਰੋ।",
+    "voucherNumber": "ਰਸੀਦ / ਚਲਾਨ ਨੰਬਰ (ਵਿਕਲਪਿਕ)"
   },
   "revenue": {
     "title": "à¨«à¨¾à¨°à¨® à¨¦à©€ à¨†à¨®à¨¦à¨¨ à¨…à¨¤à©‡ à¨ªà©à¨°à¨¾à¨ªà¨¤à©€à¨†à¨‚",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "totalHarvest",
     "trajectoryComparison": "trajectoryComparison",
     "trajectoryDesc": "trajectoryDesc",
-    "vouchersCount": "vouchersCount"
+    "vouchersCount": "vouchersCount",
+    "createFarmFirst": "ਮੁਨਾਫਾ-ਨੁਕਸਾਨ ਵਿੱਤੀ ਵਿਸ਼ਲੇਸ਼ਣ ਵੇਖਣ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਆਪਣਾ ਖੇਤ ਦਰਜ ਕਰੋ ਅਤੇ ਫਸਲ ਵਿਕਰੀ ਜਾਂ ਖਰਚ ਦਰਜ ਕਰੋ।",
+    "noCropsRecorded": "ਚੁਣੇ ਫਿਲਟਰ ਲਈ ਕੋਈ ਫਸਲ ਵਿੱਤੀ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।",
+    "noFarmsRecorded": "ਚੁਣੇ ਫਿਲਟਰ ਲਈ ਕੋਈ ਖੇਤ ਵਿੱਤੀ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।"
   },
   "notifications": {
     "title": "à¨¸à©‚à¨šà¨¨à¨¾ à¨•à©‡à¨‚à¨¦à¨°",
@@ -1259,7 +1265,8 @@
     "dateAfter": "à¨µà¨¾à¨¢à©€ à¨¦à©€ à¨®à¨¿à¨¤à©€ à¨¬à¨¿à¨œà¨¾à¨ˆ à¨¤à©‹à¨‚ à¨¬à¨¾à¨…à¨¦ à¨¦à©€ à¨¹à©‹à¨£à©€ à¨šà¨¾à¨¹à©€à¨¦à©€ à¨¹à©ˆ",
     "invalidAmount": "à¨­à©à¨—à¨¤à¨¾à¨¨ à¨•à©€à¨¤à©€ à¨°à¨•à¨® à¨•à©à©±à¨² à¨µà¨¿à¨•à¨°à©€ à¨°à¨•à¨® à¨¤à©‹à¨‚ à¨µà©±à¨§ à¨¨à¨¹à©€à¨‚ à¨¹à©‹ à¨¸à¨•à¨¦à©€",
     "positiveNumber": "à¨µà¨¾à¨¢à©€ à¨¦à©€ à¨®à¨¾à¨¤à¨°à¨¾ 0 à¨œà¨¾à¨‚ à¨‡à¨¸ à¨¤à©‹à¨‚ à¨µà©±à¨§ à¨¹à©‹à¨£à©€ à¨šà¨¾à¨¹à©€à¨¦à©€ à¨¹à©ˆ",
-    "range": "range"
+    "range": "range",
+    "dateNotInFuture": "ਖਰਚ ਦੀ ਮਿਤੀ ਭਵਿੱਖ ਦੀ ਨਹੀਂ ਹੋ ਸਕਦੀ"
   },
   "alerts": {
     "farmAdded": "à¨«à¨¾à¨°à¨® à¨¸à¨«à¨²à¨¤à¨¾à¨ªà©‚à¨°à¨µà¨• à¨œà©‹à©œà¨¿à¨† à¨—à¨¿à¨†à¥¤",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "à¨°à¨¿à¨•à¨¾à¨°à¨¡ à¨¸à¨«à¨²à¨¤à¨¾à¨ªà©‚à¨°à¨µà¨• à¨®à¨¿à¨Ÿà¨¾à¨‡à¨† à¨—à¨¿à¨†à¥¤",
     "fillRequiredFields": "à¨•à¨¿à¨°à¨ªà¨¾ à¨•à¨°à¨•à©‡ à¨¸à¨¾à¨°à©‡ à¨²à©‹à©œà©€à¨‚à¨¦à©‡ à¨µà©‡à¨°à¨µà©‡ à¨¸à¨¹à©€ à¨­à¨°à©‹à¥¤",
     "harvestUpdated": "ਵਾਢੀ ਦਾ ਰਿਕਾਰਡ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ।",
-    "saleUpdated": "ਵਿਕਰੀ ਰਿਕਾਰਡ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ।"
+    "saleUpdated": "ਵਿਕਰੀ ਰਿਕਾਰਡ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ।",
+    "expenseUpdated": "ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ!",
+    "expenseDeleted": "ਸਫਲਤਾਪੂਰਵਕ ਮਿਟਾਇਆ ਗਿਆ।"
   },
   "messages": {
     "cropAdded": "à¨«à¨¼à¨¸à¨² à¨šà©±à¨•à¨° à¨¸à¨«à¨²à¨¤à¨¾à¨ªà©‚à¨°à¨µà¨• à¨°à¨œà¨¿à¨¸à¨Ÿà¨° à¨•à©€à¨¤à¨¾ à¨—à¨¿à¨†!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "ਬੀਜ",
+    "fertilizer": "ਖਾਦ",
+    "pesticides": "ਕੀਟਨਾਸ਼ਕ",
+    "irrigation": "ਸਿੰਚਾਈ",
+    "labour": "ਮਜ਼ਦੂਰੀ",
+    "machinery": "ਮਸ਼ੀਨਰੀ",
+    "fuel": "ਤੇਲ/ਈਂਧਨ",
+    "transport": "ਢੋਆ-ਢੁਆਈ",
+    "soiltesting": "ਮਿੱਟੀ ਪਰਖ",
+    "other": "ਹੋਰ"
   }
 }

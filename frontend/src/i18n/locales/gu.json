@@ -941,10 +941,7 @@
     "paidOutflows": "paidOutflows",
     "payment": "payment",
     "paymentMethods": {
-      "bankTransfer": "àª¬à«‡àª‚àª• àªŸà«àª°àª¾àª¨à«àª¸àª«àª°",
-      "cash": "àª°à«‹àª•àª¡",
-      "credit": "credit",
-      "upi": "àª¯à«àªªà«€àª†àªˆ / àª“àª¨àª²àª¾àª‡àª¨"
+      "cheque": "બેંક ચેક"
     },
     "paymentStatus": "paymentStatus",
     "pendingPayables": "pendingPayables",
@@ -972,7 +969,13 @@
     "voucherRef": "voucherRef",
     "voucherRemarks": "voucherRemarks",
     "vouchersLogged": "vouchersLogged",
-    "zeroDebt": "zeroDebt"
+    "zeroDebt": "zeroDebt",
+    "editExpense": "ખર્ચ વાઉચર સંપાદિત કરો",
+    "deleteTitle": "ખર્ચ વાઉચર કાઢી નાખો",
+    "deleteConfirmMsg": "શું તમે ખરેખર \"{{desc}}\" ({{amount}}) માટે ખર્ચ વાઉચર #{{id}} કાયમી ધોરણે કાઢી નાખવા માંગો છો? આ લેજર મેળવણી કરશે.",
+    "createFarmFirst": "કૃષિ ઇનપુટ વાઉચર, મજૂરી અને મશીનરી ખર્ચ નોંધવા માટે કૃપા કરીને પહેલા તમારું ફાર્મ રજીસ્ટર કરો.",
+    "noExpensesLogged": "હજુ સુધી કોઈ ખર્ચ વાઉચર નોંધાયેલ નથી. તમારું પ્રથમ વાઉચર નોંધવા \"ફાર્મ ખર્ચ નોંધો\" પર ક્લિક કરો.",
+    "voucherNumber": "રસીદ / ઇન્વૉઇસ નંબર (વૈકલ્પિક)"
   },
   "revenue": {
     "title": "àª–à«‡àª¤àª° àª†àªµàª• àª…àª¨à«‡ àªªà«àª°àª¾àªªà«àª¤àª¿",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "totalHarvest",
     "trajectoryComparison": "trajectoryComparison",
     "trajectoryDesc": "trajectoryDesc",
-    "vouchersCount": "vouchersCount"
+    "vouchersCount": "vouchersCount",
+    "createFarmFirst": "નફો-નુકસાન નાણાકીય વિશ્લેષણ જોવા માટે કૃપા કરીને પહેલા તમારું ફાર્મ રજીસ્ટર કરો અને પાક વેચાણ અથવા ખર્ચ નોંધો.",
+    "noCropsRecorded": "પસંદ કરેલ માપદંડ માટે કોઈ પાક નાણાકીય રેકોર્ડ મળ્યો નથી.",
+    "noFarmsRecorded": "પસંદ કરેલ માપદંડ માટે કોઈ ફાર્મ નાણાકીય રેકોર્ડ મળ્યો નથી."
   },
   "notifications": {
     "title": "àª¸à«‚àªšàª¨àª¾ àª•à«‡àª¨à«àª¦à«àª°",
@@ -1259,7 +1265,8 @@
     "dateAfter": "àª²àª£àª£à«€àª¨à«€ àª¤àª¾àª°à«€àª– àªµàª¾àªµàª£à«€ àªªàª›à«€àª¨à«€ àª¹à«‹àªµà«€ àªœà«‹àªˆàª",
     "invalidAmount": "àªšà«‚àª•àªµà«‡àª² àª°àª•àª® àª•à«àª² àªµà«‡àªšàª¾àª£ àª°àª•àª®àª¥à«€ àªµàª§à« àª¹à«‹àªˆ àª¶àª•àª¤à«€ àª¨àª¥à«€",
     "positiveNumber": "àª²àª£àª£à«€ àªœàª¥à«àª¥à«‹ 0 àª•à«‡ àª¤à«‡àª¥à«€ àªµàª§à« àª¹à«‹àªµà«‹ àªœà«‹àªˆàª",
-    "range": "range"
+    "range": "range",
+    "dateNotInFuture": "ખર્ચની તારીખ ભવિષ્યની ન હોઈ શકે"
   },
   "alerts": {
     "farmAdded": "àª–à«‡àª¤àª° àª¸àª«àª³àª¤àª¾àªªà«‚àª°à«àªµàª• àª‰àª®à«‡àª°àª¾àª¯à«àª‚.",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "àª¨à«‹àª‚àª§ àª¸àª«àª³àª¤àª¾àªªà«‚àª°à«àªµàª• àª•àª¾àª¢à«€ àª¨àª¾àª–àªµàª¾àª®àª¾àª‚ àª†àªµà«€.",
     "fillRequiredFields": "àª•à«ƒàªªàª¾ àª•àª°à«€àª¨à«‡ àª¬àª§à«€ àªœàª°à«‚àª°à«€ àªµàª¿àª—àª¤à«‹ àª¯à«‹àª—à«àª¯ àª°à«€àª¤à«‡ àª­àª°à«‹.",
     "harvestUpdated": "લણણી રેકોર્ડ સફળતાપૂર્વક અપડેટ થયો.",
-    "saleUpdated": "વેચાણ રેકોર્ડ સફળતાપૂર્વક અપડેટ થયો."
+    "saleUpdated": "વેચાણ રેકોર્ડ સફળતાપૂર્વક અપડેટ થયો.",
+    "expenseUpdated": "સફળતાપૂર્વક અપડેટ થયું!",
+    "expenseDeleted": "સફળતાપૂર્વક કાઢી નાખવામાં આવ્યું."
   },
   "messages": {
     "cropAdded": "àªªàª¾àª• àªšàª•à«àª° àª¸àª«àª³àª¤àª¾àªªà«‚àª°à«àªµàª• àª¨à«‹àª‚àª§àª¾àª¯à«àª‚!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "બિયારણ",
+    "fertilizer": "ખાતર",
+    "pesticides": "જંતુનાશકો",
+    "irrigation": "સિંચાઈ",
+    "labour": "મજૂરી",
+    "machinery": "મશીનરી",
+    "fuel": "બળતણ",
+    "transport": "પરિવહન",
+    "soiltesting": "જમીન પરીક્ષણ",
+    "other": "અન્ય"
   }
 }

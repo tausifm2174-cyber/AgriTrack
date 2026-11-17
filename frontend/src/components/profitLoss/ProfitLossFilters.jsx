@@ -68,11 +68,15 @@ export default function ProfitLossFilters({
             aria-label="Filter by agronomic crop"
           >
             <option value="ALL">{t('common.allCrops', 'All Crops')}</option>
-            {cropList.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
+            {cropList.map((c) => {
+              const val = typeof c === 'object' && c !== null ? c.id : c;
+              const label = typeof c === 'object' && c !== null ? c.name : c;
+              return (
+                <option key={val} value={val}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
         </div>
 

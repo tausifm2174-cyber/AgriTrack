@@ -16,6 +16,15 @@ export default function ProfitLossChart({ trendData = [] }) {
 
   const formatMonth = (m) => {
     if (!m) return '';
+    if (typeof m === 'string' && m.match(/^\d{4}-\d{2}$/)) {
+      const [yr, mo] = m.split('-').map(Number);
+      const d = new Date(yr, mo - 1, 1);
+      try {
+        return new Intl.DateTimeFormat(i18n.language || 'en-IN', { month: 'short', year: 'numeric' }).format(d);
+      } catch {
+        return m;
+      }
+    }
     const parts = m.split(' ');
     const monthAbbrs = {
       Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,

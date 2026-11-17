@@ -941,10 +941,7 @@
     "paidOutflows": "Paid Outflows",
     "payment": "Payment",
     "paymentMethods": {
-      "bankTransfer": "Bank Transfer (NEFT)",
-      "cash": "Cash Voucher",
-      "credit": "Vendor Credit",
-      "upi": "UPI Direct"
+      "cheque": "Bank Cheque"
     },
     "paymentStatus": "Payment Status",
     "pendingPayables": "Pending Payables",
@@ -972,7 +969,13 @@
     "voucherRef": "Receipt / Voucher Ref",
     "voucherRemarks": "Voucher & Technical Remarks",
     "vouchersLogged": "input vouchers logged",
-    "zeroDebt": "Zero outstanding debt"
+    "zeroDebt": "Zero outstanding debt",
+    "editExpense": "Edit Expense Voucher",
+    "deleteTitle": "Delete Expense Voucher",
+    "deleteConfirmMsg": "Are you sure you want to permanently delete expense voucher #{{id}} for \"{{desc}}\" ({{amount}})? This will reconcile accounting ledger totals.",
+    "createFarmFirst": "To record farm input vouchers, labor costs, and machinery expenses, please register your first farm holding.",
+    "noExpensesLogged": "No expense vouchers have been recorded yet. Click \"Record Farm Expense\" to log your first voucher.",
+    "voucherNumber": "Receipt / Invoice Number (Optional)"
   },
   "revenue": {
     "title": "Farm Revenue & Earnings",
@@ -1067,7 +1070,10 @@
     "totalHarvest": "total harvest",
     "trajectoryComparison": "P&L Financial Trajectory Comparison",
     "trajectoryDesc": "Comparative operating trajectory across cropping months",
-    "vouchersCount": "{{count}} input vouchers"
+    "vouchersCount": "{{count}} input vouchers",
+    "createFarmFirst": "To view profit & loss financial analysis, please register your first farm holding and log harvest sales or expenses.",
+    "noCropsRecorded": "No crop financial records found for the selected filter criteria.",
+    "noFarmsRecorded": "No farm holding financial records found for the selected filter criteria."
   },
   "notifications": {
     "title": "Notification Center",
@@ -1259,7 +1265,8 @@
     "dateAfter": "Harvest date must be after sowing date",
     "invalidAmount": "Paid amount cannot exceed total sale amount",
     "positiveNumber": "Harvested quantity must be 0 or greater",
-    "range": "Score must be between 1 and 100"
+    "range": "Score must be between 1 and 100",
+    "dateNotInFuture": "Expense date cannot be in the future"
   },
   "alerts": {
     "farmAdded": "Farm added successfully.",
@@ -1275,7 +1282,9 @@
     "itemDeleted": "Record removed successfully.",
     "fillRequiredFields": "Please fill all required fields correctly.",
     "harvestUpdated": "Harvest record updated successfully.",
-    "saleUpdated": "Sale record updated successfully."
+    "saleUpdated": "Sale record updated successfully.",
+    "expenseUpdated": "successfully updated!",
+    "expenseDeleted": "successfully deleted."
   },
   "messages": {
     "cropAdded": "Crop Cycle Registered Successfully!",
@@ -1314,5 +1323,17 @@
     "signIn": "Sign In",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "expenseCategories": {
+    "seeds": "Seeds",
+    "fertilizer": "Fertilizer",
+    "pesticides": "Pesticides",
+    "irrigation": "Irrigation",
+    "labour": "Labour",
+    "machinery": "Machinery",
+    "fuel": "Fuel",
+    "transport": "Transport",
+    "soiltesting": "Soil Testing",
+    "other": "Other"
   }
 }
