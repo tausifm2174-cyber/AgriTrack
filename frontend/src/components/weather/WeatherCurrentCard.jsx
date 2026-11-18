@@ -25,21 +25,32 @@ export default function WeatherCurrentCard({
 }) {
   const { t } = useTranslation();
   const {
-    temperature = 28,
+    temperature = null,
     unit = '°C',
-    condition = 'Partly Cloudy',
-    conditionCode = 'partly-cloudy',
-    feelsLike = 30,
-    humidity = 62,
-    windSpeed = '12 km/h',
-    windDirection = 'NW',
-    rainChance = '10%',
-    visibility = '9 km',
-    pressure = '1012 hPa',
-    dewPoint = '19°C',
-    uvIndex = '6 (Moderate)',
-    airQuality = 'Satisfactory',
-  } = weather;
+    condition = null,
+    conditionCode = null,
+    feelsLike = null,
+    humidity = null,
+    windSpeed = null,
+    windDirection = '',
+    rainChance = null,
+    visibility = null,
+    pressure = null,
+    dewPoint = null,
+    uvIndex = null,
+    airQuality = null,
+  } = weather || {};
+
+  const displayTemp = temperature != null ? temperature : '--';
+  const displayFeelsLike = feelsLike != null ? `${feelsLike}°C` : '--';
+  const displayDewPoint = dewPoint != null ? dewPoint : t('common.notAvailable', 'N/A');
+  const displayUvIndex = uvIndex != null ? uvIndex : t('common.notAvailable', 'N/A');
+  const displayVisibility = visibility != null ? visibility : t('common.notAvailable', 'N/A');
+  const displayRainChance = rainChance != null ? rainChance : t('common.notAvailable', 'N/A');
+  const displayPressure = pressure != null ? pressure : t('common.notAvailable', 'N/A');
+  const displayAirQuality = airQuality != null ? airQuality : t('common.notAvailable', 'N/A');
+  const displayWind = windSpeed ? `${windSpeed} ${windDirection || ''}`.trim() : t('common.notAvailable', 'N/A');
+  const displayHumidity = humidity != null ? `${humidity}%` : t('common.notAvailable', 'N/A');
 
   const renderWeatherIcon = (code) => {
     switch (code) {
@@ -76,7 +87,7 @@ export default function WeatherCurrentCard({
       <div className="agri-cur-weather-card__hero">
         <div className="agri-cur-weather-card__temp-group">
           <span className="agri-cur-weather-card__temp-num">
-            {temperature}
+            {displayTemp}
           </span>
           <span className="agri-cur-weather-card__temp-unit">{unit}</span>
         </div>
@@ -88,11 +99,19 @@ export default function WeatherCurrentCard({
 
       {/* Secondary Subtext */}
       <div className="agri-cur-weather-card__feels-row">
-        <span>{t('weather.feelsLike', 'Feels like')} <strong>{feelsLike}°C</strong></span>
-        <span className="agri-cur-weather-card__dot">•</span>
-        <span>{t('weather.dewPoint', 'Dew Point')}: {dewPoint}</span>
-        <span className="agri-cur-weather-card__dot">•</span>
-        <span>{t('weather.uvIndex', 'UV Index')}: {uvIndex}</span>
+        <span>{t('weather.feelsLike', 'Feels like')} <strong>{displayFeelsLike}</strong></span>
+        {dewPoint != null && (
+          <>
+            <span className="agri-cur-weather-card__dot">•</span>
+            <span>{t('weather.dewPoint', 'Dew Point')}: {displayDewPoint}</span>
+          </>
+        )}
+        {uvIndex != null && (
+          <>
+            <span className="agri-cur-weather-card__dot">•</span>
+            <span>{t('weather.uvIndex', 'UV Index')}: {displayUvIndex}</span>
+          </>
+        )}
       </div>
 
       {/* Metrics Grid */}
@@ -102,7 +121,7 @@ export default function WeatherCurrentCard({
             <Droplets size={14} className="text-info" aria-hidden="true" />
             {t('weather.humidity', 'Humidity')}
           </span>
-          <span className="agri-cur-weather-card__metric-val">{humidity}%</span>
+          <span className="agri-cur-weather-card__metric-val">{displayHumidity}</span>
         </div>
 
         <div className="agri-cur-weather-card__metric-item">
@@ -110,7 +129,7 @@ export default function WeatherCurrentCard({
             <Wind size={14} className="text-primary" aria-hidden="true" />
             {t('weather.wind', 'Wind')}
           </span>
-          <span className="agri-cur-weather-card__metric-val">{windSpeed} {windDirection}</span>
+          <span className="agri-cur-weather-card__metric-val">{displayWind}</span>
         </div>
 
         <div className="agri-cur-weather-card__metric-item">
@@ -118,7 +137,7 @@ export default function WeatherCurrentCard({
             <Umbrella size={14} className="text-warning" aria-hidden="true" />
             {t('weather.rainChance', 'Rain Probability')}
           </span>
-          <span className="agri-cur-weather-card__metric-val">{rainChance}</span>
+          <span className="agri-cur-weather-card__metric-val">{displayRainChance}</span>
         </div>
 
         <div className="agri-cur-weather-card__metric-item">
@@ -126,7 +145,7 @@ export default function WeatherCurrentCard({
             <Eye size={14} aria-hidden="true" />
             {t('weather.visibility', 'Visibility')}
           </span>
-          <span className="agri-cur-weather-card__metric-val">{visibility}</span>
+          <span className="agri-cur-weather-card__metric-val">{displayVisibility}</span>
         </div>
 
         <div className="agri-cur-weather-card__metric-item">
@@ -134,7 +153,7 @@ export default function WeatherCurrentCard({
             <Gauge size={14} aria-hidden="true" />
             {t('weather.pressure', 'Pressure')}
           </span>
-          <span className="agri-cur-weather-card__metric-val">{pressure}</span>
+          <span className="agri-cur-weather-card__metric-val">{displayPressure}</span>
         </div>
 
         <div className="agri-cur-weather-card__metric-item">
@@ -142,7 +161,7 @@ export default function WeatherCurrentCard({
             <ShieldCheck size={14} className="text-success" aria-hidden="true" />
             {t('weather.airQuality', 'Air Quality')}
           </span>
-          <span className="agri-cur-weather-card__metric-val">{airQuality}</span>
+          <span className="agri-cur-weather-card__metric-val">{displayAirQuality}</span>
         </div>
       </div>
     </article>

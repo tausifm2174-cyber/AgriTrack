@@ -47,7 +47,13 @@ export default function RecentActivities({ activities = [] }) {
       }
     >
       <div className="agri-recent-timeline">
-        {activities.map((item, idx) => (
+        {activities.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+            <Clock size={24} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} aria-hidden="true" />
+            <p>{t('dashboard.noActivities', 'No recent farm activity logs recorded.')}</p>
+          </div>
+        ) : (
+          activities.map((item, idx) => (
           <div key={item.id || idx} className="agri-timeline-node">
             <div
               className={`agri-timeline-bullet ${
@@ -68,7 +74,8 @@ export default function RecentActivities({ activities = [] }) {
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </Card>
   );

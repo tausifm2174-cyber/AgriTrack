@@ -21,13 +21,13 @@ export default function FarmWeatherSelector({
       <select
         id="weather-farm-select"
         className="agri-weather-farm-dropdown"
-        value={selectedFarmId}
+        value={String(selectedFarmId || '')}
         onChange={(e) => onSelectFarm(e.target.value)}
         aria-label={t('weather.selectHoldingAria', 'Select farm holding to view weather insights')}
       >
         {farms.map((farm) => (
           <option key={farm.id} value={farm.id}>
-            {farm.name} ({farm.district})
+            {farm.name || farm.farmName}{farm.location ? ` (${farm.location})` : ''}
           </option>
         ))}
       </select>

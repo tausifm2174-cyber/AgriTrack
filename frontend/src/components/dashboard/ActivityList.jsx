@@ -68,7 +68,13 @@ export default function ActivityList({ activities = [], irrigationAlerts = [] })
 
       {/* Activities List */}
       <div className="agri-activity-list">
-        {activities.map((act) => (
+        {activities.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+            <Calendar size={24} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} aria-hidden="true" />
+            <p>{t('dashboard.noActivities', 'No upcoming activities scheduled.')}</p>
+          </div>
+        ) : (
+          activities.map((act) => (
           <div key={act.id} className="agri-activity-item">
             <div
               className={`agri-activity-icon ${
@@ -111,7 +117,8 @@ export default function ActivityList({ activities = [], irrigationAlerts = [] })
               )}
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </Card>
   );

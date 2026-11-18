@@ -33,7 +33,13 @@ export default function CropSummary({ crops = [] }) {
       }
     >
       <div className="agri-crops-list">
-        {crops.map((crop) => (
+        {crops.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+            <Sprout size={24} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} aria-hidden="true" />
+            <p>{t('dashboard.noCrops', 'No active crop cycles currently recorded.')}</p>
+          </div>
+        ) : (
+          crops.map((crop) => (
           <div key={crop.id} className="agri-crop-card">
             <div className="agri-crop-card__top">
               <span className="agri-crop-card__name">
@@ -75,7 +81,8 @@ export default function CropSummary({ crops = [] }) {
               />
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </Card>
   );

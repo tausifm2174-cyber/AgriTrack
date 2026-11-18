@@ -689,3 +689,318 @@ export function adaptProfitLossSummary(summary) {
   };
 }
 
+/**
+ * Format relative or localized date/time timestamp without inventing missing facts.
+ * @param {string|Date} dateStr ISO date-time string
+ * @returns {string} Formatted localized string
+ */
+function formatPresentationTimestamp(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).format(d);
+  } catch {
+    return String(dateStr);
+  }
+}
+
+/**
+ * Format forecast date to Day & Month (e.g., '03 Oct').
+ * @param {string} dateStr ISO date string (YYYY-MM-DD)
+ * @returns {string} Formatted string
+ */
+function formatForecastDayMonth(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return new Intl.DateTimeFormat('en-IN', {
+      day: '2-digit',
+      month: 'short',
+    }).format(d);
+  } catch {
+    return String(dateStr);
+  }
+}
+
+/**
+ * Format date to short weekday label (e.g., 'Mon', 'Tue').
+ * @param {string} dateStr ISO date string
+ * @returns {string} Short weekday name
+ */
+function formatWeekday(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat('en-IN', { weekday: 'short' }).format(d);
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Maps advisory severity to UI StatusBadge variant.
+ * @param {string} severity Advisory severity level
+ * @returns {'danger'|'warning'|'info'|'success'} Badge variant
+ */
+function getAdvisorySeverityVariant(severity) {
+  if (!severity) return 'warning';
+  switch (String(severity).toUpperCase()) {
+    case 'ALERT':
+    case 'CRITICAL':
+    case 'DANGER':
+      return 'danger';
+    case 'WARNING':
+      return 'warning';
+    case 'SUCCESS':
+      return 'success';
+    case 'ADVISORY':
+    case 'INFO':
+    default:
+      return 'info';
+  }
+}
+
+/**
+ * Maps notification severity to UI StatusBadge variant.
+ * @param {string} severity Notification severity level
+ * @returns {'danger'|'warning'|'info'|'success'} Badge variant
+ */
+function getNotificationSeverityVariant(severity) {
+  if (!severity) return 'info';
+  switch (String(severity).toUpperCase()) {
+    case 'CRITICAL':
+    case 'DANGER':
+    case 'ALERT':
+      return 'danger';
+    case 'WARNING':
+      return 'warning';
+    case 'SUCCESS':
+      return 'success';
+    case 'INFO':
+    default:
+      return 'info';
+  }
+}
+
+/**
+ * Adapt a backend WeatherSnapshotResponse to UI model.
+ * Adheres strictly to non-fabrication rules: does not invent missing weather metrics.
+ * @param {Object} snapshot Backend WeatherSnapshotResponse
+ * @returns {Object|null} UI Weather Snapshot Model
+ */
+export function adaptWeatherSnapshot(snapshot) {
+  if (!snapshot) return null;
+
+  const temperature = snapshot.temperature != null ? Number(snapshot.temperature) : null;
+  const feelsLike = snapshot.feelsLike != null ? Number(snapshot.feelsLike) : null;
+  const humidity = snapshot.humidity != null ? Number(snapshot.humidity) : null;
+  const windSpeedKmh = snapshot.windSpeedKmh != null ? Number(snapshot.windSpeedKmh) : null;
+  const rainfallMm = snapshot.rainfallMm != null ? Number(snapshot.rainfallMm) : null;
+  const pressureHpa = snapshot.pressureHpa != null ? Number(snapshot.pressureHpa) : null;
+  const airQualityIndex = snapshot.airQualityIndex != null ? Number(snapshot.airQualityIndex) : null;
+  const uvIndex = snapshot.uvIndex != null ? Number(snapshot.uvIndex) : null;
+
+  return {
+    id: snapshot.id != null ? snapshot.id : null,
+    farmId: snapshot.farmId != null ? snapshot.farmId : null,
+    farmName: snapshot.farmName || '',
+    location: snapshot.location || '',
+    temperature,
+    unit: '°C',
+    feelsLike,
+    humidity,
+    windSpeedKmh,
+    windSpeed: windSpeedKmh != null ? `${windSpeedKmh} km/h` : null,
+    windDirection: snapshot.windDirection || null,
+    rainfallMm,
+    pressureHpa,
+    pressure: pressureHpa != null ? `${pressureHpa} hPa` : null,
+    conditionText: snapshot.conditionText || null,
+    condition: snapshot.conditionText || null,
+    conditionCode: snapshot.conditionCode ? snapshot.conditionCode.toLowerCase() : null,
+    uvIndex: uvIndex != null ? String(uvIndex) : null,
+    airQualityIndex,
+    airQuality: airQualityIndex != null ? `AQI ${airQualityIndex}` : null,
+    observedAt: snapshot.observedAt || null,
+    lastUpdated: snapshot.observedAt ? formatPresentationTimestamp(snapshot.observedAt) : null,
+    provider: snapshot.provider || null,
+    cached: Boolean(snapshot.cached),
+    // Unavailable fields preserved as null without fabrication
+    rainChance: null,
+    dewPoint: null,
+    visibility: null,
+  };
+}
+
+/**
+ * Adapt a single backend WeatherForecastResponse to UI model.
+ * @param {Object} item Backend WeatherForecastResponse
+ * @returns {Object|null} UI Forecast Item Model
+ */
+export function adaptWeatherForecastItem(item) {
+  if (!item) return null;
+
+  const minTemp = item.minTemp != null ? Number(item.minTemp) : null;
+  const maxTemp = item.maxTemp != null ? Number(item.maxTemp) : null;
+  const humidity = item.humidity != null ? Number(item.humidity) : null;
+  const rainChancePercent = item.rainChancePercent != null ? Number(item.rainChancePercent) : null;
+  const rainMm = item.rainMm != null ? Number(item.rainMm) : null;
+  const windSpeedKmh = item.windSpeedKmh != null ? Number(item.windSpeedKmh) : null;
+
+  return {
+    id: item.id != null ? item.id : null,
+    farmId: item.farmId != null ? item.farmId : null,
+    forecastDate: item.forecastDate || null,
+    fullDate: item.forecastDate || null,
+    dayLabel: item.dayLabel || null,
+    day: item.dayLabel || (item.forecastDate ? formatWeekday(item.forecastDate) : null),
+    date: item.forecastDate ? formatForecastDayMonth(item.forecastDate) : null,
+    minTemp,
+    maxTemp,
+    lowTemp: minTemp,
+    highTemp: maxTemp,
+    humidity,
+    rainChancePercent,
+    rainChance: rainChancePercent != null ? `${rainChancePercent}%` : null,
+    rainMm,
+    windSpeedKmh,
+    windSpeed: windSpeedKmh != null ? `${windSpeedKmh} km/h` : null,
+    conditionText: item.conditionText || null,
+    condition: item.conditionText || null,
+    conditionCode: item.conditionCode ? item.conditionCode.toLowerCase() : null,
+    fetchedAt: item.fetchedAt || null,
+  };
+}
+
+/**
+ * Adapt a backend list of WeatherForecastResponse items to UI model array.
+ * @param {Array|Object} forecastList List of WeatherForecastResponse or single item
+ * @returns {Array} List of UI Forecast Models
+ */
+export function adaptWeatherForecast(forecastList) {
+  if (!forecastList) return [];
+  const list = Array.isArray(forecastList) ? forecastList : [forecastList];
+  return list.map(adaptWeatherForecastItem).filter(Boolean);
+}
+
+/**
+ * Adapt a backend AdvisoryResponse to UI model.
+ * Preserves backend authority without modifying rule thresholds or meaning.
+ * @param {Object} advisory Backend AdvisoryResponse
+ * @returns {Object|null} UI Advisory Model
+ */
+export function adaptAdvisory(advisory) {
+  if (!advisory) return null;
+
+  return {
+    id: advisory.id != null ? advisory.id : null,
+    farmId: advisory.farmId != null ? advisory.farmId : null,
+    farmName: advisory.farmName || '',
+    fieldId: advisory.fieldId != null ? advisory.fieldId : null,
+    fieldName: advisory.fieldName || '',
+    field: advisory.fieldName || '',
+    cropCycleId: advisory.cropCycleId != null ? advisory.cropCycleId : null,
+    cropCycleName: advisory.cropCycleName || '',
+    cropName: advisory.cropCycleName || '',
+    ruleCode: advisory.ruleCode || '',
+    category: advisory.category || '',
+    advisoryType: advisory.advisoryType || '',
+    type: advisory.advisoryType ? advisory.advisoryType.toLowerCase() : 'general',
+    severity: advisory.severity || 'INFO',
+    severityVariant: getAdvisorySeverityVariant(advisory.severity),
+    badgeVariant: getAdvisorySeverityVariant(advisory.severity),
+    title: advisory.title || '',
+    message: advisory.message || '',
+    triggerCondition: advisory.triggerCondition || '',
+    recommendedAction: advisory.recommendedAction || '',
+    status: advisory.status || 'ACTIVE',
+    validUntil: advisory.validUntil || null,
+    dedupKey: advisory.dedupKey || null,
+    createdAt: advisory.createdAt || null,
+    updatedAt: advisory.updatedAt || null,
+    time: advisory.createdAt ? formatPresentationTimestamp(advisory.createdAt) : '',
+  };
+}
+
+/**
+ * Adapt a backend NotificationResponse to UI model.
+ * Preserves backend fields; does not expose or invent ownership data from userId.
+ * @param {Object} notification Backend NotificationResponse
+ * @returns {Object|null} UI Notification Model
+ */
+export function adaptNotification(notification) {
+  if (!notification) return null;
+
+  return {
+    id: notification.id != null ? notification.id : null,
+    type: notification.type || 'SYSTEM',
+    severity: notification.severity || 'INFO',
+    severityVariant: getNotificationSeverityVariant(notification.severity),
+    title: notification.title || '',
+    message: notification.message || '',
+    relatedRoute: notification.relatedRoute || '',
+    actionLabel: notification.actionLabel || '',
+    isRead: Boolean(notification.isRead),
+    readAt: notification.readAt || null,
+    createdAt: notification.createdAt || null,
+    updatedAt: notification.updatedAt || null,
+    farmId: notification.farmId != null ? notification.farmId : null,
+    farmName: notification.farmName || '',
+    fieldId: notification.fieldId != null ? notification.fieldId : null,
+    fieldName: notification.fieldName || '',
+    cropCycleId: notification.cropCycleId != null ? notification.cropCycleId : null,
+    cropCycleName: notification.cropCycleName || '',
+    cropId: notification.cropCycleId != null ? notification.cropCycleId : null,
+    cropName: notification.cropCycleName || '',
+    advisoryId: notification.advisoryId != null ? notification.advisoryId : null,
+    timestamp: notification.createdAt ? formatPresentationTimestamp(notification.createdAt) : '',
+    isoDate: notification.createdAt || '',
+  };
+}
+
+/**
+ * Adapt a backend NotificationSummaryResponse to UI summary presentation model.
+ * Maps total, unread, read, byType, bySeverity.
+ * @param {Object} summary Backend NotificationSummaryResponse
+ * @returns {Object} UI Notification Summary Model
+ */
+export function adaptNotificationSummary(summary) {
+  if (!summary) {
+    return {
+      total: 0,
+      unread: 0,
+      read: 0,
+      warnings: 0,
+      critical: 0,
+      info: 0,
+      success: 0,
+      byType: {},
+      bySeverity: {},
+    };
+  }
+
+  const bySeverity = summary.bySeverity || {};
+  const byType = summary.byType || {};
+
+  return {
+    total: summary.total != null ? Number(summary.total) : 0,
+    unread: summary.unread != null ? Number(summary.unread) : 0,
+    read: summary.read != null ? Number(summary.read) : 0,
+    warnings: bySeverity.WARNING != null ? Number(bySeverity.WARNING) : 0,
+    critical: bySeverity.CRITICAL != null ? Number(bySeverity.CRITICAL) : 0,
+    info: bySeverity.INFO != null ? Number(bySeverity.INFO) : 0,
+    success: bySeverity.SUCCESS != null ? Number(bySeverity.SUCCESS) : 0,
+    byType,
+    bySeverity,
+  };
+}
+

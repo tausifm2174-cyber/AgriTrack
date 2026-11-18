@@ -68,65 +68,71 @@ export default function WeatherTrendChart({ forecast = [] }) {
         </span>
       </div>
 
-      <div className="agri-weather-trend-card__chart-wrap">
-        <ResponsiveContainer width="100%" height={260}>
-          <AreaChart
-            data={chartData}
-            margin={{ top: 10, right: 15, left: -20, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorHigh" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorLow" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#0284c7" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#0284c7" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis
-              dataKey="day"
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: '#64748b', fontSize: 12 }}
-            />
-            <YAxis
-              domain={[10, 40]}
-              tickLine={false}
-              axisLine={false}
-              unit="°C"
-              tick={{ fill: '#64748b', fontSize: 12 }}
-            />
-            <Tooltip content={<WeatherChartTooltip />} />
-            <Legend
-              wrapperStyle={{ paddingTop: 10, fontSize: '0.8rem' }}
-              iconType="circle"
-              iconSize={8}
-            />
-            <Area
-              type="monotone"
-              name={t('weather.highTemp', 'High Temp')}
-              dataKey="High Temp"
-              stroke="#f59e0b"
-              strokeWidth={2.5}
-              fillOpacity={1}
-              fill="url(#colorHigh)"
-              dot={{ r: 4, fill: '#f59e0b' }}
-            />
-            <Area
-              type="monotone"
-              name={t('weather.lowTemp', 'Low Temp')}
-              dataKey="Low Temp"
-              stroke="#0284c7"
-              strokeWidth={2.5}
-              fillOpacity={1}
-              fill="url(#colorLow)"
-              dot={{ r: 4, fill: '#0284c7' }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      {chartData.length === 0 ? (
+        <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+          <p>{t('weather.noTrendData', 'No temperature trend data available.')}</p>
+        </div>
+      ) : (
+        <div className="agri-weather-trend-card__chart-wrap">
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 15, left: -20, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorHigh" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorLow" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0284c7" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#0284c7" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <XAxis
+                dataKey="day"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: '#64748b', fontSize: 12 }}
+              />
+              <YAxis
+                domain={['auto', 'auto']}
+                tickLine={false}
+                axisLine={false}
+                unit="°C"
+                tick={{ fill: '#64748b', fontSize: 12 }}
+              />
+              <Tooltip content={<WeatherChartTooltip />} />
+              <Legend
+                wrapperStyle={{ paddingTop: 10, fontSize: '0.8rem' }}
+                iconType="circle"
+                iconSize={8}
+              />
+              <Area
+                type="monotone"
+                name={t('weather.highTemp', 'High Temp')}
+                dataKey="High Temp"
+                stroke="#f59e0b"
+                strokeWidth={2.5}
+                fillOpacity={1}
+                fill="url(#colorHigh)"
+                dot={{ r: 4, fill: '#f59e0b' }}
+              />
+              <Area
+                type="monotone"
+                name={t('weather.lowTemp', 'Low Temp')}
+                dataKey="Low Temp"
+                stroke="#0284c7"
+                strokeWidth={2.5}
+                fillOpacity={1}
+                fill="url(#colorLow)"
+                dot={{ r: 4, fill: '#0284c7' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }

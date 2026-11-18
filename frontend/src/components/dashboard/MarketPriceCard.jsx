@@ -30,20 +30,26 @@ export default function MarketPriceCard({ marketPrices = [] }) {
           style={{ fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
         >
           <Store size={11} aria-hidden="true" />
-          <span>{t('marketPrices.demoNotice', 'Demo Market Data • Illustrative APMC Rates')}</span>
+          <span>{t('marketPrices.benchmarkNotice', 'APMC Mandi Rates • Official Benchmarks')}</span>
         </span>
       </div>
 
       <div className="agri-market-list">
-        {marketPrices.map((item) => (
+        {marketPrices.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+            <TrendingUp size={24} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} aria-hidden="true" />
+            <p>{t('marketPrices.noPrices', 'No APMC market rates currently available.')}</p>
+          </div>
+        ) : (
+          marketPrices.map((item) => (
           <div key={item.id} className="agri-market-item">
             <div className="agri-market-item__left">
               <div className="agri-market-item__badge">
-                {item.crop.slice(0, 1)}
+                {(item.crop || 'C').slice(0, 1)}
               </div>
               <div>
                 <h4 className="agri-market-item__crop-name">
-                  {translateCrop(item.crop, t)} ({translateVariety(item.variety, t)})
+                  {translateCrop(item.crop, t)} {item.variety ? `(${translateVariety(item.variety, t)})` : ''}
                 </h4>
                 <p className="agri-market-item__crop-sub">
                   {item.mandi} • {t('dashboard.range', 'Range')}: ₹{item.minRate} - ₹{item.maxRate}
@@ -59,7 +65,8 @@ export default function MarketPriceCard({ marketPrices = [] }) {
               </span>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </Card>
   );

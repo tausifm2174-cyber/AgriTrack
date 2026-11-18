@@ -22,7 +22,7 @@ export default function NotificationEmptyState({ isFiltered, onReset }) {
       <p className="agri-notif-empty__desc">
         {isFiltered
           ? t('notifications.adjustFilters', 'Try adjusting your search keywords, notification type, or severity filters.')
-          : t('notifications.noNotifications', 'There are no active notifications or farm alerts at this time. You can restore the demo dataset whenever needed.')}
+          : t('notifications.noNotifications', 'There are no active notifications or farm alerts at this time.')}
       </p>
       <Button
         variant="primary"
@@ -30,7 +30,7 @@ export default function NotificationEmptyState({ isFiltered, onReset }) {
         icon={<RotateCcw size={15} />}
         onClick={onReset}
       >
-        {isFiltered ? t('common.clearFilters', 'Clear active filters') : t('notifications.restoreDemo', 'Restore Demo Notifications')}
+        {isFiltered ? t('common.clearFilters', 'Clear active filters') : t('common.refresh', 'Refresh')}
       </Button>
     </div>
   );

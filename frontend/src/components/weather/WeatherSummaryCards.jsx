@@ -8,15 +8,21 @@ import { Thermometer, Droplets, Umbrella, Wind } from 'lucide-react';
 export default function WeatherSummaryCards({ weather = {} }) {
   const { t } = useTranslation();
   const {
-    temperature = 28,
+    temperature = null,
     unit = '°C',
-    feelsLike = 30,
-    humidity = 62,
-    rainChance = '10%',
-    rainfallMm = 0,
-    windSpeed = '12 km/h',
-    windDirection = 'NW',
-  } = weather;
+    feelsLike = null,
+    humidity = null,
+    rainChance = null,
+    rainfallMm = null,
+    windSpeed = null,
+    windDirection = '',
+  } = weather || {};
+
+  const displayTemp = temperature != null ? `${temperature}${unit}` : t('common.notAvailable', 'N/A');
+  const displayFeelsLike = feelsLike != null ? `${t('weather.feelsLike', 'Feels like')} ${feelsLike}°C` : '';
+  const displayHumidity = humidity != null ? `${humidity}%` : t('common.notAvailable', 'N/A');
+  const displayRainChance = rainChance != null ? rainChance : t('common.notAvailable', 'N/A');
+  const displayWindSpeed = windSpeed || t('common.notAvailable', 'N/A');
 
   return (
     <section className="agri-weather-summary-grid" aria-label={t('weather.summaryMetrics', 'Weather Summary Metrics')}>
@@ -27,8 +33,10 @@ export default function WeatherSummaryCards({ weather = {} }) {
         </div>
         <div className="agri-weather-summary-info">
           <span className="agri-weather-summary-label">{t('weather.meanTemp', 'Mean Temperature')}</span>
-          <span className="agri-weather-summary-value">{temperature}{unit}</span>
-          <span className="agri-weather-summary-sub">{t('weather.feelsLike', 'Feels like')} {feelsLike}°C</span>
+          <span className="agri-weather-summary-value">{displayTemp}</span>
+          {displayFeelsLike && (
+            <span className="agri-weather-summary-sub">{displayFeelsLike}</span>
+          )}
         </div>
       </div>
 
@@ -39,9 +47,11 @@ export default function WeatherSummaryCards({ weather = {} }) {
         </div>
         <div className="agri-weather-summary-info">
           <span className="agri-weather-summary-label">{t('weather.relativeHumidity', 'Relative Humidity')}</span>
-          <span className="agri-weather-summary-value">{humidity}%</span>
+          <span className="agri-weather-summary-value">{displayHumidity}</span>
           <span className="agri-weather-summary-sub">
-            {humidity > 80
+            {humidity == null
+              ? ''
+              : humidity > 80
               ? t('weather.highFungalAlert', 'High (Fungal alert)')
               : humidity < 40
               ? t('weather.dryAir', 'Dry air')
@@ -57,9 +67,9 @@ export default function WeatherSummaryCards({ weather = {} }) {
         </div>
         <div className="agri-weather-summary-info">
           <span className="agri-weather-summary-label">{t('weather.rainProbability', 'Rain Probability')}</span>
-          <span className="agri-weather-summary-value">{rainChance}</span>
+          <span className="agri-weather-summary-value">{displayRainChance}</span>
           <span className="agri-weather-summary-sub">
-            {rainfallMm > 0
+            {rainfallMm != null && Number(rainfallMm) > 0
               ? `${rainfallMm} ${t('units.mm', 'mm')} ${t('weather.recorded', 'recorded')}`
               : t('weather.noRainRecorded', 'No rain recorded today')}
           </span>
@@ -73,8 +83,10 @@ export default function WeatherSummaryCards({ weather = {} }) {
         </div>
         <div className="agri-weather-summary-info">
           <span className="agri-weather-summary-label">{t('weather.windVelocity', 'Wind Velocity')}</span>
-          <span className="agri-weather-summary-value">{windSpeed}</span>
-          <span className="agri-weather-summary-sub">{windDirection} • {t('weather.favorableSpray', 'Favorable for spray')}</span>
+          <span className="agri-weather-summary-value">{displayWindSpeed}</span>
+          <span className="agri-weather-summary-sub">
+            {windDirection ? `${windDirection} • ` : ''}{t('weather.favorableSpray', 'Favorable for spray')}
+          </span>
         </div>
       </div>
     </section>

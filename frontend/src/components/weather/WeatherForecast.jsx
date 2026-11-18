@@ -36,47 +36,53 @@ export default function WeatherForecast({ forecast = [] }) {
         </span>
       </div>
 
-      <div className="agri-weather-forecast-grid">
-        {forecast.map((item, index) => {
-          const displayDay = translateTime(item.day, t);
-          return (
-            <div
-              key={item.date || index}
-              className={`agri-forecast-item ${item.day === 'Today' ? 'agri-forecast-item--today' : ''}`}
-            >
-              <div className="agri-forecast-item__day-group">
-                <span className="agri-forecast-item__day">{displayDay}</span>
-                <span className="agri-forecast-item__date">{item.date}</span>
-              </div>
+      {forecast.length === 0 ? (
+        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+          <p>{t('weather.noForecast', 'Forecast data not available for this holding.')}</p>
+        </div>
+      ) : (
+        <div className="agri-weather-forecast-grid">
+          {forecast.map((item, index) => {
+            const displayDay = translateTime(item.day, t);
+            return (
+              <div
+                key={item.date || index}
+                className={`agri-forecast-item ${item.day === 'Today' ? 'agri-forecast-item--today' : ''}`}
+              >
+                <div className="agri-forecast-item__day-group">
+                  <span className="agri-forecast-item__day">{displayDay || item.day || '--'}</span>
+                  <span className="agri-forecast-item__date">{item.date || ''}</span>
+                </div>
 
-              <div className="agri-forecast-item__icon-box" title={translateWeatherCondition(item.conditionCode || item.condition, t)}>
-                {renderConditionIcon(item.conditionCode)}
-              </div>
+                <div className="agri-forecast-item__icon-box" title={translateWeatherCondition(item.conditionCode || item.condition || 'clear', t)}>
+                  {renderConditionIcon(item.conditionCode)}
+                </div>
 
-              <span className="agri-forecast-item__condition">
-                {translateWeatherCondition(item.conditionCode || item.condition, t)}
-              </span>
-
-              <div className="agri-forecast-item__temp-row">
-                <span className="agri-forecast-item__temp-high">{item.highTemp}°</span>
-                <span className="agri-forecast-item__temp-sep">/</span>
-                <span className="agri-forecast-item__temp-low">{item.lowTemp}°</span>
-              </div>
-
-              <div className="agri-forecast-item__meta-row">
-                <span className="agri-forecast-item__rain" title={t('weather.rainChance', 'Precipitation chance')}>
-                  <Umbrella size={12} aria-hidden="true" />
-                  <span>{item.rainChance}</span>
+                <span className="agri-forecast-item__condition">
+                  {translateWeatherCondition(item.conditionCode || item.condition || 'clear', t)}
                 </span>
-                <span className="agri-forecast-item__humid" title={t('weather.humidity', 'Relative humidity')}>
-                  <Droplets size={12} aria-hidden="true" />
-                  <span>{item.humidity}%</span>
-                </span>
+
+                <div className="agri-forecast-item__temp-row">
+                  <span className="agri-forecast-item__temp-high">{item.highTemp != null ? `${item.highTemp}°` : '--'}</span>
+                  <span className="agri-forecast-item__temp-sep">/</span>
+                  <span className="agri-forecast-item__temp-low">{item.lowTemp != null ? `${item.lowTemp}°` : '--'}</span>
+                </div>
+
+                <div className="agri-forecast-item__meta-row">
+                  <span className="agri-forecast-item__rain" title={t('weather.rainChance', 'Precipitation chance')}>
+                    <Umbrella size={12} aria-hidden="true" />
+                    <span>{item.rainChance != null ? item.rainChance : '--'}</span>
+                  </span>
+                  <span className="agri-forecast-item__humid" title={t('weather.humidity', 'Relative humidity')}>
+                    <Droplets size={12} aria-hidden="true" />
+                    <span>{item.humidity != null ? `${item.humidity}%` : '--'}</span>
+                  </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

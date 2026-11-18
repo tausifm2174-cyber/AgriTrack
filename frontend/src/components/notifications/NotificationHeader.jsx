@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CheckCheck, RotateCcw, Trash2, Info } from 'lucide-react';
+import { CheckCheck, RotateCcw, Trash2 } from 'lucide-react';
 import PageHeader from '../common/PageHeader';
 import Button from '../common/Button';
 
@@ -39,17 +39,15 @@ export default function NotificationHeader({
               {t('notifications.markAllRead', 'Mark all read')}
             </Button>
 
-            {totalCount < 15 && (
-              <Button
-                variant="outline"
-                size="sm"
-                icon={<RotateCcw size={15} />}
-                onClick={onReset}
-                title={t('notifications.restoreDefault', 'Restore default demo notification dataset')}
-              >
-                {t('common.reset', 'Reset Demo')}
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<RotateCcw size={15} />}
+              onClick={onReset}
+              title={t('common.refresh', 'Refresh notifications')}
+            >
+              {t('common.refresh', 'Refresh')}
+            </Button>
 
             {totalCount > 0 && (
               <Button
@@ -66,14 +64,6 @@ export default function NotificationHeader({
           </div>
         }
       />
-
-      <div className="agri-demo-banner" role="status" style={{ marginTop: '0.75rem' }}>
-        <Info size={16} className="agri-demo-banner__icon" aria-hidden="true" />
-        <span className="agri-demo-banner__text">
-          <strong>{t('notifications.demoModeTitle', 'Demo Mode')}</strong> — {t('notifications.demoModeDesc', 'Data shown in this application is sample data for demonstration purposes. Alerts are simulated across Green Valley Farm, Sunrise Holding, and Riverbank Farm.')}
-        </span>
-        <span className="agri-demo-banner__badge">{t('notifications.frontendDemo', 'Frontend Demo')}</span>
-      </div>
     </div>
   );
 }

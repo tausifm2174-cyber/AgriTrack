@@ -36,54 +36,61 @@ export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Fa
         </span>
       </div>
 
-      <div className="agri-weather-alerts-list">
-        {alerts.map((alert) => (
-          <article
-            key={alert.id}
-            className={`agri-weather-alert-item agri-weather-alert-item--${alert.severityVariant || 'warning'}`}
-          >
-            <div className="agri-weather-alert-item__icon-col">
-              {getAlertIcon(alert.type)}
-            </div>
-
-            <div className="agri-weather-alert-item__main">
-              <div className="agri-weather-alert-item__top">
-                <h3 className="agri-weather-alert-item__title">{alert.title}</h3>
-                <div className="agri-weather-alert-item__badge-wrap">
-                  <StatusBadge variant={alert.severityVariant || 'warning'}>
-                    {alert.severity}
-                  </StatusBadge>
-                  {alert.time && (
-                    <span className="agri-weather-alert-item__time">{alert.time}</span>
-                  )}
-                </div>
+      {alerts.length === 0 ? (
+        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+          <CheckCircle size={28} style={{ margin: '0 auto 0.5rem', color: 'var(--success-text)', display: 'block' }} aria-hidden="true" />
+          <p>{t('weather.noAlerts', 'No active weather advisories or alerts for this holding.')}</p>
+        </div>
+      ) : (
+        <div className="agri-weather-alerts-list">
+          {alerts.map((alert) => (
+            <article
+              key={alert.id}
+              className={`agri-weather-alert-item agri-weather-alert-item--${alert.severityVariant || 'warning'}`}
+            >
+              <div className="agri-weather-alert-item__icon-col">
+                {getAlertIcon(alert.type)}
               </div>
 
-              <p className="agri-weather-alert-item__condition">
-                <strong>{t('weather.trigger', 'Trigger')}:</strong> {alert.condition || alert.triggerCondition}
-              </p>
-
-              <div className="agri-weather-alert-item__recommendation">
-                <span className="agri-weather-alert-item__recom-label">{t('weather.recommendedAction', 'Recommended Action')}:</span>
-                <span className="agri-weather-alert-item__recom-text">
-                  {alert.recommendation || alert.recommendedAction}
-                </span>
-              </div>
-
-              {alert.affectedFields && alert.affectedFields.length > 0 && (
-                <div className="agri-weather-alert-item__fields">
-                  <span className="text-muted">{t('weather.targetParcels', 'Target Parcels')}: </span>
-                  {alert.affectedFields.map((f, i) => (
-                    <span key={i} className="agri-weather-alert-item__field-pill">
-                      {f}
-                    </span>
-                  ))}
+              <div className="agri-weather-alert-item__main">
+                <div className="agri-weather-alert-item__top">
+                  <h3 className="agri-weather-alert-item__title">{alert.title}</h3>
+                  <div className="agri-weather-alert-item__badge-wrap">
+                    <StatusBadge variant={alert.severityVariant || 'warning'}>
+                      {alert.severity}
+                    </StatusBadge>
+                    {alert.time && (
+                      <span className="agri-weather-alert-item__time">{alert.time}</span>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
+
+                <p className="agri-weather-alert-item__condition">
+                  <strong>{t('weather.trigger', 'Trigger')}:</strong> {alert.condition || alert.triggerCondition}
+                </p>
+
+                <div className="agri-weather-alert-item__recommendation">
+                  <span className="agri-weather-alert-item__recom-label">{t('weather.recommendedAction', 'Recommended Action')}:</span>
+                  <span className="agri-weather-alert-item__recom-text">
+                    {alert.recommendation || alert.recommendedAction}
+                  </span>
+                </div>
+
+                {alert.affectedFields && alert.affectedFields.length > 0 && (
+                  <div className="agri-weather-alert-item__fields">
+                    <span className="text-muted">{t('weather.targetParcels', 'Target Parcels')}: </span>
+                    {alert.affectedFields.map((f, i) => (
+                      <span key={i} className="agri-weather-alert-item__field-pill">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

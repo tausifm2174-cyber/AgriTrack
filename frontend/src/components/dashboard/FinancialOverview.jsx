@@ -48,14 +48,14 @@ function FinancialTooltip({ active, payload, label }) {
 export default function FinancialOverview({ financialSummary, monthlyFinancials = [] }) {
   const { t, i18n } = useTranslation();
   const {
-    expenses = 32000,
-    revenue = 50000,
-    netProfit = 18000,
-    netMargin = 36.0,
-    costPerQuintal = 1280,
-    harvestYieldKg = 2500,
-    averageMandiRatePerKg = 20,
-    period = 'Current Season (Rabi)',
+    expenses = 0,
+    revenue = 0,
+    netProfit = 0,
+    netMargin = 0,
+    costPerQuintal = null,
+    harvestYieldKg = null,
+    averageMandiRatePerKg = null,
+    period = 'Current Season',
   } = financialSummary || {};
 
   const localizedFinancials = (monthlyFinancials || []).map((m) => {
@@ -174,20 +174,32 @@ export default function FinancialOverview({ financialSummary, monthlyFinancials 
         </ResponsiveContainer>
       </div>
 
-      {/* PPT Financial Reference Metrics Strip */}
-      <div className="agri-finance-metrics-strip">
-        <span>
-          {t('profitLoss.costPerQuintal', 'Cost per Quintal')}: <strong>{formatCurrency(costPerQuintal)}/{t('units.q', 'q')}</strong>
-        </span>
-        <span>•</span>
-        <span>
-          {t('harvests.harvestQuantity', 'Harvest Yield')}: <strong>{harvestYieldKg.toLocaleString('en-IN')} {t('units.kg', 'kg')}</strong>
-        </span>
-        <span>•</span>
-        <span>
-          {t('marketPrices.modalPrice', 'Average Mandi Rate')}: <strong>₹{averageMandiRatePerKg}/{t('units.kg', 'kg')}</strong>
-        </span>
-      </div>
+      {/* Reference Metrics Strip */}
+      {(costPerQuintal != null || harvestYieldKg != null || averageMandiRatePerKg != null) && (
+        <div className="agri-finance-metrics-strip">
+          {costPerQuintal != null && (
+            <span>
+              {t('profitLoss.costPerQuintal', 'Cost per Quintal')}: <strong>{formatCurrency(costPerQuintal)}/{t('units.q', 'q')}</strong>
+            </span>
+          )}
+          {harvestYieldKg != null && (
+            <>
+              {costPerQuintal != null && <span>•</span>}
+              <span>
+                {t('harvests.harvestQuantity', 'Harvest Yield')}: <strong>{harvestYieldKg.toLocaleString('en-IN')} {t('units.kg', 'kg')}</strong>
+              </span>
+            </>
+          )}
+          {averageMandiRatePerKg != null && (
+            <>
+              {(costPerQuintal != null || harvestYieldKg != null) && <span>•</span>}
+              <span>
+                {t('marketPrices.modalPrice', 'Average Mandi Rate')}: <strong>₹{averageMandiRatePerKg}/{t('units.kg', 'kg')}</strong>
+              </span>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

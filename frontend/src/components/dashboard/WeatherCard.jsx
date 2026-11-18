@@ -5,22 +5,22 @@ import { translateWeatherCondition } from '../../utils/displayLabels';
 
 /**
  * WeatherCard Component
- * Prominent weather overview card for AgriTrack dashboard.
+ * Weather overview card for AgriTrack dashboard with null-safety and live feed support.
  * @param {Object} props
  * @param {Object} props.weather
  */
 export default function WeatherCard({ weather }) {
   const { t } = useTranslation();
-  const {
-    temperature = 28,
-    unit = '°C',
-    condition = 'Partly Cloudy',
-    location = 'Farm Area',
-    subtext = "Today's weather",
-    humidity = 62,
-    windSpeed = '12 km/h',
-    rainChance = '10%',
-  } = weather || {};
+  const hasWeather = weather && weather.temperature != null;
+
+  const temperature = hasWeather ? Math.round(weather.temperature) : '--';
+  const unit = weather?.unit || '°C';
+  const condition = weather?.condition || (hasWeather ? 'Clear' : 'No Weather Data');
+  const location = weather?.location || 'Farm Area';
+  const subtext = weather?.subtext || (hasWeather ? "Today's weather" : 'Sync weather in Weather & Insights');
+  const humidity = weather?.humidity != null ? `${weather.humidity}%` : '--';
+  const windSpeed = weather?.windSpeed != null ? (typeof weather.windSpeed === 'number' ? `${weather.windSpeed} km/h` : weather.windSpeed) : '--';
+  const precipitation = weather?.precipitation != null ? `${weather.precipitation} mm` : '--';
 
   return (
     <div className="agri-weather-card">
@@ -40,7 +40,7 @@ export default function WeatherCard({ weather }) {
 
         <div className="agri-weather-card__main">
           <span className="agri-weather-card__temp">
-            {temperature}{unit}
+            {hasWeather ? `${temperature}${unit}` : '--'}
           </span>
           <div className="agri-weather-card__condition-wrap">
             <span className="agri-weather-card__condition">{translateWeatherCondition(condition, t)}</span>
@@ -54,7 +54,7 @@ export default function WeatherCard({ weather }) {
               <Droplets size={11} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
               {t('dashboard.humidity', 'Humidity')}
             </span>
-            <span className="agri-weather-card__detail-val">{humidity}%</span>
+            <span className="agri-weather-card__detail-val">{humidity}</span>
           </div>
           <div className="agri-weather-card__detail-item">
             <span className="agri-weather-card__detail-label">
@@ -68,7 +68,7 @@ export default function WeatherCard({ weather }) {
               <Umbrella size={11} style={{ display: 'inline', marginRight: '2px' }} aria-hidden="true" />
               {t('dashboard.rainfall', 'Rainfall')}
             </span>
-            <span className="agri-weather-card__detail-val">{rainChance}</span>
+            <span className="agri-weather-card__detail-val">{precipitation}</span>
           </div>
         </div>
       </div>

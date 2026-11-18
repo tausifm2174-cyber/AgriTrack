@@ -1,12 +1,16 @@
 import { useTranslation } from 'react-i18next';
-import { CloudRain, AlertTriangle, CheckCircle, Droplets, Info } from 'lucide-react';
-import { StatusBadge } from '../common';
+import { CloudRain, AlertTriangle, CheckCircle, Droplets, Info, Check, EyeOff } from 'lucide-react';
+import { StatusBadge, Button } from '../common';
 
 /**
  * AdvisoryCard component
- * Displays "Current Farm Advisories" section evaluated against local weather demo rules.
+ * Displays "Current Farm Advisories" section evaluated against live backend advisory rules.
  */
-export default function AdvisoryCard({ advisories = [], farmName = 'Green Valley Farm' }) {
+export default function AdvisoryCard({
+  advisories = [],
+  farmName = 'Green Valley Farm',
+  onUpdateStatus,
+}) {
   const { t } = useTranslation();
 
   const getIcon = (type) => {
@@ -35,46 +39,83 @@ export default function AdvisoryCard({ advisories = [], farmName = 'Green Valley
         </div>
       </div>
 
-      <div className="agri-advisory-grid">
-        {advisories.map((adv) => (
-          <article
-            key={adv.id}
-            className={`agri-advisory-card agri-advisory-card--${adv.severityVariant || 'warning'}`}
-          >
-            <div className="agri-advisory-card__header">
-              <div className="agri-advisory-card__icon-box">
-                {getIcon(adv.type)}
+      {advisories.length === 0 ? (
+        <div style={{ padding: '2rem 1rem', textAlign: 'center', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid var(--slate-200)', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+          <CheckCircle size={28} style={{ margin: '0 auto 0.5rem', color: 'var(--success-text)', display: 'block' }} aria-hidden="true" />
+          <p>{t('advisories.noAdvisories', 'No active agronomic advisories for this holding.')}</p>
+        </div>
+      ) : (
+        <div className="agri-advisory-grid">
+          {advisories.map((adv) => (
+            <article
+              key={adv.id}
+              className={`agri-advisory-card agri-advisory-card--${adv.severityVariant || 'warning'}`}
+            >
+              <div className="agri-advisory-card__header">
+                <div className="agri-advisory-card__icon-box">
+                  {getIcon(adv.type)}
+                </div>
+                <div className="agri-advisory-card__title-box">
+                  <span className="agri-advisory-card__category">{adv.category}</span>
+                  <h3 className="agri-advisory-card__title">{adv.title}</h3>
+                </div>
+                <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                  <StatusBadge variant={adv.severityVariant || 'warning'}>
+                    {adv.severity}
+                  </StatusBadge>
+                  {adv.status && adv.status !== 'ACTIVE' && (
+                    <StatusBadge variant="neutral">
+                      {adv.status === 'ACKNOWLEDGED' ? t('advisories.acknowledged', 'Acknowledged') : t('advisories.dismissed', 'Dismissed')}
+                    </StatusBadge>
+                  )}
+                </div>
               </div>
-              <div className="agri-advisory-card__title-box">
-                <span className="agri-advisory-card__category">{adv.category}</span>
-                <h3 className="agri-advisory-card__title">{adv.title}</h3>
-              </div>
-              <StatusBadge variant={adv.severityVariant || 'warning'}>
-                {adv.severity}
-              </StatusBadge>
-            </div>
 
-            <div className="agri-advisory-card__body">
-              <div className="agri-advisory-card__row">
-                <span className="agri-advisory-card__label">{t('recommendations.triggerCondition', 'Trigger Condition')}:</span>
-                <span className="agri-advisory-card__val">{adv.triggerCondition}</span>
+              <div className="agri-advisory-card__body">
+                <div className="agri-advisory-card__row">
+                  <span className="agri-advisory-card__label">{t('recommendations.triggerCondition', 'Trigger Condition')}:</span>
+                  <span className="agri-advisory-card__val">{adv.triggerCondition}</span>
+                </div>
+
+                <div className="agri-advisory-card__action-box">
+                  <span className="agri-advisory-card__action-label">{t('weather.recommendedAction', 'Recommended Action')}:</span>
+                  <span className="agri-advisory-card__action-val">{adv.recommendedAction}</span>
+                </div>
               </div>
 
-              <div className="agri-advisory-card__action-box">
-                <span className="agri-advisory-card__action-label">{t('weather.recommendedAction', 'Recommended Action')}:</span>
-                <span className="agri-advisory-card__action-val">{adv.recommendedAction}</span>
-              </div>
-            </div>
+              <div className="agri-advisory-card__footer">
+                <div>
+                  <span className="agri-advisory-card__farm">{adv.farmName || farmName}</span>
+                  {adv.time && (
+                    <span className="agri-advisory-card__time" style={{ marginLeft: '0.5rem' }}>{adv.time}</span>
+                  )}
+                </div>
 
-            <div className="agri-advisory-card__footer">
-              <span className="agri-advisory-card__farm">{adv.farmName || farmName}</span>
-              {adv.time && (
-                <span className="agri-advisory-card__time">{adv.time}</span>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
+                {onUpdateStatus && adv.status === 'ACTIVE' && (
+                  <div style={{ display: 'flex', gap: '0.375rem', marginTop: '0.5rem' }}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={<Check size={13} aria-hidden="true" />}
+                      onClick={() => onUpdateStatus(adv.id, 'ACKNOWLEDGED')}
+                    >
+                      {t('advisories.acknowledge', 'Acknowledge')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      icon={<EyeOff size={13} aria-hidden="true" />}
+                      onClick={() => onUpdateStatus(adv.id, 'DISMISSED')}
+                    >
+                      {t('advisories.dismiss', 'Dismiss')}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

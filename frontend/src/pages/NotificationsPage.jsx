@@ -186,7 +186,7 @@ export default function NotificationsPage() {
             </div>
             <div className="agri-modal-body">
               <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: '1.5' }}>
-                {t('notifications.clearAllConfirmDesc', 'Are you sure you want to clear all {{count}} notifications from this session? You can restore the demo notification dataset at any time using the "Reset Demo" button.', { count: notifications.length })}
+                {t('notifications.clearAllConfirmDesc', 'Are you sure you want to clear all {{count}} notifications? This action cannot be undone.', { count: notifications.length })}
               </p>
             </div>
             <div className="agri-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>

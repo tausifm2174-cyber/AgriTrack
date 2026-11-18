@@ -49,7 +49,13 @@ export default function FarmAlerts({ alerts = [] }) {
       }
     >
       <div className="agri-alerts-list">
-        {alerts.map((alert) => (
+        {alerts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--slate-500)', fontSize: '0.875rem' }}>
+            <Bell size={24} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} aria-hidden="true" />
+            <p>{t('dashboard.noAlerts', 'No active alerts or advisories.')}</p>
+          </div>
+        ) : (
+          alerts.map((alert) => (
           <div key={alert.id} className="agri-alert-item">
             <div className="agri-alert-item__icon">
               {getAlertIcon(alert.type)}
@@ -70,7 +76,7 @@ export default function FarmAlerts({ alerts = [] }) {
               <p className="agri-alert-item__meta">
                 {alert.type === 'irrigation' ? (
                   <Link
-                    to="/irrigation?fieldId=field-2b"
+                    to="/irrigation"
                     style={{ color: 'var(--primary-700)', textDecoration: 'none', fontWeight: 600 }}
                   >
                     {formatFieldName(alert.field, t)} • {t('dashboard.openSchedule', 'Open Schedule')} →
@@ -81,7 +87,8 @@ export default function FarmAlerts({ alerts = [] }) {
               </p>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </Card>
   );

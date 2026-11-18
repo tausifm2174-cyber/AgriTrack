@@ -291,7 +291,7 @@
     "recordIrrigation": "Log Irrigation",
     "addExpense": "Log Expense",
     "recordHarvest": "Record Harvest",
-    "noAlerts": "All systems normal. No critical alerts.",
+    "noAlerts": "No active alerts or advisories.",
     "noUpcoming": "No upcoming activities scheduled for this week.",
     "currentSeasonRabi": "Current Season (Rabi 2025-26)",
     "currentSeason": "Current Season",
@@ -337,7 +337,12 @@
         "name": "Organic Fertilizer Application",
         "notes": "NPK organic top-dressing and bio-stimulant foliar spray"
       }
-    }
+    },
+    "noFarms": "No farm holdings registered",
+    "noCrops": "No active crop cycles currently recorded.",
+    "noActivities": "No upcoming activities scheduled.",
+    "noCropsStanding": "No standing crops",
+    "greetingSubtitleNoFarms": "Welcome to AgriTrack. Register your first farm holding to get started."
   },
   "farms": {
     "title": "Farm Management",
@@ -627,7 +632,18 @@
     "updated": "Updated",
     "visibility": "Visibility",
     "wind": "Wind",
-    "windVelocity": "Wind Velocity"
+    "windVelocity": "Wind Velocity",
+    "syncWeather": "Sync Weather",
+    "syncing": "Syncing...",
+    "cachedFeed": "Cached",
+    "liveFeed": "Live",
+    "cachedNotice": "Snapshot cached from Open-Meteo",
+    "noFarmsTitle": "No Farm Holdings Registered",
+    "noFarmsDesc": "To monitor live weather conditions, please add your farm holding first.",
+    "missingLocationTitle": "Farm Location Required",
+    "noAlerts": "No active weather alerts or operational advisories for this holding.",
+    "noForecast": "7-day forecast data is currently unavailable for this farm location.",
+    "noTrendData": "No temperature trend data available"
   },
   "recommendations": {
     "title": "Agronomy Recommendations",
@@ -1335,5 +1351,12 @@
     "transport": "Transport",
     "soiltesting": "Soil Testing",
     "other": "Other"
+  },
+  "advisories": {
+    "acknowledge": "Acknowledge",
+    "dismiss": "Dismiss",
+    "acknowledged": "Acknowledged",
+    "dismissed": "Dismissed",
+    "noAdvisories": "No active agronomic advisories for this holding."
   }
 }
