@@ -1,11 +1,15 @@
 package com.agritrack;
 
+import com.agritrack.dto.MarketPriceHistoryResponse;
 import com.agritrack.dto.MarketPriceRequest;
 import com.agritrack.dto.MarketPriceResponse;
 import com.agritrack.entity.MarketPrice;
 import com.agritrack.exception.ResourceNotFoundException;
 import com.agritrack.repository.MarketPriceRepository;
 import com.agritrack.service.MarketPriceService;
+import com.agritrack.service.mandi.MandiApiClient;
+import com.agritrack.service.mandi.MandiMarketDto;
+import com.agritrack.service.mandi.MandiPriceDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +36,9 @@ class MarketPriceServiceTest {
 
     @Mock
     private MarketPriceRepository marketPriceRepository;
+
+    @Mock
+    private MandiApiClient mandiApiClient;
 
     @InjectMocks
     private MarketPriceService marketPriceService;
@@ -69,6 +78,199 @@ class MarketPriceServiceTest {
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).getCropName()).isEqualTo("Wheat");
         assertThat(responses.get(0).getPricePerQuintal()).isEqualByComparingTo(new BigDecimal("2450.00"));
+    }
+
+    @Test
+    @DisplayName("getMarkets passes state to provider, maps response, preserves district exactly, and invents no city")
+    void shouldGetMarketsSuccessfully() {
+        MandiMarketDto m1 = new MandiMarketDto("Ramanagara APMC", "Bengaluru South");
+        MandiMarketDto m2 = new MandiMarketDto("APMC Hubballi", "Dharwad");
+        when(mandiApiClient.getMarkets("Karnataka")).thenReturn(List.of(m1, m2));
+
+        List<MandiMarketDto> result = marketPriceService.getMarkets("Karnataka");
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getMarket()).isEqualTo("Ramanagara APMC");
+        assertThat(result.get(0).getDistrict()).isEqualTo("Bengaluru South");
+        assertThat(result.get(1).getMarket()).isEqualTo("APMC Hubballi");
+        assertThat(result.get(1).getDistrict()).isEqualTo("Dharwad");
+        verify(mandiApiClient, times(1)).getMarkets("Karnataka");
+    }
+
+    @Test
+    @DisplayName("getMarkets rejects null or blank state")
+    void shouldRejectInvalidStateInGetMarkets() {
+        assertThatThrownBy(() -> marketPriceService.getMarkets(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("State is required");
+
+        assertThatThrownBy(() -> marketPriceService.getMarkets("   "))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("State is required");
+    }
+
+    @Test
+    @DisplayName("getMarketPrices maps live provider DTOs, performs exact APMC isolation, and calculates pricePerKg")
+    void shouldGetLiveMarketPricesWithExactApmcIsolation() {
+        LocalDate arrivalDate = LocalDate.of(2026, 10, 16);
+        MandiPriceDto matching = new MandiPriceDto(
+                272197L, "Karnataka", "Bengaluru South", "Ramanagara APMC",
+                "Tomato", "Hybrid", "A", arrivalDate,
+                new BigDecimal("1200.00"), new BigDecimal("2000.00"), new BigDecimal("1600.00"),
+                OffsetDateTime.parse("2026-10-16T18:44:38.811Z")
+        );
+        // Rogue APMC record from external provider that must be filtered out by defensive isolation
+        MandiPriceDto rogue = new MandiPriceDto(
+                999999L, "Karnataka", "Bengaluru", "Bengaluru APMC",
+                "Tomato", "Local", "B", arrivalDate,
+                new BigDecimal("1000.00"), new BigDecimal("1500.00"), new BigDecimal("1300.00"),
+                OffsetDateTime.parse("2026-10-16T18:44:38.811Z")
+        );
+
+        when(mandiApiClient.getPrices("Karnataka", "Tomato", "Ramanagara APMC", arrivalDate))
+                .thenReturn(List.of(matching, rogue));
+
+        // Mock history for previous price lookup: previous trading day was 2026-10-15 with price 1500.00
+        MandiPriceDto prevDay = new MandiPriceDto(
+                272000L, "Karnataka", "Bengaluru South", "Ramanagara APMC",
+                "Tomato", "Hybrid", "A", LocalDate.of(2026, 10, 15),
+                new BigDecimal("1100.00"), new BigDecimal("1900.00"), new BigDecimal("1500.00"),
+                OffsetDateTime.parse("2026-10-15T18:00:00Z")
+        );
+        when(mandiApiClient.getPriceHistory(eq("Karnataka"), eq("Tomato"), eq("Ramanagara APMC"), any(), any()))
+                .thenReturn(List.of(prevDay));
+
+        List<MarketPriceResponse> responses = marketPriceService.getMarketPrices(
+                "Karnataka", "Bengaluru South", "Tomato", "Ramanagara APMC", null, arrivalDate, null, null);
+
+        // Verify exact APMC isolation: only Ramanagara APMC survives; rogue Bengaluru APMC is filtered out
+        assertThat(responses).hasSize(1);
+        MarketPriceResponse r = responses.get(0);
+        assertThat(r.getId()).isEqualTo(272197L);
+        assertThat(r.getCropName()).isEqualTo("Tomato");
+        assertThat(r.getVariety()).isEqualTo("Hybrid");
+        assertThat(r.getMarketName()).isEqualTo("Ramanagara APMC");
+        assertThat(r.getLocation()).isEqualTo("Bengaluru South, Karnataka");
+        assertThat(r.getPricePerQuintal()).isEqualByComparingTo(new BigDecimal("1600.00"));
+        assertThat(r.getPricePerKg()).isEqualByComparingTo(new BigDecimal("16.00")); // modal_price / 100
+        assertThat(r.getMinPrice()).isEqualByComparingTo(new BigDecimal("1200.00"));
+        assertThat(r.getMaxPrice()).isEqualByComparingTo(new BigDecimal("2000.00"));
+        assertThat(r.getQualityGrade()).isEqualTo("A");
+        assertThat(r.getPriceDate()).isEqualTo(arrivalDate);
+        assertThat(r.getSource()).isEqualTo("Ministry of Agriculture (data.gov.in / Agmarknet)");
+        assertThat(r.getArrivalVolumeQuintals()).isNull(); // not fabricated
+
+        // Verify previous price and trend calculation from real history
+        assertThat(r.getPreviousPrice()).isEqualByComparingTo(new BigDecimal("1500.00"));
+        assertThat(r.getPriceChange()).isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(r.getChangePercent()).isEqualByComparingTo(new BigDecimal("6.67"));
+        assertThat(r.getTrend()).isEqualTo("RISING");
+    }
+
+    @Test
+    @DisplayName("getMarketPrices leaves previous price null and trend STABLE when no historical trading day exists")
+    void shouldKeepPreviousPriceNullWhenNoHistoryAvailable() {
+        LocalDate arrivalDate = LocalDate.of(2026, 10, 16);
+        MandiPriceDto matching = new MandiPriceDto(
+                272197L, "Karnataka", "Bengaluru South", "Ramanagara APMC",
+                "Tomato", "Hybrid", "A", arrivalDate,
+                new BigDecimal("1200.00"), new BigDecimal("2000.00"), new BigDecimal("1600.00"),
+                OffsetDateTime.parse("2026-10-16T18:44:38.811Z")
+        );
+
+        when(mandiApiClient.getPrices("Karnataka", "Tomato", "Ramanagara APMC", arrivalDate))
+                .thenReturn(List.of(matching));
+        when(mandiApiClient.getPriceHistory(eq("Karnataka"), eq("Tomato"), eq("Ramanagara APMC"), any(), any()))
+                .thenReturn(Collections.emptyList());
+
+        List<MarketPriceResponse> responses = marketPriceService.getMarketPrices(
+                "Karnataka", "Bengaluru South", "Tomato", "Ramanagara APMC", null, arrivalDate, null, null);
+
+        assertThat(responses).hasSize(1);
+        MarketPriceResponse r = responses.get(0);
+        assertThat(r.getPreviousPrice()).isNull();
+        assertThat(r.getPriceChange()).isNull();
+        assertThat(r.getChangePercent()).isNull();
+        assertThat(r.getTrend()).isEqualTo("STABLE");
+    }
+
+    @Test
+    @DisplayName("getMarketPrices returns empty list when provider returns no data or no matching APMC")
+    void shouldReturnEmptyListWhenNoDataForApmc() {
+        LocalDate arrivalDate = LocalDate.of(2026, 10, 16);
+        when(mandiApiClient.getPrices("Karnataka", "Tomato", "Ramanagara APMC", arrivalDate))
+                .thenReturn(Collections.emptyList());
+
+        List<MarketPriceResponse> responses = marketPriceService.getMarketPrices(
+                "Karnataka", "Bengaluru South", "Tomato", "Ramanagara APMC", null, arrivalDate, null, null);
+
+        assertThat(responses).isEmpty();
+        verifyNoInteractions(marketPriceRepository);
+    }
+
+    @Test
+    @DisplayName("getMarketPrices returns empty list when district is passed without market")
+    void shouldReturnEmptyListWhenDistrictProvidedWithoutMarket() {
+        List<MarketPriceResponse> responses = marketPriceService.getMarketPrices(
+                "Karnataka", "Bengaluru South", "Tomato", null, null, null, null, null);
+
+        assertThat(responses).isEmpty();
+        verifyNoInteractions(mandiApiClient);
+        verifyNoInteractions(marketPriceRepository);
+    }
+
+    @Test
+    @DisplayName("getPriceHistory forwards parameters, isolates APMC, maps modal price, and chronologically sorts")
+    void shouldGetPriceHistoryWithApmcIsolationAndSorting() {
+        LocalDate d1 = LocalDate.of(2026, 9, 2);
+        LocalDate d2 = LocalDate.of(2026, 9, 1);
+        MandiPriceDto p1 = new MandiPriceDto(1L, "Karnataka", "Bengaluru South", "Ramanagara APMC", "Tomato", "Local", "A", d1, new BigDecimal("1200"), new BigDecimal("1800"), new BigDecimal("1500"), null);
+        MandiPriceDto p2 = new MandiPriceDto(2L, "Karnataka", "Bengaluru South", "Ramanagara APMC", "Tomato", "Local", "A", d2, new BigDecimal("1100"), new BigDecimal("1700"), new BigDecimal("1400"), null);
+        MandiPriceDto otherMarket = new MandiPriceDto(3L, "Karnataka", "Bengaluru", "Other APMC", "Tomato", "Local", "A", d1, new BigDecimal("900"), new BigDecimal("1200"), new BigDecimal("1000"), null);
+
+        when(mandiApiClient.getPriceHistory("Karnataka", "Tomato", "Ramanagara APMC", LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 30)))
+                .thenReturn(List.of(p1, otherMarket, p2));
+
+        List<MarketPriceHistoryResponse> history = marketPriceService.getPriceHistory(
+                "Karnataka", "Tomato", "Ramanagara APMC", LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 30));
+
+        assertThat(history).hasSize(2);
+        // Assert chronological order (d2: Sep 1 comes before d1: Sep 2)
+        assertThat(history.get(0).getDate()).isEqualTo(LocalDate.of(2026, 9, 1));
+        assertThat(history.get(0).getPrice()).isEqualByComparingTo(new BigDecimal("1400.00"));
+        assertThat(history.get(1).getDate()).isEqualTo(LocalDate.of(2026, 9, 2));
+        assertThat(history.get(1).getPrice()).isEqualByComparingTo(new BigDecimal("1500.00"));
+    }
+
+    @Test
+    @DisplayName("getPriceHistory validates required fields and date ordering")
+    void shouldValidatePriceHistoryArguments() {
+        LocalDate from = LocalDate.of(2026, 9, 30);
+        LocalDate to = LocalDate.of(2026, 9, 1); // from after to
+
+        assertThatThrownBy(() -> marketPriceService.getPriceHistory(null, "Tomato", "APMC", to, from))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("State is required");
+
+        assertThatThrownBy(() -> marketPriceService.getPriceHistory("Karnataka", null, "APMC", to, from))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Crop is required");
+
+        assertThatThrownBy(() -> marketPriceService.getPriceHistory("Karnataka", "Tomato", null, to, from))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Market is required");
+
+        assertThatThrownBy(() -> marketPriceService.getPriceHistory("Karnataka", "Tomato", "APMC", null, from))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("From date is required");
+
+        assertThatThrownBy(() -> marketPriceService.getPriceHistory("Karnataka", "Tomato", "APMC", to, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("To date is required");
+
+        assertThatThrownBy(() -> marketPriceService.getPriceHistory("Karnataka", "Tomato", "APMC", from, to))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("cannot be after to date");
     }
 
     @Test

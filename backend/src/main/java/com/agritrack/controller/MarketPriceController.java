@@ -1,9 +1,11 @@
 package com.agritrack.controller;
 
 import com.agritrack.dto.ApiResponse;
+import com.agritrack.dto.MarketPriceHistoryResponse;
 import com.agritrack.dto.MarketPriceRequest;
 import com.agritrack.dto.MarketPriceResponse;
 import com.agritrack.service.MarketPriceService;
+import com.agritrack.service.mandi.MandiMarketDto;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -28,16 +30,49 @@ public class MarketPriceController {
         this.marketPriceService = marketPriceService;
     }
 
+    /**
+     * Retrieves APMC markets available for a given state from the live Mandi provider.
+     *
+     * @param state State name (e.g. Karnataka)
+     * @return List of markets and their districts
+     */
+    @GetMapping("/market-prices/markets")
+    public ResponseEntity<ApiResponse<List<MandiMarketDto>>> getMarkets(
+            @RequestParam(required = false) String state) {
+        List<MandiMarketDto> markets = marketPriceService.getMarkets(state);
+        return ResponseEntity.ok(ApiResponse.success(markets, "Markets retrieved successfully"));
+    }
+
+    /**
+     * Retrieves APMC commodity market benchmark prices.
+     * Supports state, district, crop, market, and date filters against the live Mandi provider.
+     */
     @GetMapping("/market-prices")
     public ResponseEntity<ApiResponse<List<MarketPriceResponse>>> getMarketPrices(
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String district,
             @RequestParam(required = false) String crop,
             @RequestParam(required = false) String market,
             @RequestParam(required = false) String trend,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
-        List<MarketPriceResponse> prices = marketPriceService.getMarketPrices(crop, market, trend, date, dateFrom, dateTo);
+        List<MarketPriceResponse> prices = marketPriceService.getMarketPrices(state, district, crop, market, trend, date, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(prices, "Market prices retrieved successfully"));
+    }
+
+    /**
+     * Retrieves historical price series for a specific APMC commodity from the live Mandi provider.
+     */
+    @GetMapping("/market-prices/history")
+    public ResponseEntity<ApiResponse<List<MarketPriceHistoryResponse>>> getPriceHistory(
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String crop,
+            @RequestParam(required = false) String market,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        List<MarketPriceHistoryResponse> history = marketPriceService.getPriceHistory(state, crop, market, from, to);
+        return ResponseEntity.ok(ApiResponse.success(history, "Market price history retrieved successfully"));
     }
 
     @GetMapping("/market-prices/{id}")

@@ -5,9 +5,6 @@ import MarketTrendChart from './MarketTrendChart';
 import { formatCurrency } from '../../utils/formatters';
 import { translateCrop, translateVariety } from '../../utils/displayLabels';
 
-const MARKET_DATA_DISCLAIMER =
-  'APMC mandi commodity rates are benchmark modal prices reported from major agricultural wholesale markets (mandis). Prices fluctuate daily based on arrivals, variety, and grade quality.';
-
 export default function MarketPriceDetailsModal({ marketPrice, onClose, onCreateSale }) {
   const { t } = useTranslation();
   if (!marketPrice) return null;
@@ -17,8 +14,8 @@ export default function MarketPriceDetailsModal({ marketPrice, onClose, onCreate
   const trendClass = isRising
     ? 'agri-trend-pill--rising'
     : isFalling
-    ? 'agri-trend-pill--falling'
-    : 'agri-trend-pill--stable';
+      ? 'agri-trend-pill--falling'
+      : 'agri-trend-pill--stable';
 
   return (
     <div
@@ -43,8 +40,8 @@ export default function MarketPriceDetailsModal({ marketPrice, onClose, onCreate
                   {isRising
                     ? t('marketPrices.rising', 'Rising')
                     : isFalling
-                    ? t('marketPrices.falling', 'Falling')
-                    : t('marketPrices.stable', 'Stable')}{' '}
+                      ? t('marketPrices.falling', 'Falling')
+                      : t('marketPrices.stable', 'Stable')}{' '}
                   {t('marketPrices.priceTrend', 'Trend')}
                 </span>
               </span>
@@ -99,20 +96,24 @@ export default function MarketPriceDetailsModal({ marketPrice, onClose, onCreate
                 className="agri-market-detail-metric-card__value"
                 style={{ color: isRising ? '#059669' : isFalling ? '#dc2626' : 'var(--slate-700)' }}
               >
-                {isRising ? '+' : ''}₹{marketPrice.change}
+                {marketPrice.change != null ? `${isRising ? '+' : ''}₹${marketPrice.change}` : '—'}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {isRising ? '+' : ''}{marketPrice.changePercent}% {t('marketPrices.from', 'from')} ₹{marketPrice.previousPrice}
+                {marketPrice.previousPrice != null
+                  ? `${isRising ? '+' : ''}${marketPrice.changePercent}% ${t('marketPrices.from', 'from')} ₹${marketPrice.previousPrice}`
+                  : t('marketPrices.noPriorTrading', 'No prior trading record')}
               </span>
             </div>
 
             <div className="agri-market-detail-metric-card">
               <span className="agri-market-detail-metric-card__label">{t('marketPrices.terminalArrivals', 'Terminal Arrivals')}</span>
               <span className="agri-market-detail-metric-card__value">
-                {marketPrice.arrivalVolumeQ} q
+                {marketPrice.arrivalVolumeQ != null ? `${marketPrice.arrivalVolumeQ} q` : t('common.notAvailable', 'N/A')}
               </span>
               <span style={{ fontSize: '0.725rem', color: 'var(--slate-500)' }}>
-                {t('marketPrices.dayRange', 'Range')}: ₹{marketPrice.minPrice} – ₹{marketPrice.maxPrice}
+                {marketPrice.minPrice != null && marketPrice.maxPrice != null
+                  ? `${t('marketPrices.dayRange', 'Range')}: ₹${marketPrice.minPrice} – ₹${marketPrice.maxPrice}`
+                  : t('marketPrices.singleRateReported', 'Single auction rate reported')}
               </span>
             </div>
           </div>
@@ -142,18 +143,18 @@ export default function MarketPriceDetailsModal({ marketPrice, onClose, onCreate
                 {t('marketPrices.qualitySource', 'Quality & Reporting Source')}
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.875rem' }}>
-                <div>{t('marketPrices.standard', 'Standard')}: <strong>{t('harvests.quality', 'Grade')} {marketPrice.qualityGrade} (Moisture &lt; 12%)</strong></div>
-                <div>{t('marketPrices.sourceBulletin', 'Source Bulletin')}: <strong>{marketPrice.source}</strong></div>
+                <div>{t('marketPrices.standard', 'Standard')}: <strong>{t('harvests.quality', 'Grade')} {marketPrice.qualityGrade || 'A'}</strong></div>
+                <div>{t('marketPrices.sourceBulletin', 'Source Bulletin')}: <strong>{marketPrice.source || 'Ministry of Agriculture (Agmarknet)'}</strong></div>
                 <div>{t('marketPrices.effectiveDate', 'Effective Date')}: <strong>{marketPrice.date}</strong></div>
               </div>
             </div>
           </div>
 
-          {/* Disclaimer */}
+          {/* Source Notice */}
           <div className="agri-market-disclaimer-banner">
             <AlertTriangle size={18} style={{ flexShrink: 0 }} />
             <div>
-              <strong>{t('marketPrices.demoDisclaimer', 'Demonstration Disclaimer:')}</strong> {MARKET_DATA_DISCLAIMER}
+              <strong>{t('marketPrices.officialSource', 'Official Agmarknet Source:')}</strong> {t('marketPrices.officialDisclaimer', 'APMC commodity benchmark prices are officially reported by the Ministry of Agriculture. Modal rates fluctuate daily based on wholesale spot arrivals, commodity variety, and physical quality grade.')}
             </div>
           </div>
         </div>

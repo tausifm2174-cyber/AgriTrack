@@ -2,6 +2,7 @@ package com.agritrack.exception;
 
 import com.agritrack.dto.ApiError;
 import com.agritrack.dto.ApiResponse;
+import com.agritrack.service.mandi.MandiApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -136,6 +137,17 @@ public class GlobalExceptionHandler {
         logger.warn("Type mismatch: {}", message);
         ApiResponse<Void> response = ApiResponse.error(message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    /**
+     * Handles external Mandi price API errors and connection failures (HTTP 502).
+     */
+    @ExceptionHandler(MandiApiException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMandiApiException(MandiApiException ex) {
+        logger.warn("External Mandi API provider error [status {}] at {}: {}",
+                ex.getStatusCode(), ex.getEndpoint(), ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error("Mandi service provider error: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(response);
     }
 
     /**

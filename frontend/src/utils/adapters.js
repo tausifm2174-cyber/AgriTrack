@@ -434,9 +434,9 @@ export function adaptMarketPrice(record, historyRecords = []) {
 
   const pricePerQuintal = record.pricePerQuintal != null ? Number(record.pricePerQuintal) : 0;
   const pricePerKg = record.pricePerKg != null ? Number(record.pricePerKg) : (pricePerQuintal > 0 ? pricePerQuintal / 100 : 0);
-  const previousPrice = record.previousPrice != null ? Number(record.previousPrice) : pricePerQuintal;
-  const change = record.priceChange != null ? Number(record.priceChange) : 0;
-  const changePercent = record.changePercent != null ? Number(record.changePercent) : 0;
+  const previousPrice = record.previousPrice != null ? Number(record.previousPrice) : null;
+  const change = record.priceChange != null ? Number(record.priceChange) : null;
+  const changePercent = record.changePercent != null ? Number(record.changePercent) : null;
 
   const arrivalVolumeQ = record.arrivalVolumeQuintals != null ? Number(record.arrivalVolumeQuintals) : null;
   const minPrice = record.minPrice != null ? Number(record.minPrice) : null;

@@ -10,48 +10,197 @@ import {
   MarketPriceTable,
   MarketPriceCard,
   MarketPriceDetailsModal,
+  MarketTrendChart,
 } from '../components/marketPrices';
 import '../components/marketPrices/marketPrices.css';
 import marketService from '../services/marketService';
 import { adaptMarketPrice } from '../utils/adapters';
+
+const INDIAN_STATES = [
+  'Karnataka',
+  'Maharashtra',
+  'Punjab',
+  'Haryana',
+  'Rajasthan',
+  'Uttar Pradesh',
+  'Gujarat',
+  'Madhya Pradesh',
+  'Tamil Nadu',
+  'Andhra Pradesh',
+  'Telangana',
+  'Kerala',
+  'West Bengal',
+  'Bihar',
+  'Odisha',
+];
+
+const DEFAULT_CROPS = [
+  'Tomato',
+  'Onion',
+  'Potato',
+  'Wheat',
+  'Rice',
+  'Maize',
+  'Soybean',
+  'Cotton',
+  'Mustard',
+  'Gram',
+  'Chilli',
+  'Garlic',
+  'Ginger',
+  'Turmeric',
+  'Apple',
+  'Banana',
+  'Mango',
+];
+
+function getDateRange(range, baseDateStr) {
+  const base = baseDateStr ? new Date(baseDateStr) : new Date();
+  const to = base.toISOString().slice(0, 10);
+  const fromDate = new Date(base);
+  if (range === '30d') {
+    fromDate.setDate(fromDate.getDate() - 30);
+  } else {
+    fromDate.setDate(fromDate.getDate() - 5);
+  }
+  const from = fromDate.toISOString().slice(0, 10);
+  return { from, to };
+}
 
 export default function MarketPricesPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Query parameters
-  const queryCrop = searchParams.get('crop') || 'ALL';
+  // Query parameters from URL if any
+  const queryState = searchParams.get('state') || 'Karnataka';
+  const queryDistrict = searchParams.get('district') || 'ALL';
   const queryMarket = searchParams.get('market') || 'ALL';
+  const queryCrop = searchParams.get('crop') || 'ALL';
+  const queryDate = searchParams.get('date') || '';
   const queryId = searchParams.get('id');
 
-  // Live state
-  const [marketPrices, setMarketPrices] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-
   // Filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCrop, setSelectedCrop] = useState(queryCrop);
-  const [selectedVariety, setSelectedVariety] = useState('ALL');
+  const [selectedState, setSelectedState] = useState(queryState);
+  const [selectedDistrict, setSelectedDistrict] = useState(queryDistrict);
   const [selectedMarket, setSelectedMarket] = useState(queryMarket);
+  const [selectedCrop, setSelectedCrop] = useState(queryCrop);
+  const [selectedDate, setSelectedDate] = useState(queryDate);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedVariety, setSelectedVariety] = useState('ALL');
   const [selectedTrend, setSelectedTrend] = useState('ALL');
   const [selectedGrade, setSelectedGrade] = useState('ALL');
   const [viewMode, setViewMode] = useState('table');
 
+  // Live markets fetched from backend for the selected state
+  const [availableMarkets, setAvailableMarkets] = useState([]);
+  const [isLoadingMarkets, setIsLoadingMarkets] = useState(false);
+
+  // Live price records fetched from backend
+  const [marketPrices, setMarketPrices] = useState([]);
+  const [isLoadingPrices, setIsLoadingPrices] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Historical price records for APMC Trend Chart
+  const [priceHistory, setPriceHistory] = useState([]);
+  const [historyRange, setHistoryRange] = useState('5d');
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
   const [activeMarketPriceDetails, setActiveMarketPriceDetails] = useState(null);
 
-  // Fetch live market benchmark rates
+  // 1. Fetch available APMC markets when state changes
   useEffect(() => {
     let isMounted = true;
 
-    async function loadData() {
-      setIsLoading(true);
+    async function loadMarkets() {
+      setIsLoadingMarkets(true);
+      try {
+        const raw = await marketService.getMarkets(selectedState);
+        if (!isMounted) return;
+        const list = Array.isArray(raw) ? raw : [];
+        setAvailableMarkets(list);
+
+        // If currently selected market is not in this state's markets, reset market
+        setSelectedMarket((prev) => {
+          if (prev !== 'ALL' && !list.some((m) => m.market === prev)) {
+            return list[0]?.market || 'ALL';
+          }
+          return prev;
+        });
+      } catch {
+        if (!isMounted) return;
+        setAvailableMarkets([]);
+      } finally {
+        if (isMounted) {
+          setIsLoadingMarkets(false);
+        }
+      }
+    }
+
+    loadMarkets();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedState]);
+
+  // Derive districts and markets based on selections
+  const districtList = useMemo(() => {
+    const districts = new Set(availableMarkets.map((m) => m.district).filter(Boolean));
+    return Array.from(districts).sort();
+  }, [availableMarkets]);
+
+  const marketList = useMemo(() => {
+    const filtered = selectedDistrict === 'ALL'
+      ? availableMarkets
+      : availableMarkets.filter((m) => m.district === selectedDistrict);
+    return Array.from(new Set(filtered.map((m) => m.market).filter(Boolean))).sort();
+  }, [availableMarkets, selectedDistrict]);
+
+  // Handle State change: clear downstream filters
+  const handleStateChange = (newState) => {
+    setSelectedState(newState);
+    setSelectedDistrict('ALL');
+    setSelectedMarket('ALL');
+  };
+
+  // Handle District change: reset market
+  const handleDistrictChange = (newDistrict) => {
+    setSelectedDistrict(newDistrict);
+    setSelectedMarket('ALL');
+  };
+
+  // 2. Fetch live market benchmark prices
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadPrices() {
+      setIsLoadingPrices(true);
       setLoadError(null);
 
       try {
-        const rawPrices = await marketService.getMarketPrices();
+        const params = {
+          state: selectedState,
+        };
+
+        if (selectedDistrict !== 'ALL') {
+          params.district = selectedDistrict;
+        }
+
+        if (selectedMarket !== 'ALL') {
+          params.market = selectedMarket;
+        }
+
+        if (selectedCrop !== 'ALL') {
+          params.crop = selectedCrop;
+        }
+
+        if (selectedDate) {
+          params.date = selectedDate;
+        }
+
+        const rawPrices = await marketService.getMarketPrices(params);
 
         if (!isMounted) return;
 
@@ -71,24 +220,72 @@ export default function MarketPricesPage() {
           err.message ||
           t('marketPrices.loadError', 'Failed to load APMC market prices. Please check connection and try again.')
         );
+        setMarketPrices([]);
       } finally {
         if (isMounted) {
-          setIsLoading(false);
+          setIsLoadingPrices(false);
         }
       }
     }
 
-    loadData();
+    loadPrices();
 
     return () => {
       isMounted = false;
     };
-  }, [refreshKey, queryId, t]);
+  }, [selectedState, selectedDistrict, selectedMarket, selectedCrop, selectedDate, refreshKey, queryId, t]);
 
-  // Filter option lists
+  // 3. Fetch APMC-specific historical price series for MarketTrendChart
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadHistory() {
+      // Only fetch history when an APMC market is selected
+      if (selectedMarket === 'ALL') {
+        setPriceHistory([]);
+        return;
+      }
+
+      setIsLoadingHistory(true);
+      const cropForHistory = selectedCrop !== 'ALL'
+        ? selectedCrop
+        : (marketPrices[0]?.crop || 'Tomato');
+
+      const { from, to } = getDateRange(historyRange, selectedDate);
+
+      try {
+        const rawHistory = await marketService.getPriceHistory({
+          state: selectedState,
+          crop: cropForHistory,
+          market: selectedMarket,
+          from,
+          to,
+        });
+
+        if (!isMounted) return;
+        setPriceHistory(Array.isArray(rawHistory) ? rawHistory : []);
+      } catch {
+        if (!isMounted) return;
+        setPriceHistory([]);
+      } finally {
+        if (isMounted) {
+          setIsLoadingHistory(false);
+        }
+      }
+    }
+
+    loadHistory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedState, selectedMarket, selectedCrop, historyRange, selectedDate, marketPrices]);
+
+  // Derive commodities list
   const cropList = useMemo(() => {
-    const crops = new Set(marketPrices.map((m) => m.crop).filter(Boolean));
-    return Array.from(crops).sort();
+    const cropsFromPrices = marketPrices.map((m) => m.crop).filter(Boolean);
+    const combined = new Set([...cropsFromPrices, ...DEFAULT_CROPS]);
+    return Array.from(combined).sort();
   }, [marketPrices]);
 
   const varietyList = useMemo(() => {
@@ -97,11 +294,6 @@ export default function MarketPricesPage() {
       : marketPrices.filter((m) => m.crop?.toLowerCase() === selectedCrop.toLowerCase()).map((m) => m.variety).filter(Boolean);
     return Array.from(new Set(list)).sort();
   }, [marketPrices, selectedCrop]);
-
-  const marketList = useMemo(() => {
-    const markets = new Set(marketPrices.map((m) => m.market).filter(Boolean));
-    return Array.from(markets).sort();
-  }, [marketPrices]);
 
   // Filtered market records
   const filteredPrices = useMemo(() => {
@@ -129,8 +321,8 @@ export default function MarketPricesPage() {
         return false;
       }
 
-      // Market
-      if (selectedMarket !== 'ALL' && item.market !== selectedMarket) {
+      // Market (Strict APMC Isolation)
+      if (selectedMarket !== 'ALL' && item.market?.trim().toLowerCase() !== selectedMarket.trim().toLowerCase()) {
         return false;
       }
 
@@ -157,10 +349,13 @@ export default function MarketPricesPage() {
   ]);
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setSelectedCrop('ALL');
-    setSelectedVariety('ALL');
+    setSelectedState('Karnataka');
+    setSelectedDistrict('ALL');
     setSelectedMarket('ALL');
+    setSelectedCrop('ALL');
+    setSelectedDate('');
+    setSearchQuery('');
+    setSelectedVariety('ALL');
     setSelectedTrend('ALL');
     setSelectedGrade('ALL');
   };
@@ -202,18 +397,29 @@ export default function MarketPricesPage() {
       )}
 
       {/* Summary KPI Cards */}
-      <MarketPriceSummaryCards marketPrices={marketPrices} />
+      <MarketPriceSummaryCards marketPrices={filteredPrices} />
 
-      {/* Filter Bar */}
+      {/* Filter Bar with Cascading Hierarchy: State -> District -> APMC -> Crop -> Date */}
       <MarketPriceFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedCrop={selectedCrop}
-        onCropChange={setSelectedCrop}
-        selectedVariety={selectedVariety}
-        onVarietyChange={setSelectedVariety}
+        selectedState={selectedState}
+        onStateChange={handleStateChange}
+        stateList={INDIAN_STATES}
+        selectedDistrict={selectedDistrict}
+        onDistrictChange={handleDistrictChange}
+        districtList={districtList}
         selectedMarket={selectedMarket}
         onMarketChange={setSelectedMarket}
+        marketList={marketList}
+        selectedCrop={selectedCrop}
+        onCropChange={setSelectedCrop}
+        cropList={cropList}
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedVariety={selectedVariety}
+        onVarietyChange={setSelectedVariety}
+        varietyList={varietyList}
         selectedTrend={selectedTrend}
         onTrendChange={setSelectedTrend}
         selectedGrade={selectedGrade}
@@ -221,13 +427,23 @@ export default function MarketPricesPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onResetFilters={handleResetFilters}
-        cropList={cropList}
-        varietyList={varietyList}
-        marketList={marketList}
+        isLoadingMarkets={isLoadingMarkets}
       />
 
+      {/* APMC Historical Price Trend Chart (Phase 22.9.4) */}
+      {selectedMarket !== 'ALL' && (
+        <MarketTrendChart
+          history={priceHistory}
+          crop={selectedCrop !== 'ALL' ? selectedCrop : (filteredPrices[0]?.crop || '')}
+          market={selectedMarket}
+          range={historyRange}
+          onRangeChange={setHistoryRange}
+          isLoading={isLoadingHistory}
+        />
+      )}
+
       {/* Main Content Area */}
-      {isLoading ? (
+      {isLoadingPrices ? (
         <div className="agri-market-cards-grid" style={{ opacity: 0.7 }}>
           {[1, 2, 3, 4].map((n) => (
             <div
@@ -245,9 +461,9 @@ export default function MarketPricesPage() {
         <EmptyState
           title={t('marketPrices.noPrices', 'No market prices found')}
           message={
-            marketPrices.length === 0
-              ? t('marketPrices.noPricesDesc', 'No APMC mandi benchmark rates are currently available. Check back soon for live updates.')
-              : t('marketPrices.noFilterPricesDesc', 'No APMC market records match your filter criteria. Try resetting or adjusting your search parameters.')
+            selectedMarket === 'ALL'
+              ? t('marketPrices.selectApmcPrompt', 'Please select a specific APMC Mandi from the filters above to retrieve official benchmark rates.')
+              : t('marketPrices.noPricesDesc', 'No APMC mandi benchmark rates are currently reported for the selected filters. Check back soon for live updates.')
           }
           actionText={t('common.clearFilters', 'Reset Filters')}
           onAction={handleResetFilters}
@@ -275,7 +491,10 @@ export default function MarketPricesPage() {
       {activeMarketPriceDetails && (
         <MarketPriceDetailsModal
           key={activeMarketPriceDetails.id}
-          marketPrice={activeMarketPriceDetails}
+          marketPrice={{
+            ...activeMarketPriceDetails,
+            history: priceHistory.length > 0 ? priceHistory : activeMarketPriceDetails.history,
+          }}
           onClose={() => setActiveMarketPriceDetails(null)}
           onCreateSale={handleCreateSale}
         />

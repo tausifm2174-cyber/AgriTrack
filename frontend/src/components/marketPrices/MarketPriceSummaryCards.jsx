@@ -42,7 +42,9 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
         <div className="agri-market-summary-card__content">
           <span className="agri-market-summary-card__label">{t('marketPrices.mandisCovered', 'Mandis Covered')}</span>
           <span className="agri-market-summary-card__value">{mandisCount}</span>
-          <span className="agri-market-summary-card__subtext">Nashik, Karnal, Vashi...</span>
+          <span className="agri-market-summary-card__subtext">
+            {mandisCount > 0 ? t('marketPrices.liveReportingMandis', 'Live reporting mandis') : t('common.na', 'N/A')}
+          </span>
         </div>
       </div>
 
@@ -86,10 +88,10 @@ export default function MarketPriceSummaryCards({ marketPrices = [] }) {
         <div className="agri-market-summary-card__content">
           <span className="agri-market-summary-card__label">{t('marketPrices.datasetStatus', 'Dataset Status')}</span>
           <span className="agri-market-summary-card__value" style={{ fontSize: '1.05rem' }}>
-            {t('common.demoData', 'Demo Data')}
+            {marketPrices.length > 0 ? t('marketPrices.liveAgmarknet', 'Live Mandi Feed') : t('common.noData', 'No Data')}
           </span>
           <span className="agri-market-summary-card__subtext">
-            {t('marketPrices.lastUpdated', 'Last updated 02 Oct 2026')}
+            {marketPrices[0]?.date ? `${t('common.date', 'Date')}: ${marketPrices[0].date}` : t('marketPrices.liveFeedActive', 'Live feed active')}
           </span>
         </div>
       </div>

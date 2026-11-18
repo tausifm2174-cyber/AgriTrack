@@ -3,9 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { TrendingUp, Receipt, Sprout, AlertTriangle } from 'lucide-react';
 import { Button } from '../common';
 
-const MARKET_DATA_DISCLAIMER =
-  'APMC mandi commodity rates are benchmark modal prices reported from major agricultural wholesale markets (mandis). Prices fluctuate daily based on arrivals, variety, and grade quality.';
-
 export default function MarketPriceHeader() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -15,18 +12,19 @@ export default function MarketPriceHeader() {
       <div className="agri-market-header__left">
         <div className="agri-market-header__badge">
           <TrendingUp size={14} />
-          <span>{t('marketPrices.benchmarkBadge', 'APMC Terminal Mandi Benchmarks • Sample Data')}</span>
+          <span>{t('marketPrices.benchmarkBadge', 'APMC Terminal Mandi Benchmarks • Live Data')}</span>
         </div>
         <h1 className="agri-market-header__title">{t('marketPrices.title', 'APMC Market Prices')}</h1>
         <p className="agri-market-header__desc">
-          {t('marketPrices.subtitle', 'Daily agricultural commodity rates across major terminal mandis to support harvest valuation, sales negotiation, and farmer profitability.')}
+          {t('marketPrices.subtitle', 'Live agricultural commodity rates across major terminal mandis to support harvest valuation, sales negotiation, and farmer profitability.')}
         </p>
 
-        {/* Prominent Demo Data Disclaimer */}
+        {/* Live Data Agmarknet Banner */}
         <div className="agri-market-disclaimer-banner" style={{ marginTop: '0.75rem' }}>
           <AlertTriangle size={18} style={{ flexShrink: 0 }} />
           <div>
-            <strong>{t('marketPrices.demoDataset', 'Demonstration Dataset:')}</strong> {MARKET_DATA_DISCLAIMER}
+            <strong>{t('marketPrices.officialSource', 'Official Agmarknet Source:')}</strong>{' '}
+            {t('marketPrices.officialDisclaimer', 'APMC commodity benchmark prices are officially reported by the Ministry of Agriculture. Modal rates fluctuate daily based on wholesale spot arrivals, commodity variety, and physical quality grade.')}
           </div>
         </div>
       </div>

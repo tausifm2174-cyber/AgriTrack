@@ -73,22 +73,26 @@ export default function MarketPriceTable({ marketPrices, onViewDetails, onCreate
                   </td>
                   <td>
                     <span style={{ color: 'var(--slate-500)', fontSize: '0.85rem' }}>
-                      {formatCurrency(mp.previousPrice)}/q
+                      {mp.previousPrice != null ? `${formatCurrency(mp.previousPrice)}/q` : '—'}
                     </span>
                   </td>
                   <td>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.2rem',
-                        fontWeight: 700,
-                        color: isRising ? '#059669' : isFalling ? '#dc2626' : 'var(--slate-600)',
-                      }}
-                    >
-                      {isRising ? '+' : ''}₹{mp.change} ({isRising ? '+' : ''}
-                      {mp.changePercent}%)
-                    </div>
+                    {mp.change != null ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.2rem',
+                          fontWeight: 700,
+                          color: isRising ? '#059669' : isFalling ? '#dc2626' : 'var(--slate-600)',
+                        }}
+                      >
+                        {isRising ? '+' : ''}₹{mp.change}
+                        {mp.changePercent != null ? ` (${isRising ? '+' : ''}${mp.changePercent}%)` : ''}
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--slate-400)', fontSize: '0.85rem' }}>—</span>
+                    )}
                   </td>
                   <td>
                     <span className={`agri-trend-pill ${trendClass}`}>

@@ -65,16 +65,21 @@ export default function MarketPriceCard({ marketPrice, onViewDetails, onCreateSa
             <Calendar size={14} />
             <span>{t('marketPrices.bulletinDate', 'Bulletin Date')}: {marketPrice.date}</span>
           </div>
-          <div style={{ fontWeight: 700, color: isRising ? '#059669' : isFalling ? '#dc2626' : 'var(--slate-600)' }}>
-            {isRising ? '+' : ''}₹{marketPrice.change} ({isRising ? '+' : ''}{marketPrice.changePercent}%)
-          </div>
+          {marketPrice.change != null ? (
+            <div style={{ fontWeight: 700, color: isRising ? '#059669' : isFalling ? '#dc2626' : 'var(--slate-600)' }}>
+              {isRising ? '+' : ''}₹{marketPrice.change}
+              {marketPrice.changePercent != null ? ` (${isRising ? '+' : ''}${marketPrice.changePercent}%)` : ''}
+            </div>
+          ) : (
+            <div style={{ color: 'var(--slate-400)', fontSize: '0.8rem' }}>—</div>
+          )}
         </div>
 
         <div className="agri-market-card__stats-grid">
           <div className="agri-market-card__stat-item">
             <span className="agri-market-card__stat-label">{t('marketPrices.prevRate', 'Previous Rate')}</span>
             <span className="agri-market-card__stat-value">
-              {formatCurrency(marketPrice.previousPrice)}/q
+              {marketPrice.previousPrice != null ? `${formatCurrency(marketPrice.previousPrice)}/q` : '—'}
             </span>
           </div>
           <div className="agri-market-card__stat-item">

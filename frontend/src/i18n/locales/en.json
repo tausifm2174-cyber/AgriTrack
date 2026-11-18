@@ -914,7 +914,22 @@
     "viewTrend": "View trend for",
     "loadError": "Failed to load APMC market prices. Please check connection and try again.",
     "refreshPrices": "Refresh Market Prices",
-    "noFilterPricesDesc": "No APMC market records match your filter criteria. Try resetting or adjusting your search parameters."
+    "noFilterPricesDesc": "No APMC market records match your filter criteria. Try resetting or adjusting your search parameters.",
+    "district": "District",
+    "allDistricts": "All Districts",
+    "range5d": "5 Days",
+    "range30d": "30 Days",
+    "historicalPriceTrend": "APMC Historical Price Trend",
+    "loadingMarkets": "Loading mandis...",
+    "loadingHistory": "Loading price history...",
+    "officialSource": "Official Agmarknet Source:",
+    "officialDisclaimer": "APMC commodity benchmark prices are officially reported by the Ministry of Agriculture. Modal rates fluctuate daily based on wholesale spot arrivals, commodity variety, and physical quality grade.",
+    "noPriorTrading": "No prior trading record",
+    "singleRateReported": "Single auction rate reported",
+    "liveReportingMandis": "Live reporting mandis",
+    "liveAgmarknet": "Live Mandi Feed",
+    "liveFeedActive": "Live feed active",
+    "selectApmcPrompt": "Please select a specific APMC Mandi from the filters above to retrieve official benchmark rates."
   },
   "expenses": {
     "title": "Farm Expenses",
