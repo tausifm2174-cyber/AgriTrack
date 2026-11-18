@@ -164,8 +164,6 @@ export function formatFieldName(fieldName, t) {
   if (match) {
     return `${t('fields.field', 'Field')} ${match[1]}`;
   }
-  if (fieldName === 'North Farm') return t('farms.demoNames.farm-1', fieldName);
-  if (fieldName === 'South Field') return t('fields.southField', fieldName);
   return fieldName;
 }
 
@@ -191,7 +189,6 @@ export function translateTime(timeStr, t) {
   if (timeStr === 'Today') return t('common.today', 'Today');
   if (timeStr === 'Yesterday') return t('common.yesterday', 'Yesterday');
   if (timeStr === 'Tomorrow') return t('common.tomorrow', 'Tomorrow');
-  if (timeStr === 'Just now (Demo)') return t('common.justNow', 'Just now (Demo)');
   if (timeStr === '2 days ago') return t('common.twoDaysAgo', '2 days ago');
   if (timeStr === '3 days ago') return t('common.threeDaysAgo', '3 days ago');
   if (timeStr === '4 days ago') return t('common.fourDaysAgo', '4 days ago');

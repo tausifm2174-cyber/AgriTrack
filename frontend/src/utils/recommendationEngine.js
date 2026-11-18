@@ -224,7 +224,7 @@ export function evaluateCropRecommendations(inputs = {}) {
  * @param {string} [farmName] - Target farm name
  * @returns {Array<Object>} Generated active farm advisories
  */
-export function evaluateWeatherAdvisories(weatherObj = {}, farmName = 'Green Valley Farm') {
+export function evaluateWeatherAdvisories(weatherObj = {}, farmName = '') {
   const current = weatherObj.current || weatherObj;
   const forecast = weatherObj.forecast || [];
 

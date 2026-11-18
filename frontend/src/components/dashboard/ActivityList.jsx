@@ -58,7 +58,7 @@ export default function ActivityList({ activities = [], irrigationAlerts = [] })
                 <span> • {t('soil.title', 'Soil')}: {primaryIrrigationAlert.soilMoisture}</span>
               )}
               <span> • </span>
-              <Link to="/irrigation?fieldId=field-2b" className="agri-card-action-link" style={{ fontSize: '0.725rem' }}>
+              <Link to={primaryIrrigationAlert.fieldId ? `/irrigation?fieldId=${primaryIrrigationAlert.fieldId}` : '/irrigation'} className="agri-card-action-link" style={{ fontSize: '0.725rem' }}>
                 {t('irrigation.title', 'Irrigation Management')}
               </Link>
             </div>

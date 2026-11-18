@@ -1,4 +1,5 @@
 import api from './api';
+import farmService from './farmService';
 
 /**
  * Field Service
@@ -10,6 +11,30 @@ import api from './api';
  *   DELETE /api/v1/fields/{id}
  */
 export const fieldService = {
+  /**
+   * Retrieve all fields across all farms belonging to the authenticated user.
+   * Resolves the user's farms first, then queries fields for each farm in parallel.
+   * @returns {Promise<Array>} Unified list of FieldResponse objects
+   */
+  async getAllFields() {
+    try {
+      const farmsRes = await farmService.getAllFarms();
+      const farms = Array.isArray(farmsRes) ? farmsRes : (farmsRes?.data?.data || farmsRes?.data || []);
+      if (!Array.isArray(farms) || farms.length === 0) return [];
+
+      const fieldResults = await Promise.all(
+        farms.map((f) =>
+          api.get(`/farms/${f.id}/fields`)
+            .then((r) => (Array.isArray(r) ? r : r?.data?.data || r?.data || []))
+            .catch(() => [])
+        )
+      );
+      return fieldResults.flat();
+    } catch {
+      return [];
+    }
+  },
+
   /**
    * Retrieve all fields belonging to a specific farm.
    * @param {number|string} farmId Farm ID

@@ -216,11 +216,7 @@ export function calculateProfitByCrop(sales = [], expenses = []) {
  * Comprehensive Farm-level P&L.
  */
 export function calculateProfitByFarm(sales = [], expenses = [], farms = []) {
-  const farmList = farms.length > 0 ? farms : [
-    { id: 'farm-1', name: 'Green Valley Farm' },
-    { id: 'farm-2', name: 'Sunrise Agricultural Holding' },
-    { id: 'farm-3', name: 'Riverbank Farm' },
-  ];
+  const farmList = farms.length > 0 ? farms : [];
 
   return farmList.map((farm) => {
     const farmSales = sales.filter((s) => s.farmId === farm.id);

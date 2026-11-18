@@ -8,7 +8,7 @@ import { StatusBadge, Button } from '../common';
  */
 export default function AdvisoryCard({
   advisories = [],
-  farmName = 'Green Valley Farm',
+  farmName = '',
   onUpdateStatus,
 }) {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ export default function AdvisoryCard({
         <div>
           <h2 className="agri-advisory-section__title">{t('recommendations.currentFarmAdvisories', 'Current Farm Advisories')}</h2>
           <p className="agri-advisory-section__subtitle">
-            {t('recommendations.directivesGenerated', 'Rule-based operational directives generated from current micro-climate conditions at')} {farmName}
+            {t('recommendations.directivesGenerated', 'Rule-based operational directives generated from current micro-climate conditions')}{farmName ? ` at ${farmName}` : ''}
           </p>
         </div>
       </div>

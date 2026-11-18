@@ -70,12 +70,11 @@ export default function RecommendationsPage() {
         ]);
 
         if (isMounted) {
+          const fieldsList = rawFields.status === 'fulfilled' && Array.isArray(rawFields.value) ? rawFields.value : [];
           const adaptedFarms = rawFarms.status === 'fulfilled' && Array.isArray(rawFarms.value)
-            ? rawFarms.value.map((f) => adaptFarm(f))
+            ? rawFarms.value.map((f) => adaptFarm(f, fieldsList))
             : [];
-          const adaptedFields = rawFields.status === 'fulfilled' && Array.isArray(rawFields.value)
-            ? rawFields.value.map((f) => adaptField(f))
-            : [];
+          const adaptedFields = fieldsList.map((f) => adaptField(f));
           const adaptedSoil = rawSoil.status === 'fulfilled' && Array.isArray(rawSoil.value)
             ? rawSoil.value.map((s) => adaptSoilRecord(s))
             : [];

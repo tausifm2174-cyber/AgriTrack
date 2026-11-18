@@ -534,7 +534,8 @@
     "deleting": "Deleting...",
     "loadError": "Failed to load activities. Please check connection and try again.",
     "noActivities": "No activities found. Log a field activity to begin.",
-    "generalFieldActivity": "General Field Activity (No Crop)"
+    "generalFieldActivity": "General Field Activity (No Crop)",
+    "priority": "Priority"
   },
   "irrigation": {
     "title": "Irrigation Management",
@@ -543,7 +544,7 @@
     "irrigationDate": "Irrigation Date",
     "method": "Irrigation Method",
     "waterQuantity": "Water Volume",
-    "duration": "Duration (Hours)",
+    "duration": "Duration",
     "advisory": "Irrigation Advisory",
     "suspendNotice": "Heavy rain forecasted. Recommend suspending irrigation.",
     "automated": "Automated",

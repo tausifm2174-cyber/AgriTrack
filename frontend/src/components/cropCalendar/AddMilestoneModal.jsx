@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, CheckCircle, Info } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '../common';
 import { cropTypes } from '../../data/cropData';
+import activityService from '../../services/activityService';
 
 /**
  * AddMilestoneModal component
- * Allows scheduling a new crop milestone or agronomic field task in demo state.
+ * Allows scheduling a new crop milestone or agronomic field task with backend persistence.
  */
 export default function AddMilestoneModal({
   isOpen,
@@ -17,7 +18,7 @@ export default function AddMilestoneModal({
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
-    fieldId: fields[0]?.id || 'field-1a',
+    fieldId: fields[0]?.id ? String(fields[0].id) : '',
     crop: 'Wheat',
     eventType: 'lifecycle',
     date: new Date().toISOString().split('T')[0],
@@ -26,6 +27,7 @@ export default function AddMilestoneModal({
     description: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,57 +39,88 @@ export default function AddMilestoneModal({
     if (error) setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
       setError(t('validation.required', 'Milestone title is required'));
       return;
     }
 
-    const selectedField = fields.find((f) => f.id === formData.fieldId) || fields[0];
+    const selectedField = fields.find((f) => String(f.id) === String(formData.fieldId)) || fields[0];
+    if (!selectedField) {
+      setError(t('fields.noFieldsFound', 'Please register a field before scheduling milestones.'));
+      return;
+    }
 
     let category = 'Crop Milestone';
     let statusVariant = 'info';
+    let activityType = 'Crop Inspection';
+
     if (formData.eventType === 'fertilizer') {
       category = 'Agronomic Input';
       statusVariant = 'neutral';
+      activityType = 'Fertilizing';
     } else if (formData.eventType === 'irrigation') {
       category = 'Water Management';
       statusVariant = 'info';
+      activityType = 'Irrigation';
     } else if (formData.eventType === 'harvest') {
       category = 'Harvest Readiness';
       statusVariant = 'success';
+      activityType = 'Harvest Preparation';
     } else if (formData.eventType === 'crop_protection') {
       category = 'Crop Protection';
       statusVariant = 'warning';
+      activityType = 'Spraying';
     }
 
-    const newMilestone = {
-      id: `cal-${Date.now()}`,
-      title: formData.title.trim(),
-      crop: formData.crop,
-      variety: selectedField?.cropVariety || 'Standard',
-      fieldId: selectedField?.id || 'field-1a',
-      fieldName: selectedField?.name || 'Field 1A',
-      farmId: selectedField?.farmId || 'farm-1',
-      farmName: selectedField?.farmName || 'Green Valley Farm',
-      eventType: formData.eventType,
-      category,
-      date: formData.date,
-      displayDate: formData.date,
-      stage: selectedField?.cropStage || 'Vegetative Growth',
-      status: 'Scheduled',
-      statusVariant,
-      priority: formData.priority,
-      description: formData.description.trim() || 'Scheduled agronomic field task.',
-    };
+    setIsSubmitting(true);
+    setError('');
 
-    setSubmitted(true);
-    setTimeout(() => {
-      onMilestoneAdded?.(newMilestone);
-      setSubmitted(false);
-      onClose();
-    }, 1100);
+    try {
+      const activityPayload = {
+        title: formData.title.trim(),
+        activityType,
+        status: 'Planned',
+        priority: formData.priority || 'Medium',
+        activityDate: formData.date,
+        activityTime: formData.time || '08:00 AM',
+        description: formData.description.trim() || 'Scheduled agronomic field task.',
+      };
+
+      const savedActivity = await activityService.createActivity(Number(selectedField.id), activityPayload);
+
+      const newMilestone = {
+        id: savedActivity?.id ? String(savedActivity.id) : `act-${Date.now()}`,
+        title: formData.title.trim(),
+        crop: formData.crop,
+        variety: selectedField?.cropVariety || 'Standard',
+        fieldId: selectedField.id,
+        fieldName: selectedField.name || `Field #${selectedField.id}`,
+        farmId: selectedField.farmId,
+        farmName: selectedField.farmName || '',
+        eventType: formData.eventType,
+        category,
+        date: formData.date,
+        displayDate: formData.date,
+        stage: selectedField?.cropStage || 'Vegetative Growth',
+        status: 'Scheduled',
+        statusVariant,
+        priority: formData.priority,
+        description: formData.description.trim() || 'Scheduled agronomic field task.',
+      };
+
+      setSubmitted(true);
+      setTimeout(() => {
+        onMilestoneAdded?.(newMilestone);
+        setSubmitted(false);
+        setIsSubmitting(false);
+        onClose();
+      }, 1000);
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || t('common.error', 'Failed to save milestone.'));
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -123,12 +156,25 @@ export default function AddMilestoneModal({
 
         <form onSubmit={handleSubmit}>
           <div className="agri-modal-body">
-            <div className="agri-demo-badge-banner">
-              <Info size={16} aria-hidden="true" />
-              <span>
-                <strong>{t('common.info', 'Demo Mode')}:</strong> {t('common.demoNote', 'Scheduled milestone will be saved in memory for this session.')}
-              </span>
-            </div>
+            {error && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  backgroundColor: '#fef2f2',
+                  color: '#991b1b',
+                  border: '1px solid #fecaca',
+                  borderRadius: 'var(--radius-md, 8px)',
+                  marginBottom: '1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                <AlertCircle size={16} />
+                <span>{error}</span>
+              </div>
+            )}
 
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
@@ -258,8 +304,15 @@ export default function AddMilestoneModal({
               <Button variant="secondary" onClick={onClose} type="button">
                 {t('common.cancel', 'Cancel')}
               </Button>
-              <Button variant="primary" type="submit">
-                {t('cropCalendar.addMilestone', 'Schedule Milestone')}
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={15} style={{ animation: 'spin 1s linear infinite', marginRight: '6px' }} />
+                    <span>{t('common.saving', 'Saving...')}</span>
+                  </>
+                ) : (
+                  t('cropCalendar.addMilestone', 'Schedule Milestone')
+                )}
               </Button>
             </div>
           )}

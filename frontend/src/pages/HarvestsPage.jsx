@@ -17,7 +17,7 @@ import harvestService from '../services/harvestService';
 import cropService from '../services/cropService';
 import farmService from '../services/farmService';
 import fieldService from '../services/fieldService';
-import { adaptHarvest } from '../utils/adapters';
+import { adaptHarvest, adaptFarm, adaptField } from '../utils/adapters';
 
 export default function HarvestsPage() {
   const { t } = useTranslation();
@@ -102,10 +102,13 @@ export default function HarvestsPage() {
 
         const adapted = rawHarvests.map((h) => adaptHarvest(h, cyclesMap, flMap, fMap));
 
+        const adaptedFarms = rawFarms.map((f) => adaptFarm(f, rawFields)).filter(Boolean);
+        const adaptedFields = rawFields.map((fl) => adaptField(fl, rawCrops)).filter(Boolean);
+
         setHarvests(adapted);
         setCropCycles(rawCrops);
-        setFarms(rawFarms);
-        setFields(rawFields);
+        setFarms(adaptedFarms);
+        setFields(adaptedFields);
 
         // Preselect harvest if queryId present
         if (queryId) {

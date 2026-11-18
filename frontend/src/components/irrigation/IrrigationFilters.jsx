@@ -118,7 +118,7 @@ export default function IrrigationFilters({
             <option value="">{t('common.all')} {t('navigation.farms')}</option>
             {farms.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name}
+                {t(`farms.demoNames.${f.id}`, f.name || f.farmName || `Farm #${f.id}`)}
               </option>
             ))}
           </select>

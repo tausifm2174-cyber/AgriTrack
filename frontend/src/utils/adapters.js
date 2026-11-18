@@ -18,9 +18,12 @@ export function adaptFarm(farm, fields = []) {
     ? fields.filter((f) => String(f.farmId) === String(farmId))
     : [];
 
+  const farmName = farm.farmName || farm.name || 'Unnamed Farm';
+
   return {
     id: farmId,
-    name: farm.farmName || farm.name || 'Unnamed Farm',
+    name: farmName,
+    farmName: farmName,
     code: farm.code || `FRM-${String(farmId).padStart(3, '0')}`,
     location: farm.location || 'Location Not Specified',
     totalArea: farm.totalArea != null ? Number(farm.totalArea) : 0,
@@ -62,11 +65,14 @@ export function adaptField(field, cropCycles = []) {
     ? cropCycles.find((c) => String(c.fieldId) === String(fieldId) && c.status !== 'Completed' && c.status !== 'Inactive')
     : null;
 
+  const fieldNameResolved = field.fieldName || field.name || `Field #${fieldId}`;
+
   return {
     id: fieldId,
     farmId: field.farmId,
     farmName: field.farmName || '',
-    name: field.fieldName || field.name || `Field #${fieldId}`,
+    name: fieldNameResolved,
+    fieldName: fieldNameResolved,
     code: field.code || `FLD-${fieldId}`,
     area: field.area != null ? Number(field.area) : 0,
     areaAcres: field.area != null ? Number(field.area) : (field.areaAcres != null ? Number(field.areaAcres) : 0),
@@ -191,9 +197,12 @@ export function adaptCropCycle(cycle, field = null) {
     { stage: 'Harvest Readiness', date: cycle.expectedHarvestDate || '', status: stageStep === 5 ? 'In Progress' : 'Upcoming', notes: '' },
   ];
 
+  const resolvedCropName = cycle.cropName || cycle.name || 'Unnamed Crop';
+
   return {
     id: cycleId,
-    cropName: cycle.cropName || 'Unnamed Crop',
+    cropName: resolvedCropName,
+    name: resolvedCropName,
     variety: cycle.variety || '',
     category: cycle.category ?? field?.cropCategory ?? null,
     farmId: cycle.farmId || field?.farmId || '',
@@ -207,6 +216,7 @@ export function adaptCropCycle(cycle, field = null) {
     expectedHarvestDate: cycle.expectedHarvestDate || '',
     actualHarvestDate: cycle.actualHarvestDate || '',
     currentStage: cycle.currentStage || 'Sowing',
+    stage: cycle.currentStage || 'Sowing',
     currentStageStep: stageStep,
     progressPercent,
     status,
@@ -234,8 +244,8 @@ export function adaptActivity(activity, fieldsMap = {}, farmsMap = {}) {
 
   const fieldId = activity.fieldId ?? null;
   const farmId = activity.farmId ?? fieldsMap[fieldId]?.farmId ?? null;
-  const farmName = activity.farmName || farmsMap[farmId]?.name || '';
-  const fieldName = activity.fieldName || fieldsMap[fieldId]?.name || '';
+  const farmName = activity.farmName || farmsMap[farmId]?.name || farmsMap[farmId]?.farmName || '';
+  const fieldName = activity.fieldName || fieldsMap[fieldId]?.name || fieldsMap[fieldId]?.fieldName || (fieldId ? `Field #${fieldId}` : '');
   const cropCycleId = activity.cropCycleId ?? null;
   const cropName = activity.cropName || '';
   const duration = activity.durationHours != null ? Number(activity.durationHours) : null;
@@ -282,8 +292,8 @@ export function adaptIrrigation(schedule, fieldsMap = {}, farmsMap = {}) {
 
   const fieldId = schedule.fieldId ?? null;
   const farmId = schedule.farmId ?? fieldsMap[fieldId]?.farmId ?? null;
-  const farmName = schedule.farmName || farmsMap[farmId]?.name || '';
-  const fieldName = schedule.fieldName || fieldsMap[fieldId]?.name || '';
+  const farmName = schedule.farmName || farmsMap[farmId]?.name || farmsMap[farmId]?.farmName || '';
+  const fieldName = schedule.fieldName || fieldsMap[fieldId]?.name || fieldsMap[fieldId]?.fieldName || (fieldId ? `Field #${fieldId}` : '');
   const cropCycleId = schedule.cropCycleId ?? null;
   const cropName = schedule.cropName || '';
   const durationMinutes = schedule.durationMinutes != null ? Number(schedule.durationMinutes) : null;
@@ -334,10 +344,10 @@ export function adaptHarvest(harvest, cropCyclesMap = {}, fieldsMap = {}, farmsM
   const fieldId = harvest.fieldId ?? cycle.fieldId ?? null;
   const farmId = harvest.farmId ?? cycle.farmId ?? fieldsMap[fieldId]?.farmId ?? null;
 
-  const cropName = harvest.cropName || cycle.cropName || '';
+  const cropName = harvest.cropName || cycle.cropName || cycle.name || '';
   const variety = harvest.variety || cycle.variety || '';
-  const farmName = harvest.farmName || farmsMap[farmId]?.name || '';
-  const fieldName = harvest.fieldName || fieldsMap[fieldId]?.name || '';
+  const farmName = harvest.farmName || cycle.farmName || farmsMap[farmId]?.name || farmsMap[farmId]?.farmName || '';
+  const fieldName = harvest.fieldName || cycle.fieldName || fieldsMap[fieldId]?.name || fieldsMap[fieldId]?.fieldName || (fieldId ? `Field #${fieldId}` : '');
   const season = cycle.season || '';
 
   const harvestedQuantityKg = harvest.harvestedQuantityKg != null ? Number(harvest.harvestedQuantityKg) : 0;

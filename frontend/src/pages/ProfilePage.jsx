@@ -44,15 +44,15 @@ export default function ProfilePage() {
         if (!isMounted) return;
 
         const rawFarms = farmsRes.status === 'fulfilled' && Array.isArray(farmsRes.value) ? farmsRes.value : [];
-        const adaptedFarms = rawFarms.map(adaptFarm).filter(Boolean);
-        setFarms(adaptedFarms);
-
         const rawFields = fieldsRes.status === 'fulfilled' && Array.isArray(fieldsRes.value) ? fieldsRes.value : [];
-        const adaptedFields = rawFields.map(adaptField).filter(Boolean);
-        setFields(adaptedFields);
-
         const rawCrops = cropsRes.status === 'fulfilled' && Array.isArray(cropsRes.value) ? cropsRes.value : [];
+
+        const adaptedFarms = rawFarms.map((f) => adaptFarm(f, rawFields)).filter(Boolean);
+        const adaptedFields = rawFields.map((fld) => adaptField(fld)).filter(Boolean);
         const adaptedCrops = rawCrops.map((c) => adaptCropCycle(c)).filter(Boolean);
+
+        setFarms(adaptedFarms);
+        setFields(adaptedFields);
         setCrops(adaptedCrops);
       } catch {
         // Safe graceful degradation

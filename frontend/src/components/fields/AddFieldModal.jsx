@@ -13,18 +13,34 @@ export default function AddFieldModal({
   isOpen,
   onClose,
   onFieldAdded,
+  onFieldUpdated,
+  fieldToEdit = null,
   farms = [],
   defaultFarmId = '',
 }) {
   const { t } = useTranslation();
+  const isEditMode = Boolean(fieldToEdit);
   const fallbackFarmId = defaultFarmId || (farms[0]?.id ? String(farms[0].id) : '');
-  const [formData, setFormData] = useState({
-    name: '',
-    farmId: '',
-    areaAcres: '',
-    soilType: 'Alluvial Loam',
-    irrigationMethod: 'Drip Irrigation',
-    notes: '',
+
+  const [formData, setFormData] = useState(() => {
+    if (fieldToEdit) {
+      return {
+        name: fieldToEdit.name || fieldToEdit.fieldName || '',
+        farmId: fieldToEdit.farmId ? String(fieldToEdit.farmId) : fallbackFarmId,
+        areaAcres: fieldToEdit.area != null ? String(fieldToEdit.area) : (fieldToEdit.areaAcres != null ? String(fieldToEdit.areaAcres) : ''),
+        soilType: fieldToEdit.soilType || 'Alluvial Loam',
+        irrigationMethod: fieldToEdit.irrigationType || fieldToEdit.irrigationMethod || 'Drip Irrigation',
+        notes: fieldToEdit.description || fieldToEdit.notes || '',
+      };
+    }
+    return {
+      name: '',
+      farmId: '',
+      areaAcres: '',
+      soilType: 'Alluvial Loam',
+      irrigationMethod: 'Drip Irrigation',
+      notes: '',
+    };
   });
 
   const [errorMsg, setErrorMsg] = useState('');
@@ -67,25 +83,26 @@ export default function AddFieldModal({
 
     setIsSubmitting(true);
     try {
-      const createdField = await fieldService.createField(selectedFarmId, payload);
-      const adapted = adaptField(createdField);
+      let savedField;
+      if (isEditMode) {
+        savedField = await fieldService.updateField(fieldToEdit.id, payload);
+      } else {
+        savedField = await fieldService.createField(selectedFarmId, payload);
+      }
+      const adapted = adaptField(savedField);
       setSubmitted(true);
       setTimeout(() => {
-        onFieldAdded?.(adapted);
+        if (isEditMode) {
+          onFieldUpdated?.(adapted);
+        } else {
+          onFieldAdded?.(adapted);
+        }
         setSubmitted(false);
         setIsSubmitting(false);
-        setFormData({
-          name: '',
-          farmId: '',
-          areaAcres: '',
-          soilType: 'Alluvial Loam',
-          irrigationMethod: 'Drip Irrigation',
-          notes: '',
-        });
         onClose();
-      }, 1000);
+      }, 800);
     } catch (err) {
-      setErrorMsg(err.message || t('common.error', 'Failed to map field plot. Please try again.'));
+      setErrorMsg(err.message || t('common.error', 'Failed to save field plot. Please try again.'));
       setIsSubmitting(false);
     }
   };
@@ -104,10 +121,10 @@ export default function AddFieldModal({
         <div className="agri-modal-header">
           <div>
             <h3 id="add-field-title" className="agri-modal-title">
-              {t('fields.addField', 'Map New Field Plot')}
+              {isEditMode ? t('fields.editField', 'Edit Field Plot') : t('fields.addField', 'Map New Field Plot')}
             </h3>
             <p className="agri-modal-subtitle">
-              {t('fields.subtitle', 'Register a cultivation parcel and associate it with a farm holding')}
+              {isEditMode ? t('fields.editSubtitle', 'Update field parcel boundaries and agronomic baseline') : t('fields.subtitle', 'Register a cultivation parcel and associate it with a farm holding')}
             </p>
           </div>
           <button
@@ -288,7 +305,7 @@ export default function AddFieldModal({
                     <span>{t('common.saving', 'Saving...')}</span>
                   </>
                 ) : (
-                  <span>{t('fields.addField', 'Save Field Plot')}</span>
+                  <span>{isEditMode ? t('common.saveChanges', 'Save Changes') : t('fields.addField', 'Save Field Plot')}</span>
                 )}
               </Button>
             </div>

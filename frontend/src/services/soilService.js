@@ -1,4 +1,5 @@
 import api from './api';
+import fieldService from './fieldService';
 
 /**
  * Soil Record Service
@@ -10,6 +11,27 @@ import api from './api';
  *   DELETE /api/v1/soil-records/{id}
  */
 export const soilService = {
+  /**
+   * Retrieve all soil records across all fields belonging to the authenticated user.
+   * @returns {Promise<Array>} Unified list of SoilRecordResponse
+   */
+  async getAllSoilRecords() {
+    try {
+      const allFields = await fieldService.getAllFields();
+      if (!Array.isArray(allFields) || allFields.length === 0) return [];
+
+      const recordPromises = allFields.map((fld) =>
+        api.get(`/fields/${fld.id}/soil-records`)
+          .then((r) => (Array.isArray(r) ? r : r?.data?.data || r?.data || []))
+          .catch(() => [])
+      );
+      const results = await Promise.all(recordPromises);
+      return results.flat();
+    } catch {
+      return [];
+    }
+  },
+
   /**
    * Retrieve all soil test records for a specific field.
    * @param {number|string} fieldId Field ID

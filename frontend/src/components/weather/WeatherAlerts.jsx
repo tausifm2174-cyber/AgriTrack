@@ -6,7 +6,7 @@ import { StatusBadge } from '../common';
  * WeatherAlerts component
  * Renders rule-based agronomic alerts triggered by weather conditions.
  */
-export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Farm' }) {
+export default function WeatherAlerts({ alerts = [], farmName = '' }) {
   const { t } = useTranslation();
 
   const getAlertIcon = (type) => {
@@ -32,7 +32,7 @@ export default function WeatherAlerts({ alerts = [], farmName = 'Green Valley Fa
           <h2 className="agri-weather-alerts-card__title">{t('weather.ruleBasedAdvisories', 'Rule-Based Weather Advisories')}</h2>
         </div>
         <span className="agri-weather-alerts-card__sub">
-          {t('weather.thresholdsEvaluatedFor', 'Automated agronomic thresholds evaluated for')} {farmName}
+          {t('weather.thresholdsEvaluatedFor', 'Automated agronomic thresholds evaluated')}{farmName ? ` for ${farmName}` : ''}
         </span>
       </div>
 

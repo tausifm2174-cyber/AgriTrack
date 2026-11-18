@@ -76,31 +76,22 @@ export default function ExpensesPage() {
       setError(null);
 
       try {
-        // 1. Fetch auxiliary reference entities
-        const [rawFarms, rawCrops] = await Promise.all([
-          farmService.getAllFarms().catch(() => []),
-          cropService.getAllCropCycles().catch(() => []),
+        // 1. Fetch auxiliary reference entities in parallel
+        const [rawFarms, rawFields, rawCrops] = await Promise.all([
+          farmService.getAllFarms(),
+          fieldService.getAllFields(),
+          cropService.getAllCropCycles(),
         ]);
 
         if (!isMounted) return;
 
-        const adaptedFarms = Array.isArray(rawFarms) ? rawFarms.map((f) => adaptFarm(f)) : [];
-        setFarms(adaptedFarms);
-
         const adaptedCrops = Array.isArray(rawCrops) ? rawCrops.map((c) => adaptCropCycle(c)) : [];
         setCropCycles(adaptedCrops);
 
-        // 2. Fetch fields across all farms
-        let allFields = [];
-        if (adaptedFarms.length > 0) {
-          const fieldResults = await Promise.all(
-            adaptedFarms.map((f) =>
-              fieldService.getFieldsByFarm(f.id).catch(() => [])
-            )
-          );
-          allFields = fieldResults.flat().map((fld) => adaptField(fld, adaptedCrops));
-        }
-        if (!isMounted) return;
+        const adaptedFarms = Array.isArray(rawFarms) ? rawFarms.map((f) => adaptFarm(f, rawFields)) : [];
+        setFarms(adaptedFarms);
+
+        const allFields = Array.isArray(rawFields) ? rawFields.map((fld) => adaptField(fld, adaptedCrops)) : [];
         setFields(allFields);
 
         // 3. Fetch expenses & summary

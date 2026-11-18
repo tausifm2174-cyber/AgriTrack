@@ -23,9 +23,8 @@ export default function CropCalendarView({
   onSelectDate,
 }) {
   const { t, i18n } = useTranslation();
-  // Anchored to October 2026 based on demo dataset
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [currentMonth, setCurrentMonth] = useState(9); // 0-indexed: 9 = October
+  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -45,9 +44,10 @@ export default function CropCalendarView({
     }
   };
 
-  const handleGoToOctober2026 = () => {
-    setCurrentYear(2026);
-    setCurrentMonth(9);
+  const handleGoToToday = () => {
+    const now = new Date();
+    setCurrentYear(now.getFullYear());
+    setCurrentMonth(now.getMonth());
   };
 
   // Map events to date strings
@@ -74,6 +74,8 @@ export default function CropCalendarView({
       cells.push({ empty: true, key: `empty-${i}` });
     }
 
+    const todayStr = new Date().toISOString().slice(0, 10);
+
     // Days in current month
     for (let day = 1; day <= daysInMonth; day++) {
       const monthStr = String(currentMonth + 1).padStart(2, '0');
@@ -87,7 +89,7 @@ export default function CropCalendarView({
         dayNumber: day,
         dateString: dateStr,
         events: dayEvents,
-        isToday: dateStr === '2026-10-03', // Demo current date
+        isToday: dateStr === todayStr,
         isSelected: dateStr === selectedDate,
       });
     }
@@ -119,7 +121,7 @@ export default function CropCalendarView({
           <button
             type="button"
             className="agri-cal-nav-btn"
-            onClick={handleGoToOctober2026}
+            onClick={handleGoToToday}
             title={t('common.today', 'Today')}
           >
             {t('common.today', 'Today')}

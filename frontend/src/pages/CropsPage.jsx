@@ -41,26 +41,17 @@ export default function CropsPage() {
 
     const loadData = async () => {
       try {
-        const [farmList, cropList] = await Promise.all([
-          farmService.getAllFarms().catch(() => []),
-          cropService.getAllCropCycles().catch(() => []),
+        const [farmList, fieldList, cropList] = await Promise.all([
+          farmService.getAllFarms(),
+          fieldService.getAllFields(),
+          cropService.getAllCropCycles(),
         ]);
 
         if (ignore) return;
 
-        const adaptedFarms = Array.isArray(farmList) ? farmList.map((f) => adaptFarm(f)) : [];
+        const rawFields = Array.isArray(fieldList) ? fieldList : [];
+        const adaptedFarms = Array.isArray(farmList) ? farmList.map((f) => adaptFarm(f, rawFields)) : [];
         setFarms(adaptedFarms);
-
-        // Fetch fields across all user farms
-        let rawFields = [];
-        if (adaptedFarms.length > 0) {
-          const fieldsArrays = await Promise.all(
-            adaptedFarms.map((f) => fieldService.getFieldsByFarm(f.id).catch(() => []))
-          );
-          rawFields = fieldsArrays.flat();
-        }
-
-        if (ignore) return;
 
         const adaptedFields = rawFields.map((f) => adaptField(f, cropList));
         setFields(adaptedFields);

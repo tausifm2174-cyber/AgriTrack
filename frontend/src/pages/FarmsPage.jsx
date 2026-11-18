@@ -22,6 +22,7 @@ export default function FarmsPage() {
   const { t } = useTranslation();
   const [farms, setFarms] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState(null);
+  const [farmToEdit, setFarmToEdit] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,15 +90,33 @@ export default function FarmsPage() {
     setFarms((prev) => [newFarm, ...prev]);
   };
 
+  const handleFarmUpdated = (updatedFarm) => {
+    setFarms((prev) => prev.map((f) => (String(f.id) === String(updatedFarm.id) ? updatedFarm : f)));
+    if (selectedFarm && String(selectedFarm.id) === String(updatedFarm.id)) {
+      setSelectedFarm(updatedFarm);
+    }
+  };
+
   const handleFarmDeleted = (deletedFarmId) => {
     setFarms((prev) => prev.filter((f) => String(f.id) !== String(deletedFarmId)));
     setSelectedFarm(null);
   };
 
+  const handleOpenAddModal = () => {
+    setFarmToEdit(null);
+    setIsAddModalOpen(true);
+  };
+
+  const handleEditFarm = (farm) => {
+    setSelectedFarm(null);
+    setFarmToEdit(farm);
+    setIsAddModalOpen(true);
+  };
+
   return (
     <div className="agri-farms-page">
       {/* 1. Header with Add Farm action */}
-      <FarmHeader onAddFarm={() => setIsAddModalOpen(true)} />
+      <FarmHeader onAddFarm={handleOpenAddModal} />
 
       {/* Error Banner with Retry */}
       {error && (
@@ -177,15 +196,23 @@ export default function FarmsPage() {
           farm={selectedFarm}
           onClose={() => setSelectedFarm(null)}
           onDeleteFarm={handleFarmDeleted}
+          onEditFarm={handleEditFarm}
         />
       )}
 
-      {/* 5. Add Farm Modal */}
-      <AddFarmModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onFarmAdded={handleFarmAdded}
-      />
+      {/* 5. Add / Edit Farm Modal */}
+      {isAddModalOpen && (
+        <AddFarmModal
+          isOpen={isAddModalOpen}
+          onClose={() => {
+            setIsAddModalOpen(false);
+            setFarmToEdit(null);
+          }}
+          onFarmAdded={handleFarmAdded}
+          onFarmUpdated={handleFarmUpdated}
+          farmToEdit={farmToEdit}
+        />
+      )}
     </div>
   );
 }

@@ -32,6 +32,7 @@ export default function FieldsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState('');
   const [selectedField, setSelectedField] = useState(null);
+  const [fieldToEdit, setFieldToEdit] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -174,17 +175,56 @@ export default function FieldsPage() {
 
   const handleFieldAdded = (newField) => {
     setFields((prev) => [newField, ...prev]);
+    setFarms((prev) =>
+      prev.map((f) =>
+        String(f.id) === String(newField.farmId)
+          ? { ...f, fieldsCount: (f.fieldsCount || 0) + 1, fieldIds: [...(f.fieldIds || []), newField.id] }
+          : f
+      )
+    );
   };
 
   const handleFieldDeleted = (deletedFieldId) => {
+    const deleted = fields.find((f) => String(f.id) === String(deletedFieldId));
     setFields((prev) => prev.filter((f) => String(f.id) !== String(deletedFieldId)));
+    if (deleted) {
+      setFarms((prev) =>
+        prev.map((f) =>
+          String(f.id) === String(deleted.farmId)
+            ? {
+                ...f,
+                fieldsCount: Math.max(0, (f.fieldsCount || 1) - 1),
+                fieldIds: (f.fieldIds || []).filter((id) => String(id) !== String(deletedFieldId)),
+              }
+            : f
+        )
+      );
+    }
     setSelectedField(null);
+  };
+
+  const handleFieldUpdated = (updatedField) => {
+    setFields((prev) => prev.map((f) => (String(f.id) === String(updatedField.id) ? updatedField : f)));
+    if (selectedField && String(selectedField.id) === String(updatedField.id)) {
+      setSelectedField(updatedField);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    setFieldToEdit(null);
+    setIsAddModalOpen(true);
+  };
+
+  const handleEditField = (fld) => {
+    setSelectedField(null);
+    setFieldToEdit(fld);
+    setIsAddModalOpen(true);
   };
 
   return (
     <div className="agri-fields-page">
       {/* 1. Header with Add Field button */}
-      <FieldHeader onAddField={() => setIsAddModalOpen(true)} />
+      <FieldHeader onAddField={handleOpenAddModal} />
 
       {/* Error Alert with Retry */}
       {error && (
@@ -311,17 +351,25 @@ export default function FieldsPage() {
               field={selectedField}
               onClose={() => setSelectedField(null)}
               onDeleteField={handleFieldDeleted}
+              onEditField={handleEditField}
             />
           )}
 
-          {/* 6. Add Field Modal */}
-          <AddFieldModal
-            isOpen={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-            onFieldAdded={handleFieldAdded}
-            farms={farms}
-            defaultFarmId={selectedFarmId}
-          />
+          {/* 6. Add / Edit Field Modal */}
+          {isAddModalOpen && (
+            <AddFieldModal
+              isOpen={isAddModalOpen}
+              onClose={() => {
+                setIsAddModalOpen(false);
+                setFieldToEdit(null);
+              }}
+              onFieldAdded={handleFieldAdded}
+              onFieldUpdated={handleFieldUpdated}
+              fieldToEdit={fieldToEdit}
+              farms={farms}
+              defaultFarmId={selectedFarmId}
+            />
+          )}
         </>
       )}
     </div>

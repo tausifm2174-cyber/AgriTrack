@@ -7,18 +7,33 @@ import { adaptFarm } from '../../utils/adapters';
 
 /**
  * AddFarmModal component
- * Modal dialog for registering a new farm holding with backend persistence.
+ * Modal dialog for registering a new farm holding or updating an existing one with backend persistence.
  */
-export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
+export default function AddFarmModal({ isOpen, onClose, onFarmAdded, onFarmUpdated, farmToEdit = null }) {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    name: '',
-    location: '',
-    areaAcres: '',
-    soilType: 'Alluvial Loam',
-    waterSource: 'Borewell / Tube Well',
-    primaryCrop: '',
-    notes: '',
+  const isEditMode = Boolean(farmToEdit);
+
+  const [formData, setFormData] = useState(() => {
+    if (farmToEdit) {
+      return {
+        name: farmToEdit.name || farmToEdit.farmName || '',
+        location: farmToEdit.location || '',
+        areaAcres: farmToEdit.totalArea != null ? String(farmToEdit.totalArea) : (farmToEdit.areaAcres != null ? String(farmToEdit.areaAcres) : ''),
+        soilType: farmToEdit.soilType || 'Alluvial Loam',
+        waterSource: farmToEdit.waterSource || 'Borewell / Tube Well',
+        primaryCrop: farmToEdit.primaryCrop || '',
+        notes: farmToEdit.description || farmToEdit.notes || '',
+      };
+    }
+    return {
+      name: '',
+      location: '',
+      areaAcres: '',
+      soilType: 'Alluvial Loam',
+      waterSource: 'Borewell / Tube Well',
+      primaryCrop: '',
+      notes: '',
+    };
   });
 
   const [errorMsg, setErrorMsg] = useState('');
@@ -58,26 +73,26 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
 
     setIsSubmitting(true);
     try {
-      const createdFarm = await farmService.createFarm(payload);
-      const adapted = adaptFarm(createdFarm, []);
+      let savedFarm;
+      if (isEditMode) {
+        savedFarm = await farmService.updateFarm(farmToEdit.id, payload);
+      } else {
+        savedFarm = await farmService.createFarm(payload);
+      }
+      const adapted = adaptFarm(savedFarm, farmToEdit?.fieldIds ? farmToEdit.fieldIds.map((id) => ({ id, farmId: farmToEdit.id })) : []);
       setSubmitted(true);
       setTimeout(() => {
-        onFarmAdded?.(adapted);
+        if (isEditMode) {
+          onFarmUpdated?.(adapted);
+        } else {
+          onFarmAdded?.(adapted);
+        }
         setSubmitted(false);
         setIsSubmitting(false);
-        setFormData({
-          name: '',
-          location: '',
-          areaAcres: '',
-          soilType: 'Alluvial Loam',
-          waterSource: 'Borewell / Tube Well',
-          primaryCrop: '',
-          notes: '',
-        });
         onClose();
-      }, 1000);
+      }, 800);
     } catch (err) {
-      setErrorMsg(err.message || t('common.error', 'Failed to register farm holding. Please try again.'));
+      setErrorMsg(err.message || t('common.error', 'Failed to save farm holding. Please try again.'));
       setIsSubmitting(false);
     }
   };
@@ -96,10 +111,10 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
         <div className="agri-modal-header">
           <div>
             <h3 id="add-farm-title" className="agri-modal-title">
-              {t('farms.addFarm', 'Register New Farm Holding')}
+              {isEditMode ? t('farms.editFarm', 'Edit Farm Holding') : t('farms.addFarm', 'Register New Farm Holding')}
             </h3>
             <p className="agri-modal-subtitle">
-              {t('farms.subtitle', 'Add a new property or land parcel to your operational portfolio')}
+              {isEditMode ? t('farms.editSubtitle', 'Update property details and boundaries') : t('farms.subtitle', 'Add a new property or land parcel to your operational portfolio')}
             </p>
           </div>
           <button
@@ -274,10 +289,10 @@ export default function AddFarmModal({ isOpen, onClose, onFarmAdded }) {
                 {isSubmitting ? (
                   <>
                     <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                    <span>{t('common.saving', 'Registering...')}</span>
+                    <span>{t('common.saving', 'Saving...')}</span>
                   </>
                 ) : (
-                  <span>{t('farms.addFarm', 'Register Farm')}</span>
+                  <span>{isEditMode ? t('common.saveChanges', 'Save Changes') : t('farms.addFarm', 'Register Farm')}</span>
                 )}
               </Button>
             </div>

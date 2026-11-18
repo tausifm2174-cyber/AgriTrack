@@ -77,6 +77,10 @@ export default function RevenuePage() {
           if (adapted) harvestsMap[adapted.id] = adapted;
         });
 
+        if (salesRes.status === 'rejected') {
+          setLoadError(salesRes.reason?.response?.data?.message || salesRes.reason?.message || 'Failed to load revenue sales data');
+        }
+
         const rawSales = salesRes.status === 'fulfilled' && Array.isArray(salesRes.value) ? salesRes.value : [];
         const adaptedSales = rawSales.map((s) => adaptSale(s, harvestsMap)).filter(Boolean);
         setSales(adaptedSales);

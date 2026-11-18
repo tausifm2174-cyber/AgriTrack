@@ -17,7 +17,7 @@ import farmService from '../services/farmService';
 import fieldService from '../services/fieldService';
 import cropService from '../services/cropService';
 import activityService from '../services/activityService';
-import { adaptActivity, adaptField } from '../utils/adapters';
+import { adaptActivity, adaptField, adaptFarm } from '../utils/adapters';
 import '../components/activities/activities.css';
 
 /**
@@ -85,6 +85,7 @@ export default function ActivitiesPage() {
         setIsLoading(true);
         setLoadError(null);
 
+        // 1. Fetch farms, fields, crops, and activities in parallel
         const [farmsRes, fieldsRes, cropsRes, activitiesRes] = await Promise.all([
           farmService.getAllFarms(),
           fieldService.getAllFields(),
@@ -94,25 +95,35 @@ export default function ActivitiesPage() {
 
         if (!isMounted) return;
 
-        const rawFarms = Array.isArray(farmsRes) ? farmsRes : [];
-        const rawFields = Array.isArray(fieldsRes) ? fieldsRes : [];
-        const rawCrops = Array.isArray(cropsRes) ? cropsRes : [];
-        const rawActivities = Array.isArray(activitiesRes) ? activitiesRes : [];
+        const rawFarms = Array.isArray(farmsRes)
+          ? farmsRes
+          : (farmsRes?.data?.data || farmsRes?.data || []);
+        const rawFields = Array.isArray(fieldsRes)
+          ? fieldsRes
+          : (fieldsRes?.data?.data || fieldsRes?.data || []);
+        const rawCrops = Array.isArray(cropsRes)
+          ? cropsRes
+          : (cropsRes?.data?.data || cropsRes?.data || []);
+        const rawActivities = Array.isArray(activitiesRes)
+          ? activitiesRes
+          : (activitiesRes?.data?.data || activitiesRes?.data || []);
 
-        const fMap = rawFarms.reduce((acc, f) => {
+        const adaptedFarms = rawFarms.map((f) => adaptFarm(f, rawFields)).filter(Boolean);
+        const adaptedFields = rawFields.map((f) => adaptField(f, rawCrops)).filter(Boolean);
+
+        const fMap = adaptedFarms.reduce((acc, f) => {
           acc[f.id] = f;
           return acc;
         }, {});
 
-        const flMap = rawFields.reduce((acc, f) => {
+        const flMap = adaptedFields.reduce((acc, f) => {
           acc[f.id] = f;
           return acc;
         }, {});
 
-        const adaptedFields = rawFields.map((f) => adaptField(f, rawCrops));
-        const adaptedActivities = rawActivities.map((a) => adaptActivity(a, flMap, fMap));
+        const adaptedActivities = rawActivities.map((a) => adaptActivity(a, flMap, fMap)).filter(Boolean);
 
-        setFarms(rawFarms);
+        setFarms(adaptedFarms);
         setFields(adaptedFields);
         setCrops(rawCrops);
         setActivities(adaptedActivities);

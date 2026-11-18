@@ -51,7 +51,7 @@ export default function ActivityDetailsModal({
 
   const farm = farmsMap[activity.farmId];
   const field = fieldsMap[activity.fieldId];
-  const farmName = farm?.name ? t(`farms.demoNames.${activity.farmId}`, farm.name) : activity.farmId;
+  const farmName = (farm?.name || farm?.farmName) ? t(`farms.demoNames.${activity.farmId}`, farm.name || farm.farmName) : activity.farmId;
   const fieldName = field?.name ? formatFieldName(field.name, t) : activity.fieldId;
 
   const handleNavigateToField = () => {

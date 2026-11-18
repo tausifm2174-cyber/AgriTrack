@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Warehouse, Sprout, Wallet, TrendingUp } from 'lucide-react';
+import { Warehouse, Sprout, Wallet, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { translateCrop } from '../utils/displayLabels';
 import { useAuth } from '../context/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
+import { LoadingState } from '../components/common';
 
 // Services
 import farmService from '../services/farmService';
@@ -77,12 +78,17 @@ export default function DashboardPage() {
   const [weatherSnapshot, setWeatherSnapshot] = useState(null);
   const [advisories, setAdvisories] = useState([]);
   const [marketPrices, setMarketPrices] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Orchestrated data loading
   useEffect(() => {
     let isMounted = true;
 
     async function loadDashboardData() {
+      setIsLoading(true);
+      setLoadError(null);
       try {
         const [
           farmsRes,
@@ -106,13 +112,31 @@ export default function DashboardPage() {
 
         if (!isMounted) return;
 
+        // Track critical failures
+        const failedSections = [];
+        if (farmsRes.status === 'rejected') failedSections.push(t('navigation.farms', 'Farms'));
+        if (fieldsRes.status === 'rejected') failedSections.push(t('navigation.fields', 'Fields'));
+        if (cropsRes.status === 'rejected') failedSections.push(t('navigation.crops', 'Crops'));
+        if (activitiesRes.status === 'rejected') failedSections.push(t('navigation.activities', 'Activities'));
+        if (profitLossRes.status === 'rejected') failedSections.push(t('navigation.financials', 'Financials'));
+
+        if (failedSections.length > 0) {
+          setLoadError(
+            t(
+              'dashboard.partialLoadError',
+              'Failed to retrieve server data for: {{sections}}. Displaying available metrics.',
+              { sections: failedSections.join(', ') }
+            )
+          );
+        }
+
         // Process Farms & Fields
         const rawFarms = farmsRes.status === 'fulfilled' && Array.isArray(farmsRes.value) ? farmsRes.value : [];
-        const adaptedFarms = rawFarms.map(adaptFarm).filter(Boolean);
-        setFarms(adaptedFarms);
-
         const rawFields = fieldsRes.status === 'fulfilled' && Array.isArray(fieldsRes.value) ? fieldsRes.value : [];
-        const adaptedFields = rawFields.map(adaptField).filter(Boolean);
+
+        const adaptedFarms = rawFarms.map((f) => adaptFarm(f, rawFields)).filter(Boolean);
+        const adaptedFields = rawFields.map((fld) => adaptField(fld)).filter(Boolean);
+        setFarms(adaptedFarms);
         setFields(adaptedFields);
 
         // Process Crops
@@ -120,9 +144,11 @@ export default function DashboardPage() {
         const adaptedCrops = rawCrops.map((c) => adaptCropCycle(c)).filter(Boolean);
         setCrops(adaptedCrops);
 
-        // Process Activities
+        // Process Activities with lookup maps
+        const fMap = adaptedFarms.reduce((acc, f) => { acc[f.id] = f; return acc; }, {});
+        const flMap = adaptedFields.reduce((acc, fld) => { acc[fld.id] = fld; return acc; }, {});
         const rawActivities = activitiesRes.status === 'fulfilled' && Array.isArray(activitiesRes.value) ? activitiesRes.value : [];
-        const adaptedActivities = rawActivities.map((a) => adaptActivity(a)).filter(Boolean);
+        const adaptedActivities = rawActivities.map((a) => adaptActivity(a, flMap, fMap)).filter(Boolean);
         setActivities(adaptedActivities);
 
         // Process Financials
@@ -155,8 +181,14 @@ export default function DashboardPage() {
             if (isMounted) setWeatherSnapshot(null);
           }
         }
-      } catch {
-        // Safe graceful degradation
+      } catch (err) {
+        if (isMounted) {
+          setLoadError(err.message || t('dashboard.loadError', 'Failed to load dashboard data.'));
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
 
@@ -165,7 +197,11 @@ export default function DashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [refreshKey, t]);
+
+  const handleRetry = () => {
+    setRefreshKey((k) => k + 1);
+  };
 
   // Derived Farmer Header Model
   const farmerHeader = useMemo(() => {
@@ -292,8 +328,56 @@ export default function DashboardPage() {
       {/* 1. Dashboard Header */}
       <DashboardHeader farmer={farmerHeader} />
 
-      {/* 2. Top Weather & 4 Primary KPI Summary Cards */}
-      <section className="agri-kpi-grid" aria-label={t('navigation.dashboard', 'Key Performance Indicators')}>
+      {/* Error Alert Banner with Retry */}
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            backgroundColor: '#fef2f2',
+            color: '#b91c1c',
+            border: '1px solid #fecaca',
+            padding: '0.875rem 1.25rem',
+            borderRadius: '12px',
+            marginBottom: '1.25rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <AlertCircle size={20} style={{ flexShrink: 0 }} />
+            <span style={{ fontSize: '0.925rem', fontWeight: 500 }}>{loadError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleRetry}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.375rem',
+              padding: '0.375rem 0.75rem',
+              backgroundColor: '#fff',
+              border: '1px solid #fca5a5',
+              borderRadius: '6px',
+              color: '#b91c1c',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            <RefreshCw size={14} />
+            <span>{t('common.retry', 'Retry')}</span>
+          </button>
+        </div>
+      )}
+
+      {isLoading && farms.length === 0 ? (
+        <LoadingState message={t('dashboard.loadingData', 'Loading authoritative farm metrics and records...')} />
+      ) : (
+        <>
+          {/* 2. Top Weather & 4 Primary KPI Summary Cards */}
+          <section className="agri-kpi-grid" aria-label={t('navigation.dashboard', 'Key Performance Indicators')}>
         {/* Weather Summary Card */}
         <div className="agri-kpi-grid__weather">
           <WeatherCard weather={weatherSnapshot} />
@@ -385,6 +469,8 @@ export default function DashboardPage() {
       <section aria-label={t('dashboard.quickActions.title', 'Quick Actions')}>
         <QuickActions actions={DEFAULT_QUICK_ACTIONS} />
       </section>
+        </>
+      )}
     </div>
   );
 }

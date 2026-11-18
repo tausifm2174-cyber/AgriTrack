@@ -82,8 +82,8 @@ export default function ProfitLossPage() {
     async function loadReferences() {
       try {
         const [rawFarms, rawCrops] = await Promise.all([
-          farmService.getAllFarms().catch(() => []),
-          cropService.getAllCropCycles().catch(() => []),
+          farmService.getAllFarms(),
+          cropService.getAllCropCycles(),
         ]);
         if (isMounted) {
           setFarms(Array.isArray(rawFarms) ? rawFarms.map((f) => adaptFarm(f)) : []);

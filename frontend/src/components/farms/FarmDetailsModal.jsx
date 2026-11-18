@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Grid3X3, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
+import { X, Grid3X3, Trash2, AlertTriangle, Loader2, Edit3 } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
 import farmService from '../../services/farmService';
@@ -10,7 +10,7 @@ import farmService from '../../services/farmService';
  * FarmDetailsModal component
  * Modal showing comprehensive breakdown of a farm holding with live actions.
  */
-export default function FarmDetailsModal({ farm, onClose, onDeleteFarm }) {
+export default function FarmDetailsModal({ farm, onClose, onDeleteFarm, onEditFarm }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -216,6 +216,14 @@ export default function FarmDetailsModal({ farm, onClose, onDeleteFarm }) {
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Button variant="secondary" onClick={onClose} disabled={isDeleting}>
               {t('common.close', 'Close')}
+            </Button>
+            <Button
+              variant="outline"
+              icon={<Edit3 size={15} aria-hidden="true" />}
+              onClick={() => onEditFarm?.(farm)}
+              disabled={isDeleting}
+            >
+              {t('common.edit', 'Edit')}
             </Button>
             <Button
               variant="primary"

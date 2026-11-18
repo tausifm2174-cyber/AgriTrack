@@ -143,10 +143,22 @@ function ActivityFormContent({
       newErrors.activityType = t('validation.required');
     }
     if (!formData.farmId) {
-      newErrors.farmId = t('validation.selectFarm');
+      newErrors.farmId = t('validation.selectFarm', 'Please select a farm holding.');
     }
     if (!formData.fieldId) {
-      newErrors.fieldId = t('validation.selectField');
+      newErrors.fieldId = t('validation.selectField', 'Please select a field parcel.');
+    } else if (formData.farmId) {
+      const fieldObj = fields.find((f) => String(f.id) === String(formData.fieldId));
+      if (fieldObj && String(fieldObj.farmId) !== String(formData.farmId)) {
+        newErrors.fieldId = t('validation.invalidField', 'Selected field does not belong to this farm.');
+      }
+    }
+
+    if (formData.cropCycleId && formData.fieldId) {
+      const cropObj = crops.find((c) => String(c.id) === String(formData.cropCycleId));
+      if (cropObj && String(cropObj.fieldId) !== String(formData.fieldId)) {
+        newErrors.cropCycleId = t('validation.invalidCrop', 'Selected crop does not belong to this field.');
+      }
     }
     if (!formData.date) {
       newErrors.date = t('validation.enterValidDate');
@@ -206,12 +218,15 @@ function ActivityFormContent({
     }
   };
 
-  const hasNoFarmsOrFields = farms.length === 0 || fields.length === 0;
+  const hasNoFarms = farms.length === 0;
+  const hasNoFields = fields.length === 0;
+  const selectedFarmHasNoFields = Boolean(formData.farmId && availableFields.length === 0);
+  const prerequisiteMissing = hasNoFarms || hasNoFields || selectedFarmHasNoFields;
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="agri-modal-body" style={{ maxHeight: 'calc(80vh - 120px)', overflowY: 'auto' }}>
-        {hasNoFarmsOrFields && (
+        {hasNoFarms && (
           <div
             style={{
               padding: '0.75rem 1rem',
@@ -227,7 +242,31 @@ function ActivityFormContent({
             }}
           >
             <AlertCircle size={18} aria-hidden="true" />
-            <span>{t('activities.noFarmsOrFields', 'You need to add at least one farm and field before creating an activity.')}</span>
+            <span>{t('activities.noFarms', 'No farms available. Create a farm before logging an activity.')}</span>
+          </div>
+        )}
+
+        {!hasNoFarms && (hasNoFields || selectedFarmHasNoFields) && (
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              backgroundColor: 'var(--warning-bg, #fffbeb)',
+              border: '1px solid var(--warning-border, #fef3c7)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--warning-text, #92400e)',
+              fontSize: '0.875rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>
+              {selectedFarmHasNoFields
+                ? t('activities.noFieldsForFarm', 'No fields available for this farm. Create a field first.')
+                : t('activities.noFields', 'No fields available. Create a field first.')}
+            </span>
           </div>
         )}
 
@@ -340,12 +379,12 @@ function ActivityFormContent({
               className={`agri-form-select ${errors.farmId ? 'agri-form-select--error' : ''}`}
               value={formData.farmId}
               onChange={handleFarmChange}
-              disabled={isSubmitting || hasNoFarmsOrFields}
+              disabled={isSubmitting || hasNoFarms}
             >
               <option value="">-- {t('navigation.farms')} --</option>
               {farms.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name}
+                  {f.name || f.farmName || `Farm #${f.id}`}
                 </option>
               ))}
             </select>
@@ -370,10 +409,14 @@ function ActivityFormContent({
               onChange={handleFieldChange}
               disabled={isSubmitting || availableFields.length === 0}
             >
-              <option value="">-- {t('navigation.fields')} --</option>
+              <option value="">
+                {availableFields.length === 0 && formData.farmId
+                  ? `-- ${t('activities.noFieldsForFarm', 'No fields available for this farm')} --`
+                  : `-- ${t('navigation.fields')} --`}
+              </option>
               {availableFields.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name}
+                  {f.name || f.fieldName || `Field #${f.id}`}
                 </option>
               ))}
             </select>
@@ -410,7 +453,7 @@ function ActivityFormContent({
           {/* Priority */}
           <div className="agri-form-group">
             <label htmlFor={priorityId} className="agri-form-label">
-              {t('activities.priorityLevels', 'Priority')}
+              {t('activities.priority', 'Priority')}
             </label>
             <select
               id={priorityId}
@@ -587,7 +630,7 @@ function ActivityFormContent({
         <Button variant="ghost" size="sm" type="button" onClick={onClose} disabled={isSubmitting}>
           {t('common.cancel')}
         </Button>
-        <Button variant="primary" size="sm" type="submit" disabled={isSubmitting || hasNoFarmsOrFields}>
+        <Button variant="primary" size="sm" type="submit" disabled={isSubmitting || prerequisiteMissing}>
           {isSubmitting ? (
             <>
               <Loader2 size={14} className="agri-animate-spin" aria-hidden="true" />

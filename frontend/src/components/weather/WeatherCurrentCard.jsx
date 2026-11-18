@@ -20,8 +20,8 @@ import { translateWeatherCondition } from '../../utils/displayLabels';
  */
 export default function WeatherCurrentCard({
   weather = {},
-  farmName = 'Green Valley Farm',
-  location = 'Karnal, Haryana',
+  farmName = '',
+  location = '',
 }) {
   const { t } = useTranslation();
   const {
@@ -74,9 +74,9 @@ export default function WeatherCurrentCard({
         <div className="agri-cur-weather-card__loc-group">
           <div className="agri-cur-weather-card__loc-badge">
             <MapPin size={13} aria-hidden="true" />
-            <span>{farmName}</span>
+            <span>{farmName || t('farms.farm', 'Farm')}</span>
           </div>
-          <span className="agri-cur-weather-card__loc-sub">{location}</span>
+          {location && <span className="agri-cur-weather-card__loc-sub">{location}</span>}
         </div>
         <span className="agri-cur-weather-card__condition-tag">
           {translateWeatherCondition(conditionCode || condition, t)}

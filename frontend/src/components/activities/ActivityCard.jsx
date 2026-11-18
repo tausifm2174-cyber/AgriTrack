@@ -18,7 +18,7 @@ export default function ActivityCard({
   fieldsMap = {},
 }) {
   const { t } = useTranslation();
-  const rawFarmName = farmsMap[activity.farmId]?.name || activity.farmId;
+  const rawFarmName = farmsMap[activity.farmId]?.name || farmsMap[activity.farmId]?.farmName || activity.farmId;
   const farmName = t(`farms.demoNames.${activity.farmId}`, rawFarmName);
   const rawFieldName = fieldsMap[activity.fieldId]?.name || activity.fieldId;
   const fieldName = formatFieldName(rawFieldName, t);

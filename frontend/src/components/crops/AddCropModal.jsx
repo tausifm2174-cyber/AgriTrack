@@ -86,7 +86,14 @@ export default function AddCropModal({
   const validate = () => {
     const newErrors = {};
     if (!formData.farmId) newErrors.farmId = t('validation.required', 'Farm holding is required');
-    if (!formData.fieldId) newErrors.fieldId = t('validation.required', 'Field parcel is required');
+    if (!formData.fieldId) {
+      newErrors.fieldId = t('validation.required', 'Field parcel is required');
+    } else if (formData.farmId) {
+      const matchedField = fields.find((f) => String(f.id) === String(formData.fieldId));
+      if (matchedField && String(matchedField.farmId) !== String(formData.farmId)) {
+        newErrors.fieldId = t('validation.invalidField', 'Selected field does not belong to this farm.');
+      }
+    }
     if (!formData.cropName.trim()) newErrors.cropName = t('validation.required', 'Crop name is required');
     if (!formData.variety.trim()) newErrors.variety = t('validation.required', 'Crop variety is required');
     if (!formData.sowingDate) newErrors.sowingDate = t('validation.required', 'Sowing date is required');
@@ -264,7 +271,7 @@ export default function AddCropModal({
                     >
                       {farms.map((f) => (
                         <option key={f.id} value={f.id}>
-                          {f.name}
+                          {f.name || f.farmName || `Farm #${f.id}`}
                         </option>
                       ))}
                     </select>
@@ -289,7 +296,7 @@ export default function AddCropModal({
                       ) : (
                         availableFields.map((f) => (
                           <option key={f.id} value={f.id}>
-                            {f.name} ({f.areaAcres || f.area} {t('units.acres', 'Ac')})
+                            {f.name || f.fieldName || `Field #${f.id}`} ({f.areaAcres || f.area} {t('units.acres', 'Ac')})
                           </option>
                         ))
                       )}

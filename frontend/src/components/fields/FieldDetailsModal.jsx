@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { X, FlaskConical, Droplets, Sprout, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
+import { X, FlaskConical, Droplets, Sprout, Trash2, AlertTriangle, Loader2, Edit3 } from 'lucide-react';
 import { StatusBadge, Button } from '../common';
 import { formatAcres } from '../../utils/formatters';
 import fieldService from '../../services/fieldService';
@@ -10,7 +10,7 @@ import fieldService from '../../services/fieldService';
  * FieldDetailsModal component
  * Displays detailed agronomic information and specifications for a single plot.
  */
-export default function FieldDetailsModal({ field, onClose, onDeleteField }) {
+export default function FieldDetailsModal({ field, onClose, onDeleteField, onEditField }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -249,6 +249,14 @@ export default function FieldDetailsModal({ field, onClose, onDeleteField }) {
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Button variant="secondary" onClick={onClose} disabled={isDeleting}>
               {t('common.close', 'Close')}
+            </Button>
+            <Button
+              variant="outline"
+              icon={<Edit3 size={15} aria-hidden="true" />}
+              onClick={() => onEditField?.(field)}
+              disabled={isDeleting}
+            >
+              {t('common.edit', 'Edit')}
             </Button>
             <Button
               variant="outline"
