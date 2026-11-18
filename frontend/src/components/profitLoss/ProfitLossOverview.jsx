@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
-import { PPT_FINANCIAL_REFERENCE } from '../../data/profitLossData';
 import { ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+
+const PPT_FINANCIAL_REFERENCE = {
+  revenue: 50000,
+  expenses: 32000,
+  netProfit: 18000,
+  netMargin: 36.0,
+};
 
 export default function ProfitLossOverview({
   totalRevenue = 0,

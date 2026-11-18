@@ -1004,3 +1004,152 @@ export function adaptNotificationSummary(summary) {
   };
 }
 
+/**
+ * Adapt Crop Cycles and Activities to Calendar Milestone Events.
+ * Produces chronological agronomic milestones based on crop cycle dates (sowing, harvest, stage)
+ * and recorded agricultural activities.
+ *
+ * @param {Array} cropCycles List of CropCycle models or responses
+ * @param {Array} [activities=[]] List of Activity models or responses
+ * @param {Object} [fieldsMap={}] Lookup map of fieldId -> Field Model
+ * @param {Object} [farmsMap={}] Lookup map of farmId -> Farm Model
+ * @returns {Array} List of Calendar Event models
+ */
+export function adaptToCalendarEvents(cropCycles = [], activities = [], fieldsMap = {}, farmsMap = {}) {
+  const events = [];
+
+  (cropCycles || []).forEach((cycle) => {
+    if (!cycle) return;
+    const field = fieldsMap[cycle.fieldId] || null;
+    const farm = farmsMap[cycle.farmId] || farmsMap[field?.farmId] || null;
+    const cropName = cycle.cropName || field?.currentCrop || 'Crop';
+    const fieldName = cycle.fieldName || field?.name || (cycle.fieldId ? `Field #${cycle.fieldId}` : 'Field');
+    const farmName = cycle.farmName || farm?.name || farm?.farmName || field?.farmName || '';
+    const variety = cycle.variety || field?.cropVariety || '';
+    const currentStep = cycle.currentStageStep != null ? Number(cycle.currentStageStep) : 1;
+
+    // 1. Sowing milestone
+    if (cycle.sowingDate) {
+      events.push({
+        id: `cal-cycle-${cycle.id}-sowing`,
+        title: `${cropName} Sowing`,
+        crop: cropName,
+        variety,
+        fieldId: cycle.fieldId,
+        fieldName,
+        farmId: cycle.farmId || farm?.id,
+        farmName,
+        eventType: 'lifecycle',
+        category: 'Crop Milestone',
+        date: cycle.sowingDate,
+        displayDate: cycle.sowingDate,
+        stage: 'Sowing',
+        status: (currentStep > 1 || cycle.status === 'Completed') ? 'Completed' : 'Scheduled',
+        statusVariant: (currentStep > 1 || cycle.status === 'Completed') ? 'success' : 'info',
+        priority: 'Medium',
+        description: cycle.notes || `Sowing and initial seedling establishment for ${cropName}.`,
+      });
+    }
+
+    // 2. Active stage milestone (if beyond sowing and not yet harvest)
+    if (cycle.currentStage && cycle.currentStage !== 'Sowing' && cycle.currentStage !== 'Harvest Readiness') {
+      const stageDate = cycle.upcomingMilestoneDate || cycle.sowingDate || '';
+      events.push({
+        id: `cal-cycle-${cycle.id}-stage`,
+        title: `${cropName} ${cycle.currentStage}`,
+        crop: cropName,
+        variety,
+        fieldId: cycle.fieldId,
+        fieldName,
+        farmId: cycle.farmId || farm?.id,
+        farmName,
+        eventType: 'lifecycle',
+        category: 'Crop Milestone',
+        date: stageDate,
+        displayDate: stageDate,
+        stage: cycle.currentStage,
+        status: 'Upcoming',
+        statusVariant: 'info',
+        priority: 'Medium',
+        description: `Active ${cycle.currentStage} monitoring and field operations.`,
+      });
+    }
+
+    // 3. Harvest readiness milestone
+    const harvestDate = cycle.actualHarvestDate || cycle.expectedHarvestDate;
+    if (harvestDate) {
+      const isCompleted = Boolean(cycle.actualHarvestDate || cycle.status === 'Completed');
+      const isReady = cycle.currentStage === 'Harvest Readiness';
+      events.push({
+        id: `cal-cycle-${cycle.id}-harvest`,
+        title: `${cropName} Harvest Window`,
+        crop: cropName,
+        variety,
+        fieldId: cycle.fieldId,
+        fieldName,
+        farmId: cycle.farmId || farm?.id,
+        farmName,
+        eventType: 'harvest',
+        category: 'Harvest Readiness',
+        date: harvestDate,
+        displayDate: harvestDate,
+        stage: 'Harvest Readiness',
+        status: isCompleted ? 'Completed' : (isReady ? 'Ready' : 'Upcoming'),
+        statusVariant: isCompleted ? 'success' : (isReady ? 'warning' : 'neutral'),
+        priority: 'High',
+        description: `Harvest readiness window and crop cutting for ${cropName}.`,
+      });
+    }
+  });
+
+  (activities || []).forEach((act) => {
+    if (!act) return;
+    const field = fieldsMap[act.fieldId] || null;
+    const farm = farmsMap[act.farmId] || farmsMap[field?.farmId] || null;
+    const fieldName = act.fieldName || field?.name || (act.fieldId ? `Field #${act.fieldId}` : 'Field');
+    const farmName = act.farmName || farm?.name || farm?.farmName || field?.farmName || '';
+    const cropName = act.cropName || field?.currentCrop || 'Field Crop';
+    const actType = (act.activityType || 'Other').toLowerCase();
+
+    let eventType = 'lifecycle';
+    let category = 'Field Activity';
+    if (actType.includes('fertiliz')) {
+      eventType = 'fertilizer';
+      category = 'Agronomic Input';
+    } else if (actType.includes('irrigat')) {
+      eventType = 'irrigation';
+      category = 'Water Management';
+    } else if (actType.includes('harvest')) {
+      eventType = 'harvest';
+      category = 'Harvest Readiness';
+    } else if (actType.includes('pest') || actType.includes('spray') || actType.includes('weed')) {
+      eventType = 'crop_protection';
+      category = 'Crop Protection';
+    }
+
+    const isCompleted = (act.status || '').toLowerCase() === 'completed';
+
+    events.push({
+      id: `cal-act-${act.id}`,
+      title: act.title || `${act.activityType || 'Activity'} – ${fieldName}`,
+      crop: cropName,
+      variety: '',
+      fieldId: act.fieldId,
+      fieldName,
+      farmId: act.farmId || farm?.id,
+      farmName,
+      eventType,
+      category,
+      date: act.activityDate || act.date || '',
+      displayDate: act.activityDate || act.date || '',
+      stage: act.stage || '',
+      status: isCompleted ? 'Completed' : (act.status === 'In Progress' ? 'Ready' : 'Scheduled'),
+      statusVariant: isCompleted ? 'success' : (act.status === 'In Progress' ? 'warning' : 'info'),
+      priority: act.priority || 'Medium',
+      description: act.notes || act.description || '',
+    });
+  });
+
+  return events.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+}
+

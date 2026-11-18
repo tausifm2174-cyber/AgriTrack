@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { X, PlusCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '../common';
 import MarketTrendChart from './MarketTrendChart';
-import { MARKET_DATA_DISCLAIMER } from '../../data/marketPriceData';
 import { formatCurrency } from '../../utils/formatters';
 import { translateCrop, translateVariety } from '../../utils/displayLabels';
+
+const MARKET_DATA_DISCLAIMER =
+  'APMC mandi commodity rates are benchmark modal prices reported from major agricultural wholesale markets (mandis). Prices fluctuate daily based on arrivals, variety, and grade quality.';
 
 export default function MarketPriceDetailsModal({ marketPrice, onClose, onCreateSale }) {
   const { t } = useTranslation();

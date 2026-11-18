@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PieChart, CreditCard, Wallet, Plus, AlertCircle } from 'lucide-react';
 import { Button } from '../common';
-import { FINANCIAL_DATA_DISCLAIMER } from '../../data/profitLossData';
+
+const FINANCIAL_DATA_DISCLAIMER =
+  'Financial overview aggregates operational revenues and field expenses. Subject to final reconciliations.';
 
 export default function ProfitLossHeader() {
   const { t } = useTranslation();

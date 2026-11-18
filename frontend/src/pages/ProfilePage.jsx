@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RefreshCw } from 'lucide-react';
 import {
   ProfileHeader,
   ProfileSummary,
@@ -7,24 +9,77 @@ import {
   NotificationPreferences,
 } from '../components/profile';
 import { useAuth } from '../context/useAuth';
-import { farmData } from '../data/farmData';
-import { cropCycles } from '../data/cropData';
+
+// Live services & adapters
+import farmService from '../services/farmService';
+import fieldService from '../services/fieldService';
+import cropService from '../services/cropService';
+import { adaptFarm, adaptField, adaptCropCycle } from '../utils/adapters';
 
 /**
  * ProfilePage Component
- * Connected to live authenticated user via useAuth() (Phase 22.1)
+ * Connected to live authenticated user and live farm/crop holdings
  */
 export default function ProfilePage() {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const { summary = {} } = farmData;
-  const activeCropsCount = cropCycles.length;
+
+  const [farms, setFarms] = useState([]);
+  const [fields, setFields] = useState([]);
+  const [crops, setCrops] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProfileData() {
+      setIsLoading(true);
+      try {
+        const [farmsRes, fieldsRes, cropsRes] = await Promise.allSettled([
+          farmService.getAllFarms(),
+          fieldService.getAllFields(),
+          cropService.getAllCropCycles(),
+        ]);
+
+        if (!isMounted) return;
+
+        const rawFarms = farmsRes.status === 'fulfilled' && Array.isArray(farmsRes.value) ? farmsRes.value : [];
+        const adaptedFarms = rawFarms.map(adaptFarm).filter(Boolean);
+        setFarms(adaptedFarms);
+
+        const rawFields = fieldsRes.status === 'fulfilled' && Array.isArray(fieldsRes.value) ? fieldsRes.value : [];
+        const adaptedFields = rawFields.map(adaptField).filter(Boolean);
+        setFields(adaptedFields);
+
+        const rawCrops = cropsRes.status === 'fulfilled' && Array.isArray(cropsRes.value) ? cropsRes.value : [];
+        const adaptedCrops = rawCrops.map((c) => adaptCropCycle(c)).filter(Boolean);
+        setCrops(adaptedCrops);
+      } catch {
+        // Safe graceful degradation
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadProfileData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const totalHoldings = farms.length;
+  const totalFields = fields.length;
+  const totalArea = farms.reduce((sum, f) => sum + (Number(f.areaAcres) || 0), 0);
+  const activeCropsCount = crops.filter((c) => c.status === 'Active' || c.status === 'ACTIVE').length || crops.length;
 
   const displayName = user?.fullName || 'Farmer';
   const displayRole = user?.role ? (user.role === 'FARMER' ? t('auth.roleFarmer', 'Farmer') : user.role) : t('auth.roleFarmer', 'Farmer');
   const displayEmail = user?.email || '';
   const displayPhone = user?.phone || 'Not provided';
-  const displayLocation = 'Registered Farm Location';
+  const displayLocation = farms.length > 0 && farms[0].location ? farms[0].location : 'Registered Farm Location';
   const displayStatus = user?.active ? 'Active Account' : 'Standard Account';
 
   return (
@@ -39,9 +94,9 @@ export default function ProfilePage() {
 
       {/* Profile KPI Summary Cards */}
       <ProfileSummary
-        totalHoldings={summary.totalHoldings || 3}
-        totalFields={summary.totalFields || 8}
-        totalArea={summary.totalAreaAcres || 42.5}
+        totalHoldings={totalHoldings}
+        totalFields={totalFields}
+        totalArea={totalArea}
         activeCropsCount={activeCropsCount}
       />
 
@@ -90,7 +145,15 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <FarmSummary />
+          {isLoading ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--slate-500)' }}>
+              <RefreshCw size={24} className="agri-spin" style={{ margin: '0 auto 0.5rem', color: 'var(--primary-600)' }} aria-hidden="true" />
+              <p style={{ fontSize: '0.85rem' }}>{t('common.loading', 'Loading holdings...')}</p>
+            </div>
+          ) : (
+            <FarmSummary farms={farms} />
+          )}
+
           <ProfilePreferences />
         </div>
 

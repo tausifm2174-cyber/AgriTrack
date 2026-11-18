@@ -12,10 +12,10 @@ import { formatAcres } from '../../utils/formatters';
  * @param {number} props.activeCropsCount
  */
 export default function ProfileSummary({
-  totalHoldings = 3,
-  totalFields = 8,
-  totalArea = 42.5,
-  activeCropsCount = 7,
+  totalHoldings = 0,
+  totalFields = 0,
+  totalArea = 0,
+  activeCropsCount = 0,
 }) {
   const { t } = useTranslation();
 
@@ -74,4 +74,3 @@ export default function ProfileSummary({
     </div>
   );
 }
-
